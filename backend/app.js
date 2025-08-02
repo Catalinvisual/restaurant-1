@@ -5,11 +5,13 @@ const sequelize = require('./db');
 
 // Modele
 const User = require('./models/User');
-const Product = require('./models/Product'); // ✅ adăugat pentru acces modelul Product
+const Product = require('./models/Product');
+const Menu = require('./models/Menu'); // ✅ Adăugăm modelul Menu
 
 // Rute
 const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
+const menuRoutes = require('./routes/menuRoutes'); // ✅ Ruta nouă pentru meniu
 
 const app = express();
 
@@ -22,14 +24,15 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // ✅ Rute API
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/menu', menuRoutes); // ✅ Activăm ruta de meniu
 
-
-// ✅ Sincronizare baza de date și pornirea serverului
+// ✅ Sincronizare DB + compatibilitate Render
+const PORT = process.env.PORT || 3001; // 🔁 Modificare port
 sequelize.sync({ alter: true })
   .then(() => {
     console.log('✅ Database sincronizată');
-    app.listen(3001, () => {
-      console.log('🚀 Server pornit pe http://localhost:3001');
+    app.listen(PORT, () => {
+      console.log(`🚀 Server pornit pe portul ${PORT}`);
     });
   })
   .catch(error => {
