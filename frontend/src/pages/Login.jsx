@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+const API_BASE = process.env.REACT_APP_API_URL; // 👈 Variabilă din .env
+
 export default function Login() {
   const [isRegistering, setIsRegistering] = useState(false);
   const [email, setEmail] = useState('');
@@ -10,59 +12,57 @@ export default function Login() {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (isRegistering) {
-    // ✅ Înregistrare
-    if (name.trim() === '') {
-      setError('Introduceți un nume valid');
-      return;
-    }
-
-    try {
-      const response = await fetch('http://localhost:3001/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: name, email, password }),
-      });
-
-      if (response.ok) {
-        const user = await response.json();
-        console.log('✅ Utilizator creat:', user);
-        navigate('/menu'); // sau orice pagină vrei
-      } else {
-        const errorData = await response.json();
-        setError(errorData.error || 'Eroare la înregistrare');
+    if (isRegistering) {
+      if (name.trim() === '') {
+        setError('Introduceți un nume valid');
+        return;
       }
-    } catch (error) {
-      console.error('❌ Eroare conexiune:', error);
-      setError('Serverul nu răspunde');
-    }
 
-  } else {
-    // ✅ Autentificare (login)
-    try {
-      const response = await fetch('http://localhost:3001/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+      try {
+        const response = await fetch(`${API_BASE}/api/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: name, email, password }),
+        });
 
-      const result = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem('token', result.token); // ⛑️ Salvezi JWT
-        console.log('✅ Login cu succes:', result);
-        navigate('/menu'); // sau home, profil etc.
-      } else {
-        setError(result.error || 'Autentificare eșuată');
+        if (response.ok) {
+          const user = await response.json();
+          console.log('✅ Utilizator creat:', user);
+          navigate('/menu');
+        } else {
+          const errorData = await response.json();
+          setError(errorData.error || 'Eroare la înregistrare');
+        }
+      } catch (error) {
+        console.error('❌ Eroare conexiune:', error);
+        setError('Serverul nu răspunde');
       }
-    } catch (error) {
-      console.error('❌ Eroare la login:', error);
-      setError('Serverul nu răspunde');
+
+    } else {
+      try {
+        const response = await fetch(`${API_BASE}/api/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          localStorage.setItem('token', result.token);
+          console.log('✅ Login cu succes:', result);
+          navigate('/menu');
+        } else {
+          setError(result.error || 'Autentificare eșuată');
+        }
+      } catch (error) {
+        console.error('❌ Eroare la login:', error);
+        setError('Serverul nu răspunde');
+      }
     }
-  }
-};
+  };
 
   return (
     <div className="container mt-5" style={{ maxWidth: '500px' }}>
