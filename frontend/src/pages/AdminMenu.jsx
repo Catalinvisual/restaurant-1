@@ -27,6 +27,7 @@ export default function AdminMenu() {
         setNewMenuItem({ ...newMenuItem, image: file });
       } else {
         alert('❌ Fișierul selectat nu este o imagine validă.');
+        setNewMenuItem({ ...newMenuItem, image: null });
       }
     } else {
       setNewMenuItem({ ...newMenuItem, [e.target.name]: e.target.value });
@@ -36,14 +37,24 @@ export default function AdminMenu() {
   const handleAddOrEdit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('token');
-    const formData = new FormData();
 
+    if (!token) {
+      alert('❌ Nu există token de autentificare.');
+      return;
+    }
+
+    if (!newMenuItem.image || !(newMenuItem.image instanceof File)) {
+      alert('❌ Imaginea nu este setată corect.');
+      return;
+    }
+
+    const formData = new FormData();
     formData.append('name', newMenuItem.name);
     formData.append('description', newMenuItem.description);
     formData.append('price', Number(newMenuItem.price));
-    if (newMenuItem.image instanceof File) {
-      formData.append('image', newMenuItem.image);
-    }
+    formData.append('image', newMenuItem.image);
+
+    console.log('📦 FormData:', [...formData.entries()]);
 
     const url = editingItemId
       ? `${BASE_URL}/api/menu/${editingItemId}`
@@ -60,11 +71,11 @@ export default function AdminMenu() {
       });
       const result = await response.json();
 
+      console.log('🧾 Răspuns:', result);
+
       if (response.ok) {
         if (editingItemId) {
-          setMenu(
-            menu.map((item) => (item.id === editingItemId ? result : item))
-          );
+          setMenu(menu.map((item) => (item.id === editingItemId ? result : item)));
           console.log('✏️ Item editat:', result);
         } else {
           setMenu([...menu, result]);
@@ -76,6 +87,7 @@ export default function AdminMenu() {
         alert('❌ Eroare: ' + result.error);
       }
     } catch (err) {
+      console.error('❌ Eroare rețea:', err);
       alert('❌ Serverul nu răspunde.');
     }
   };
