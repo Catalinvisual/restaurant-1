@@ -1,0 +1,13 @@
+.menu-banner-fullscreen {
+  width: 100%;
+  height: 100vh; /* ocupă tot ecranul */
+  overflow: hidden;
+  position: relative;
+}
+
+.banner-img {
+  width: 100%;
+  height: 60%;
+  object-fit: cover;
+  display: block;
+}

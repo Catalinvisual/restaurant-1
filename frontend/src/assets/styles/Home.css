@@ -1,0 +1,28 @@
+.hero-section {
+  height: 100vh;
+  background-image: url('../../../public/assets/images/header-bg.jpg'); /* schimbă calea după cum ai imaginea */
+  background-size: cover;
+  background-position: center 10%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlay-text {
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 2rem;
+  border-radius: 0.5rem;
+  color: white;
+}
+
+.hero-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.hero-subtitle {
+  font-size: 1.2rem;
+  max-width: 600px;
+  margin: 0 auto;
+}

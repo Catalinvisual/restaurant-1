@@ -1,0 +1,56 @@
+/* Lista coșului */
+.cart-list {
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 0.5rem;
+}
+
+/* Element individual din coș */
+.cart-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #dee2e6;
+}
+
+/* Imagine produs */
+.cart-item img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 0.25rem;
+  margin-right: 1rem;
+}
+
+/* Detalii produs */
+.cart-item-details {
+  flex: 1;
+}
+
+/* Buton remove */
+.remove-button {
+  background-color: transparent;
+  color: #dc3545;
+  border: none;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.remove-button:hover {
+  text-decoration: underline;
+}
+
+/* Responsivitate */
+@media (max-width: 768px) {
+  .cart-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .cart-item img {
+    width: 100%;
+    height: auto;
+  }
+}

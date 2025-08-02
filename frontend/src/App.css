@@ -1,0 +1,26 @@
+/* Asigurăm că întreaga pagină are înălțime completă */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Containerul principal care include conținut + footer */
+#root, .app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Conținutul se extinde, iar footer-ul rămâne jos */
+.main-content {
+  flex: 1;
+}
+
+/* Stilul footer-ului */
+.footer {
+  background-color: #212529;
+  color: #ffffff;
+  padding: 1rem 0;
+  text-align: center;
+}

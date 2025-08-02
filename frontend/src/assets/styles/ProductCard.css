@@ -1,0 +1,68 @@
+/* Card general */
+.card {
+  width: 100%;
+  max-width: 300px;
+  margin: 1rem auto;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: scale(1.02);
+}
+
+/* Imagine produs */
+.card-img-top {
+  height: 180px;
+  width: 100%;
+  object-fit: cover;
+}
+
+/* Titlu produs */
+.card-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+/* Descriere */
+.card-text {
+  font-size: 0.95rem;
+}
+
+/* Preț evidențiat */
+.card-text.fw-bold {
+  font-size: 1rem;
+  color: #212529;
+}
+
+/* Input + buton */
+.card-body .form-control {
+  min-width: 60px;
+}
+
+/* Responsivitate */
+@media (max-width: 768px) {
+  .card {
+    max-width: 100%;
+    margin: 1rem;
+  }
+
+  .card-body {
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .card-body .d-flex {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .form-control {
+    width: 100% !important;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}

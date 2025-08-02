@@ -1,0 +1,52 @@
+.footer {
+  background-color: #212529;
+  color: #ffffff;
+}
+
+.footer h5 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.footer p,
+.footer a {
+  font-size: 0.95rem;
+}
+
+.contact-form input,
+.contact-form textarea {
+  background-color: #343a40;
+  color: #fff;
+  border: 1px solid #555;
+}
+
+.contact-form input::placeholder,
+.contact-form textarea::placeholder {
+  color: #ccc;
+}
+
+.social-link {
+  color: #ffffff;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.social-link:hover {
+  color: #ffc107;
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .footer .row > div {
+    text-align: center;
+  }
+
+  .social-link {
+    display: inline-block;
+    margin-bottom: 0.5rem;
+  }
+
+  .contact-form textarea {
+    resize: vertical;
+  }
+}
