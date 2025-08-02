@@ -28,7 +28,7 @@ app.use('/api/menu', menuRoutes); // ✅ Activăm ruta de meniu
 
 // ✅ Sincronizare DB + compatibilitate Render
 const PORT = process.env.PORT || 3001; // 🔁 Modificare port
-sequelize.sync({ alter: true })
+sequelize.sync({ force: true })
   .then(() => {
     console.log('✅ Database sincronizată');
     app.listen(PORT, () => {
