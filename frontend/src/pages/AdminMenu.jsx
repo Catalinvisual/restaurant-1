@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
 
-// 🔗 Importăm URL-ul backendului din .env
 const BASE_URL = process.env.REACT_APP_API_URL;
 
 export default function AdminMenu() {
@@ -12,9 +11,9 @@ export default function AdminMenu() {
     price: '',
     image: null
   });
+  const [editingItemId, setEditingItemId] = useState(null);
 
   useEffect(() => {
-    // ⚡ Preluare meniu de la backend
     fetch(`${BASE_URL}/api/menu`)
       .then((res) => res.json())
       .then((data) => setMenu(data))
@@ -34,37 +33,47 @@ export default function AdminMenu() {
     }
   };
 
-  const handleAdd = async (e) => {
+  const handleAddOrEdit = async (e) => {
     e.preventDefault();
-    if (!newMenuItem.image || !(newMenuItem.image instanceof File)) {
-      alert('❌ Imaginea este invalidă.');
-      return;
+    const token = localStorage.getItem('token');
+    const formData = new FormData();
+
+    formData.append('name', newMenuItem.name);
+    formData.append('description', newMenuItem.description);
+    formData.append('price', Number(newMenuItem.price));
+    if (newMenuItem.image instanceof File) {
+      formData.append('image', newMenuItem.image);
     }
 
+    const url = editingItemId
+      ? `${BASE_URL}/api/menu/${editingItemId}`
+      : `${BASE_URL}/api/menu`;
+    const method = editingItemId ? 'PUT' : 'POST';
+
     try {
-      const token = localStorage.getItem('token');
-      const formData = new FormData();
-
-      formData.append('name', newMenuItem.name);
-      formData.append('description', newMenuItem.description);
-      formData.append('price', Number(newMenuItem.price));
-      formData.append('image', newMenuItem.image);
-
-      const response = await fetch(`${BASE_URL}/api/menu`, {
-        method: 'POST',
+      const response = await fetch(url, {
+        method,
         headers: {
           Authorization: `Bearer ${token}`
         },
         body: formData
       });
+      const result = await response.json();
 
-      const added = await response.json();
       if (response.ok) {
-        console.log('✅ Item de meniu adăugat:', added);
-        setMenu([...menu, added]);
+        if (editingItemId) {
+          setMenu(
+            menu.map((item) => (item.id === editingItemId ? result : item))
+          );
+          console.log('✏️ Item editat:', result);
+        } else {
+          setMenu([...menu, result]);
+          console.log('✅ Item adăugat:', result);
+        }
         setNewMenuItem({ name: '', description: '', price: '', image: null });
+        setEditingItemId(null);
       } else {
-        alert('❌ Eroare: ' + added.error);
+        alert('❌ Eroare: ' + result.error);
       }
     } catch (err) {
       alert('❌ Serverul nu răspunde.');
@@ -75,11 +84,24 @@ export default function AdminMenu() {
     setMenu(menu.filter((item) => item.id !== id));
   };
 
+  const handleEditClick = (item) => {
+    setNewMenuItem({
+      name: item.name,
+      description: item.description,
+      price: item.price,
+      image: null
+    });
+    setEditingItemId(item.id);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="container mt-5">
-      <h2 className="text-primary mb-4">Administrare Meniu</h2>
+      <h2 className="text-primary mb-4">
+        {editingItemId ? 'Editare Item' : 'Administrare Meniu'}
+      </h2>
 
-      <form onSubmit={handleAdd} className="mb-4" encType="multipart/form-data">
+      <form onSubmit={handleAddOrEdit} className="mb-4" encType="multipart/form-data">
         <div className="row g-3">
           <div className="col-md-3">
             <input
@@ -122,27 +144,35 @@ export default function AdminMenu() {
               name="image"
               accept="image/*"
               onChange={handleChange}
-              required
+              required={!editingItemId}
             />
           </div>
           <div className="col-md-1">
-            <button type="submit" className="btn btn-success w-100">Adaugă</button>
+            <button type="submit" className="btn btn-success w-100">
+              {editingItemId ? 'Salvează' : 'Adaugă'}
+            </button>
           </div>
         </div>
       </form>
 
-      {/* 🖼️ Previzualizare imagine înainte de trimitere */}
-      {newMenuItem.image && (
-        <div className="mb-4">
-          <p className="fw-bold">Previzualizare imagine:</p>
-          <img
-            src={URL.createObjectURL(newMenuItem.image)}
-            alt="Previzualizare"
-            className="img-thumbnail"
-            style={{ maxWidth: '200px' }}
-          />
-        </div>
-      )}
+      {newMenuItem.name &&
+        newMenuItem.description &&
+        newMenuItem.price &&
+        newMenuItem.image && (
+          <div className="mb-4">
+            <p className="fw-bold">Previzualizare item:</p>
+            <ProductCard
+              product={{
+                ...newMenuItem,
+                id: 'preview',
+                image:
+                  newMenuItem.image instanceof File
+                    ? URL.createObjectURL(newMenuItem.image)
+                    : newMenuItem.image
+              }}
+            />
+          </div>
+        )}
 
       <div className="row">
         {menu.map((item) => (
@@ -153,6 +183,12 @@ export default function AdminMenu() {
               onClick={() => handleDelete(item.id)}
             >
               ✕
+            </button>
+            <button
+              className="btn btn-sm btn-warning position-absolute top-0 start-0 m-2"
+              onClick={() => handleEditClick(item)}
+            >
+              ✎
             </button>
           </div>
         ))}
