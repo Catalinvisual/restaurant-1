@@ -11,7 +11,9 @@ export default function Cart() {
   );
 
   const handleRemove = (index) => {
-    dispatch({ type: 'REMOVE_BY_INDEX', payload: index });
+    if (window.confirm('Ești sigur că vrei să ștergi acest produs?')) {
+      dispatch({ type: 'REMOVE_BY_INDEX', payload: index });
+    }
   };
 
   const handleQuantityChange = (index, newQty) => {
@@ -36,30 +38,49 @@ export default function Cart() {
                 className="list-group-item d-flex justify-content-between align-items-center"
                 key={index}
               >
-                <div>
-                  <h5>{item.name}</h5>
-                  <div className="d-flex align-items-center mb-2">
-                    <button
-                      className="btn btn-sm btn-outline-secondary me-2"
-                      onClick={() =>
-                        handleQuantityChange(index, item.quantity - 1)
-                      }
-                    >
-                      −
-                    </button>
-                    <span>{item.quantity}</span>
-                    <button
-                      className="btn btn-sm btn-outline-secondary ms-2"
-                      onClick={() =>
-                        handleQuantityChange(index, item.quantity + 1)
-                      }
-                    >
-                      +
-                    </button>
+                <div className="d-flex align-items-center">
+                  <img
+                    src={item.image || 'https://via.placeholder.com/60?text=Imagine'}
+                    alt={item.name}
+                    style={{
+                      width: '60px',
+                      height: '60px',
+                      objectFit: 'cover',
+                      borderRadius: '6px',
+                      marginRight: '15px',
+                    }}
+                  />
+
+                  <div>
+                    <h5 className="mb-1">{item.name}</h5>
+
+                    <div className="d-flex align-items-center mb-2">
+                      <button
+                        className="btn btn-sm btn-outline-secondary me-2"
+                        onClick={() => handleQuantityChange(index, item.quantity - 1)}
+                      >
+                        −
+                      </button>
+                      <span>{item.quantity}</span>
+                      <button
+                        className="btn btn-sm btn-outline-secondary ms-2"
+                        onClick={() => handleQuantityChange(index, item.quantity + 1)}
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    <p className="mb-0">
+                      Preț:{' '}
+                      <strong>
+                        {item.price &&
+                          (item.price * item.quantity).toLocaleString('ro-RO', {
+                            style: 'currency',
+                            currency: 'EUR',
+                          })}
+                      </strong>
+                    </p>
                   </div>
-                  <p className="mb-0">
-                    Preț: <strong>€{(item.price * item.quantity).toFixed(2)}</strong>
-                  </p>
                 </div>
 
                 <button
@@ -73,7 +94,13 @@ export default function Cart() {
           </ul>
 
           <div className="mt-4 text-end">
-            <h4>Total: €{total.toFixed(2)}</h4>
+            <h4>
+              Total:{' '}
+              {total.toLocaleString('ro-RO', {
+                style: 'currency',
+                currency: 'EUR',
+              })}
+            </h4>
             <button className="btn btn-success mt-3">Plată la livrare</button>
           </div>
         </>

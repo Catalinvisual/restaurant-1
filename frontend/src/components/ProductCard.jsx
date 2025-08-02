@@ -4,7 +4,7 @@ import '../assets/styles/Cart.css';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const BASE_URL = 'http://localhost:3001'; // 🔁 Poți folosi process.env.REACT_APP_API_URL
+const BASE_URL = process.env.REACT_APP_API_URL || 'https://restaurant-app-backend.onrender.com';
 
 export default function ProductCard({ product }) {
   const [quantity, setQuantity] = useState(1);
@@ -26,13 +26,14 @@ export default function ProductCard({ product }) {
 
   // 🖼️ Sursă imagine cu fallback și normalizare
   let imageSrc = 'https://via.placeholder.com/180?text=Fără+imagine';
-  if (product.image && typeof product.image === 'string') {
+  if (product.image) {
+    const imageRaw = String(product.image);
     try {
-      imageSrc = product.image.startsWith('http')
-        ? product.image
-        : new URL(product.image, BASE_URL).href;
+      imageSrc = imageRaw.startsWith('http')
+        ? imageRaw
+        : new URL(imageRaw, BASE_URL).href;
     } catch {
-      // dacă URL-ul nu e valid, păstrează fallback
+      // fallback activat automat
     }
   }
 
@@ -42,12 +43,23 @@ export default function ProductCard({ product }) {
         src={imageSrc}
         className="card-img-top"
         alt={product.name || 'Item fără nume'}
-        style={{ height: '180px', objectFit: 'cover', borderRadius: '8px' }}
+        style={{
+          height: '180px',
+          objectFit: 'cover',
+          borderRadius: '8px',
+          boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+        }}
       />
       <div className="card-body">
-        <h5 className="card-title text-primary">{product.name || 'Produs fără nume'}</h5>
-        <p className="card-text">{product.description || 'Fără descriere disponibilă.'}</p>
-        <p className="card-text fw-bold">€{Number(product.price).toFixed(2)}</p>
+        <h5 className="card-title text-primary">
+          {product.name || 'Produs fără nume'}
+        </h5>
+        <p className="card-text">
+          {product.description || 'Fără descriere disponibilă.'}
+        </p>
+        <p className="card-text fw-bold">
+          €{Number(product.price).toFixed(2)}
+        </p>
 
         {/* 🔄 Ascundem butoanele dacă e previzualizare */}
         {product.id !== 'preview' && (
@@ -70,7 +82,11 @@ export default function ProductCard({ product }) {
               </button>
             </div>
 
-            <button className="btn btn-success" onClick={handleBuyClick}>
+            <button
+              className="btn btn-success"
+              onClick={handleBuyClick}
+              disabled={buying}
+            >
               {buying ? '✔ Adăugat!' : 'Adaugă în coș'}
             </button>
           </div>

@@ -22,11 +22,12 @@ export default function Menu() {
     <>
       {/* 🔽 Imaginea fullscreen sub Header */}
       <div className="menu-banner-fullscreen">
-        <img
-          src="/assets/images/rest.jpg"
-          alt="Banner Restaurant"
-          className="banner-img"
-        />
+       <img
+  src="/assets/images/signeture-bg.jpg"
+  alt="Banner Signeture"
+  className="banner-img"
+/>
+
       </div>
 
       {/* 🔽 Conținutul paginii */}

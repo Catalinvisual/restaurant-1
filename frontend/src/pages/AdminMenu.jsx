@@ -43,18 +43,13 @@ export default function AdminMenu() {
       return;
     }
 
-    if (!newMenuItem.image || !(newMenuItem.image instanceof File)) {
-      alert('❌ Imaginea nu este setată corect.');
-      return;
-    }
-
     const formData = new FormData();
     formData.append('name', newMenuItem.name);
     formData.append('description', newMenuItem.description);
     formData.append('price', Number(newMenuItem.price));
-    formData.append('image', newMenuItem.image);
-
-    console.log('📦 FormData:', [...formData.entries()]);
+    if (newMenuItem.image instanceof File) {
+      formData.append('image', newMenuItem.image);
+    }
 
     const url = editingItemId
       ? `${BASE_URL}/api/menu/${editingItemId}`
@@ -71,15 +66,11 @@ export default function AdminMenu() {
       });
       const result = await response.json();
 
-      console.log('🧾 Răspuns:', result);
-
       if (response.ok) {
         if (editingItemId) {
           setMenu(menu.map((item) => (item.id === editingItemId ? result : item)));
-          console.log('✏️ Item editat:', result);
         } else {
           setMenu([...menu, result]);
-          console.log('✅ Item adăugat:', result);
         }
         setNewMenuItem({ name: '', description: '', price: '', image: null });
         setEditingItemId(null);
@@ -92,8 +83,23 @@ export default function AdminMenu() {
     }
   };
 
-  const handleDelete = (id) => {
-    setMenu(menu.filter((item) => item.id !== id));
+  const handleDelete = async (id) => {
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch(`${BASE_URL}/api/menu/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (res.ok) {
+        setMenu(menu.filter((item) => item.id !== id));
+      } else {
+        alert('❌ Nu s-a putut șterge item-ul.');
+      }
+    } catch (err) {
+      console.error('❌ Eroare la ștergere:', err);
+    }
   };
 
   const handleEditClick = (item) => {
@@ -101,7 +107,7 @@ export default function AdminMenu() {
       name: item.name,
       description: item.description,
       price: item.price,
-      image: null
+      image: item.image || null
     });
     setEditingItemId(item.id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -170,7 +176,7 @@ export default function AdminMenu() {
       {newMenuItem.name &&
         newMenuItem.description &&
         newMenuItem.price &&
-        newMenuItem.image && (
+        (newMenuItem.image || editingItemId) && (
           <div className="mb-4">
             <p className="fw-bold">Previzualizare item:</p>
             <ProductCard
