@@ -10,7 +10,7 @@ export default function Menu() {
     const API_URL = process.env.REACT_APP_API_URL;
     console.log("🌐 Valoarea API_URL este:", API_URL);
 
-    fetch(`${API_URL}/api/products`)
+    fetch(`${API_URL}/api/menu`)
       .then((res) => res.json())
       .then((data) => setProducts(data))
       .catch((err) =>
