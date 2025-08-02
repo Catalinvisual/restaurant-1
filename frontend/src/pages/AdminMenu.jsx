@@ -23,7 +23,12 @@ export default function AdminMenu() {
 
   const handleChange = (e) => {
     if (e.target.name === 'image') {
-      setNewProduct({ ...newProduct, image: e.target.files[0] });
+      const file = e.target.files[0];
+      if (file && file.type.startsWith('image/')) {
+        setNewProduct({ ...newProduct, image: file });
+      } else {
+        alert('❌ Fișierul selectat nu este o imagine validă.');
+      }
     } else {
       setNewProduct({ ...newProduct, [e.target.name]: e.target.value });
     }
@@ -31,13 +36,18 @@ export default function AdminMenu() {
 
   const handleAdd = async (e) => {
     e.preventDefault();
+    if (!newProduct.image || !(newProduct.image instanceof File)) {
+      alert('❌ Imaginea este invalidă.');
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
       const formData = new FormData();
 
       formData.append('name', newProduct.name);
       formData.append('description', newProduct.description);
-      formData.append('price', parseFloat(newProduct.price));
+      formData.append('price', Number(newProduct.price));
       formData.append('image', newProduct.image);
 
       const response = await fetch(`${BASE_URL}/api/products`, {
@@ -120,6 +130,19 @@ export default function AdminMenu() {
           </div>
         </div>
       </form>
+
+      {/* 🖼️ Previzualizare imagine înainte de trimitere */}
+      {newProduct.image && (
+        <div className="mb-4">
+          <p className="fw-bold">Previzualizare imagine:</p>
+          <img
+            src={URL.createObjectURL(newProduct.image)}
+            alt="Previzualizare"
+            className="img-thumbnail"
+            style={{ maxWidth: '200px' }}
+          />
+        </div>
+      )}
 
       <div className="row">
         {products.map((product) => (

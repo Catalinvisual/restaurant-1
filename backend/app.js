@@ -2,11 +2,15 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const sequelize = require('./db');
+require('dotenv').config(); // 📦 Încarcă variabilele din .env
+
+// 🔗 URL-ul public pentru imaginile uploadate
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3001';
 
 // Modele
 require('./models/User');
 require('./models/Product');
-require('./models/Menu'); // 🔄 modelele doar se înregistrează aici
+require('./models/Menu');
 
 // Rute
 const authRoutes = require('./routes/authRoutes');
@@ -53,9 +57,10 @@ app.use((err, req, res, next) => {
 // ✅ Start server și sincronizare
 const PORT = process.env.PORT || 3001;
 sequelize
-  .sync() // 👉 fără `force: true` ca să nu pierzi datele
+  .sync()
   .then(() => {
     console.log('✅ Baza de date sincronizată');
+    console.log(`🌐 BASE_URL setat ca: ${BASE_URL}`);
     app.listen(PORT, () => {
       console.log(`🚀 Server pornit pe portul ${PORT}`);
     });
