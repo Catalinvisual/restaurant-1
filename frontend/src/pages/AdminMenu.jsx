@@ -5,8 +5,8 @@ import ProductCard from '../components/ProductCard';
 const BASE_URL = process.env.REACT_APP_API_URL;
 
 export default function AdminMenu() {
-  const [products, setProducts] = useState([]);
-  const [newProduct, setNewProduct] = useState({
+  const [menu, setMenu] = useState([]);
+  const [newMenuItem, setNewMenuItem] = useState({
     name: '',
     description: '',
     price: '',
@@ -14,29 +14,29 @@ export default function AdminMenu() {
   });
 
   useEffect(() => {
-    // ⚡ Preluare produse de la backend
-    fetch(`${BASE_URL}/api/products`)
+    // ⚡ Preluare meniu de la backend
+    fetch(`${BASE_URL}/api/menu`)
       .then((res) => res.json())
-      .then((data) => setProducts(data))
-      .catch((err) => console.error('❌ Eroare la preluare produse:', err));
+      .then((data) => setMenu(data))
+      .catch((err) => console.error('❌ Eroare la preluare meniu:', err));
   }, []);
 
   const handleChange = (e) => {
     if (e.target.name === 'image') {
       const file = e.target.files[0];
       if (file && file.type.startsWith('image/')) {
-        setNewProduct({ ...newProduct, image: file });
+        setNewMenuItem({ ...newMenuItem, image: file });
       } else {
         alert('❌ Fișierul selectat nu este o imagine validă.');
       }
     } else {
-      setNewProduct({ ...newProduct, [e.target.name]: e.target.value });
+      setNewMenuItem({ ...newMenuItem, [e.target.name]: e.target.value });
     }
   };
 
   const handleAdd = async (e) => {
     e.preventDefault();
-    if (!newProduct.image || !(newProduct.image instanceof File)) {
+    if (!newMenuItem.image || !(newMenuItem.image instanceof File)) {
       alert('❌ Imaginea este invalidă.');
       return;
     }
@@ -45,12 +45,12 @@ export default function AdminMenu() {
       const token = localStorage.getItem('token');
       const formData = new FormData();
 
-      formData.append('name', newProduct.name);
-      formData.append('description', newProduct.description);
-      formData.append('price', Number(newProduct.price));
-      formData.append('image', newProduct.image);
+      formData.append('name', newMenuItem.name);
+      formData.append('description', newMenuItem.description);
+      formData.append('price', Number(newMenuItem.price));
+      formData.append('image', newMenuItem.image);
 
-      const response = await fetch(`${BASE_URL}/api/products`, {
+      const response = await fetch(`${BASE_URL}/api/menu`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`
@@ -60,9 +60,9 @@ export default function AdminMenu() {
 
       const added = await response.json();
       if (response.ok) {
-        console.log('✅ Produs adăugat:', added);
-        setProducts([...products, added]);
-        setNewProduct({ name: '', description: '', price: '', image: null });
+        console.log('✅ Item de meniu adăugat:', added);
+        setMenu([...menu, added]);
+        setNewMenuItem({ name: '', description: '', price: '', image: null });
       } else {
         alert('❌ Eroare: ' + added.error);
       }
@@ -72,7 +72,7 @@ export default function AdminMenu() {
   };
 
   const handleDelete = (id) => {
-    setProducts(products.filter((item) => item.id !== id));
+    setMenu(menu.filter((item) => item.id !== id));
   };
 
   return (
@@ -86,8 +86,8 @@ export default function AdminMenu() {
               type="text"
               className="form-control"
               name="name"
-              placeholder="Nume produs"
-              value={newProduct.name}
+              placeholder="Nume item"
+              value={newMenuItem.name}
               onChange={handleChange}
               required
             />
@@ -98,7 +98,7 @@ export default function AdminMenu() {
               className="form-control"
               name="description"
               placeholder="Descriere"
-              value={newProduct.description}
+              value={newMenuItem.description}
               onChange={handleChange}
               required
             />
@@ -110,7 +110,7 @@ export default function AdminMenu() {
               className="form-control"
               name="price"
               placeholder="Preț"
-              value={newProduct.price}
+              value={newMenuItem.price}
               onChange={handleChange}
               required
             />
@@ -132,11 +132,11 @@ export default function AdminMenu() {
       </form>
 
       {/* 🖼️ Previzualizare imagine înainte de trimitere */}
-      {newProduct.image && (
+      {newMenuItem.image && (
         <div className="mb-4">
           <p className="fw-bold">Previzualizare imagine:</p>
           <img
-            src={URL.createObjectURL(newProduct.image)}
+            src={URL.createObjectURL(newMenuItem.image)}
             alt="Previzualizare"
             className="img-thumbnail"
             style={{ maxWidth: '200px' }}
@@ -145,12 +145,12 @@ export default function AdminMenu() {
       )}
 
       <div className="row">
-        {products.map((product) => (
-          <div key={product.id} className="col-md-4 position-relative">
-            <ProductCard product={product} />
+        {menu.map((item) => (
+          <div key={item.id} className="col-md-4 position-relative">
+            <ProductCard product={item} />
             <button
               className="btn btn-sm btn-danger position-absolute top-0 end-0 m-2"
-              onClick={() => handleDelete(product.id)}
+              onClick={() => handleDelete(item.id)}
             >
               ✕
             </button>
