@@ -18,3 +18,6 @@ frontend/.env
 
 # ⛔ Build outputs (în cazul frontend-ului cu React/Vite)
 frontend/dist/
+
+uploads/*
+!uploads/.keep
