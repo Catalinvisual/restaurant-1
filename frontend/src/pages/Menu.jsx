@@ -33,6 +33,10 @@ export default function Menu() {
       <div className="container mt-5">
         <h2 className="text-primary mb-4">Meniu</h2>
         <div className="row">
+          {products.length === 0 && (
+    <p className="text-muted">Nu există produse disponibile.</p>
+  )}
+
           {products.map((product) => (
             <div key={product.id} className="col-md-4">
               <ProductCard product={product} />

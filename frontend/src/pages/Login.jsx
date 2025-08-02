@@ -53,7 +53,7 @@ export default function Login() {
         if (response.ok) {
           localStorage.setItem('token', result.token);
           console.log('✅ Login cu succes:', result);
-          navigate('/menu');
+          navigate('/');
         } else {
           setError(result.error || 'Autentificare eșuată');
         }

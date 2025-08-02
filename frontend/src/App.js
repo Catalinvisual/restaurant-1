@@ -11,6 +11,7 @@ import Menu from './pages/Menu';
 import Checkout from './pages/Checkout';
 import AdminMenu from './pages/AdminMenu';
 import '../src/App.css';
+import Contact from './pages/Contact';
 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -35,6 +36,8 @@ function App() {
               <Route path="/menu" element={<Menu />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/admin" element={<AdminMenu />} />
+              <Route path="/contact" element={<Contact />} />
+
             </Routes>
           </main>
 
