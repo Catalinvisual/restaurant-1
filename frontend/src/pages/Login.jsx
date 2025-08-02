@@ -30,7 +30,7 @@ export default function Login() {
         if (response.ok) {
           const user = await response.json();
           console.log('✅ Utilizator creat:', user);
-          navigate('/menu');
+          navigate('/');
         } else {
           const errorData = await response.json();
           setError(errorData.error || 'Eroare la înregistrare');
