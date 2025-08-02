@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
 
+// 🔗 Importăm URL-ul backendului din .env
+const BASE_URL = process.env.REACT_APP_API_URL;
+
 export default function AdminMenu() {
   const [products, setProducts] = useState([]);
   const [newProduct, setNewProduct] = useState({
@@ -11,8 +14,8 @@ export default function AdminMenu() {
   });
 
   useEffect(() => {
-    // Preluare produse deja existente
-    fetch('http://localhost:3001/api/products')
+    // ⚡ Preluare produse de la backend
+    fetch(`${BASE_URL}/api/products`)
       .then((res) => res.json())
       .then((data) => setProducts(data))
       .catch((err) => console.error('❌ Eroare la preluare produse:', err));
@@ -37,7 +40,7 @@ export default function AdminMenu() {
       formData.append('price', parseFloat(newProduct.price));
       formData.append('image', newProduct.image);
 
-      const response = await fetch('http://localhost:3001/api/products', {
+      const response = await fetch(`${BASE_URL}/api/products`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`
