@@ -4,7 +4,7 @@ import '../assets/styles/Cart.css';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const BASE_URL = 'http://localhost:3001'; // 🔁 Poți folosi process.env.REACT_APP_API_URL dacă preferi
+const BASE_URL = 'http://localhost:3001'; // 🔁 Poți folosi process.env.REACT_APP_API_URL
 
 export default function ProductCard({ product }) {
   const [quantity, setQuantity] = useState(1);
@@ -13,7 +13,7 @@ export default function ProductCard({ product }) {
 
   const handleBuyClick = () => {
     dispatch({ type: 'ADD_TO_CART', payload: { ...product, quantity } });
-    toast.success(`${product.name} a fost adăugat în coș! 🛒`, {
+    toast.success(`${product.name || 'Produs'} a fost adăugat în coș! 🛒`, {
       position: 'top-right',
       autoClose: 2000,
     });
@@ -24,14 +24,16 @@ export default function ProductCard({ product }) {
   const handleIncrement = () => setQuantity((prev) => prev + 1);
   const handleDecrement = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
 
-  // 🖼️ Calcul sursă imagine cu fallback
-  let imageSrc = '';
+  // 🖼️ Sursă imagine cu fallback și normalizare
+  let imageSrc = 'https://via.placeholder.com/180?text=Fără+imagine';
   if (product.image && typeof product.image === 'string') {
-    imageSrc = product.image.startsWith('http')
-      ? product.image
-      : `${BASE_URL}/${product.image}`;
-  } else {
-    imageSrc = 'https://via.placeholder.com/180?text=Fără+imagine';
+    try {
+      imageSrc = product.image.startsWith('http')
+        ? product.image
+        : new URL(product.image, BASE_URL).href;
+    } catch {
+      // dacă URL-ul nu e valid, păstrează fallback
+    }
   }
 
   return (
@@ -40,11 +42,11 @@ export default function ProductCard({ product }) {
         src={imageSrc}
         className="card-img-top"
         alt={product.name || 'Item fără nume'}
-        style={{ height: '180px', objectFit: 'cover' }}
+        style={{ height: '180px', objectFit: 'cover', borderRadius: '8px' }}
       />
       <div className="card-body">
-        <h5 className="card-title text-primary">{product.name}</h5>
-        <p className="card-text">{product.description}</p>
+        <h5 className="card-title text-primary">{product.name || 'Produs fără nume'}</h5>
+        <p className="card-text">{product.description || 'Fără descriere disponibilă.'}</p>
         <p className="card-text fw-bold">€{Number(product.price).toFixed(2)}</p>
 
         {/* 🔄 Ascundem butoanele dacă e previzualizare */}

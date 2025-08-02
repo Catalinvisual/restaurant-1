@@ -2,8 +2,9 @@ const express = require('express');
 const router = express.Router();
 const Menu = require('../models/Menu');
 const multer = require('multer');
+require('dotenv').config(); // 🔁 Activează variabilele din .env
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3001';
+const BASE_URL = process.env.BASE_URL; // 📦 Folosește Render URL
 
 // 📦 Configurare Multer pentru upload
 const storage = multer.diskStorage({
@@ -16,7 +17,16 @@ const storage = multer.diskStorage({
   }
 });
 
-const upload = multer({ storage });
+const upload = multer({
+  storage,
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('❌ Tip fișier invalid. Doar imagini sunt permise.'));
+    }
+  }
+});
 
 // 🔎 GET /api/menu — obține meniul
 router.get('/', async (req, res) => {
@@ -38,7 +48,7 @@ router.post('/', upload.single('image'), async (req, res) => {
       return res.status(400).json({ error: 'name și price sunt obligatorii' });
     }
 
-    // 🔗 Construiește link imagine complet (HTTPS)
+    // 🔗 Construiește link imagine complet cu BASE_URL din .env
     const imageUrl = req.file ? `${BASE_URL}/uploads/${req.file.filename}` : null;
 
     const newItem = await Menu.create({
