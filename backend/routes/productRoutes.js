@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const path = require('path');
 
-// 🔐 Middleware pentru verificarea tokenului
+// 🛡️ Middleware pentru validarea tokenului
 const verifyToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader) return res.status(401).json({ error: 'Token lipsă' });
@@ -20,22 +20,21 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-// 🖼️ Configurare multer cu nume real + extensie
+// 🖼️ Configurare Multer pentru fișiere
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'uploads/');
   },
   filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname); // .jpg, .png etc.
-    const base = path.basename(file.originalname, ext); // fără extensie
+    const ext = path.extname(file.originalname);
+    const base = path.basename(file.originalname, ext);
     const timestamp = Date.now();
     cb(null, `${base}-${timestamp}${ext}`);
   }
 });
-
 const upload = multer({ storage });
 
-// 📦 Listare produse (public)
+// 📦 Listare produse (GET public)
 router.get('/', async (req, res) => {
   try {
     const products = await Product.findAll();
@@ -46,18 +45,22 @@ router.get('/', async (req, res) => {
   }
 });
 
-// ➕ Adăugare produs cu fișier (protejată)
+// ➕ Adăugare produs cu imagine (POST protejat)
 router.post('/', verifyToken, upload.single('image'), async (req, res) => {
   const { name, description, price } = req.body;
-  const imageUrl = req.file ? `/uploads/${req.file.filename}` : '';
+
+  // ✅ Construire URL complet pentru imagine
+  const baseUrl = process.env.BASE_URL || 'https://restaurant-app-backend.onrender.com';
+  const imageUrl = req.file ? `${baseUrl}/uploads/${req.file.filename}` : '';
 
   try {
     const newProduct = await Product.create({
-      name,
-      description,
-      price: parseFloat(price),
-      imageUrl
+      name: name || 'Fără nume',
+      description: description || '',
+      price: parseFloat(price) || 0,
+      image: imageUrl
     });
+
     res.status(201).json(newProduct);
   } catch (error) {
     console.error('❌ Eroare la adăugare produs:', error);
