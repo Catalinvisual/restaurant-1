@@ -8,6 +8,7 @@ export default function Menu() {
   useEffect(() => {
     // 📦 Folosește variabila de mediu pentru a accesa backend-ul
     const API_URL = process.env.REACT_APP_API_URL;
+    console.log("🌐 Valoarea API_URL este:", API_URL);
 
     fetch(`${API_URL}/api/products`)
       .then((res) => res.json())
