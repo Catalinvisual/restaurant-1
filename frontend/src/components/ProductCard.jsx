@@ -4,7 +4,8 @@ import '../assets/styles/Cart.css';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const BASE_URL = process.env.REACT_APP_API_URL || 'https://restaurant-app-backend.onrender.com';
+const BASE_URL =
+  process.env.REACT_APP_API_URL || 'https://restaurant-app-backend.onrender.com';
 
 export default function ProductCard({ product }) {
   const [quantity, setQuantity] = useState(1);
@@ -24,12 +25,13 @@ export default function ProductCard({ product }) {
   const handleIncrement = () => setQuantity((prev) => prev + 1);
   const handleDecrement = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
 
-  // 🖼️ Sursă imagine cu fallback
-  let imageSrc = 'https://via.placeholder.com/180?text=Fără+imagine';
+  // 🖼️ Sursă imagine cu fallback robust
+  let imageSrc = 'https://via.placeholder.com/180?text=Fara+imagine';
   if (
     product.image &&
     typeof product.image === 'string' &&
-    product.image.startsWith('http')
+    product.image.trim() !== '' &&
+    product.image.startsWith('https://')
   ) {
     imageSrc = product.image;
   }
