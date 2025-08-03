@@ -4,19 +4,18 @@ import '../assets/styles/Cart.css';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const BASE_URL =
-  process.env.REACT_APP_API_URL || 'https://restaurant-app-backend.onrender.com';
-
-export default function ProductCard({ product }) {
+const ProductCard = ({ product }) => {
   const [quantity, setQuantity] = useState(1);
   const { dispatch } = useCart();
   const [buying, setBuying] = useState(false);
 
   const handleBuyClick = () => {
+    if (!product || !product.id) return;
+
     dispatch({ type: 'ADD_TO_CART', payload: { ...product, quantity } });
     toast.success(`${product.name || 'Produs'} a fost adăugat în coș! 🛒`, {
       position: 'top-right',
-      autoClose: 2000,
+      autoClose: 2000
     });
     setBuying(true);
     setTimeout(() => setBuying(false), 1500);
@@ -25,16 +24,15 @@ export default function ProductCard({ product }) {
   const handleIncrement = () => setQuantity((prev) => prev + 1);
   const handleDecrement = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
 
-  // 🖼️ Sursă imagine cu fallback robust
-  let imageSrc = 'https://via.placeholder.com/180?text=Fara+imagine';
-  if (
-    product.image &&
+  // 🖼️ Imagine cu fallback
+  const isValidImage = product?.image &&
     typeof product.image === 'string' &&
     product.image.trim() !== '' &&
-    product.image.startsWith('https://')
-  ) {
-    imageSrc = product.image;
-  }
+    product.image.startsWith('https://');
+
+  const imageSrc = isValidImage
+    ? product.image
+    : 'https://via.placeholder.com/180?text=Fara+imagine';
 
   return (
     <div className="card m-3 shadow-sm" style={{ width: '18rem' }}>
@@ -46,7 +44,7 @@ export default function ProductCard({ product }) {
           height: '180px',
           objectFit: 'cover',
           borderRadius: '8px',
-          boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+          boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
         }}
       />
       <div className="card-body">
@@ -57,10 +55,10 @@ export default function ProductCard({ product }) {
           {product.description || 'Fără descriere disponibilă.'}
         </p>
         <p className="card-text fw-bold">
-          €{Number(product.price).toFixed(2)}
+          €{Number(product.price || 0).toFixed(2)}
         </p>
 
-        {/* 🔄 Ascundem butoanele dacă e previzualizare */}
+        {/* 🔄 Ascundem interacțiunea dacă e previzualizare */}
         {product.id !== 'preview' && (
           <div className="d-flex align-items-center justify-content-between">
             <div className="d-flex align-items-center">
@@ -93,4 +91,6 @@ export default function ProductCard({ product }) {
       </div>
     </div>
   );
-}
+};
+
+export default ProductCard;

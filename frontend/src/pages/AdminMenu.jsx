@@ -36,96 +36,97 @@ export default function AdminMenu() {
   };
 
   const handleAddOrEdit = async (e) => {
-  e.preventDefault();
-  const token = localStorage.getItem('token');
-  if (!token) {
-    toast.error('❌ Token lipsă. Autentifică-te ca admin.');
-    return;
-  }
+    e.preventDefault();
+    const token = localStorage.getItem('token');
+    if (!token) {
+      toast.error('❌ Token lipsă. Autentifică-te ca admin.');
+      return;
+    }
 
-  const formData = new FormData();
-  formData.append('name', newMenuItem.name);
-  formData.append('description', newMenuItem.description);
-  formData.append('price', Number(newMenuItem.price));
+    const formData = new FormData();
+    formData.append('name', newMenuItem.name);
+    formData.append('description', newMenuItem.description);
+    formData.append('price', Number(newMenuItem.price));
 
-  // ⬇️ Imagine nouă sau existentă
-  if (newMenuItem.image instanceof File) {
-    formData.append('image', newMenuItem.image);
-  } else if (typeof newMenuItem.image === 'string') {
-    formData.append('image', newMenuItem.image); // 🔁 trimite linkul existent
-  }
+    if (newMenuItem.image instanceof File) {
+      formData.append('image', newMenuItem.image);
+    } else {
+      const oldItem = menu.find((i) => i.id === editingItemId);
+      if (oldItem?.image) {
+        formData.append('image', oldItem.image);
+      }
+    }
 
-  const url = editingItemId
-    ? `${BASE_URL}/api/menu/${editingItemId}`
-    : `${BASE_URL}/api/menu`;
-  const method = editingItemId ? 'PUT' : 'POST';
+    const url = editingItemId
+      ? `${BASE_URL}/api/menu/${editingItemId}`
+      : `${BASE_URL}/api/menu`;
+    const method = editingItemId ? 'PUT' : 'POST';
 
-  try {
-    const response = await fetch(url, {
-      method,
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
-      body: formData
-    });
-    const result = await response.json();
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: formData
+      });
+      const result = await response.json();
 
-    if (response.ok) {
-      if (editingItemId) {
-        setMenu(menu.map((item) => (item.id === editingItemId ? result : item)));
-        toast.success('✏️ Produs actualizat cu succes!', {
+      if (response.ok) {
+        if (editingItemId) {
+          setMenu(menu.map((item) => (item.id === editingItemId ? result : item)));
+          toast.success('✏️ Produs actualizat cu succes!', {
+            position: 'top-right',
+            autoClose: 2000
+          });
+        } else {
+          setMenu([...menu, result]);
+          toast.success('✅ Produs adăugat cu succes!', {
+            position: 'top-right',
+            autoClose: 2000
+          });
+        }
+        setNewMenuItem({ name: '', description: '', price: '', image: null });
+        setEditingItemId(null);
+      } else {
+        toast.error(`❌ Eroare: ${result.error}`);
+      }
+    } catch (err) {
+      console.error('❌ Eroare rețea:', err);
+      toast.error('❌ Serverul nu răspunde.');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch(`${BASE_URL}/api/menu/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (res.ok) {
+        setMenu(menu.filter((item) => item.id !== id));
+        toast.info('✅ Produs șters cu succes 🗑️', {
           position: 'top-right',
           autoClose: 2000
         });
       } else {
-        setMenu([...menu, result]);
-        toast.success('✅ Produs adăugat cu succes!', {
-          position: 'top-right',
-          autoClose: 2000
-        });
+        toast.error('❌ Nu s-a putut șterge item-ul.');
       }
-      setNewMenuItem({ name: '', description: '', price: '', image: null });
-      setEditingItemId(null);
-    } else {
-      toast.error(`❌ Eroare: ${result.error}`);
+    } catch (err) {
+      console.error('❌ Eroare la ștergere:', err);
+      toast.error('❌ Eroare de rețea la ștergere.');
     }
-  } catch (err) {
-    console.error('❌ Eroare rețea:', err);
-    toast.error('❌ Serverul nu răspunde.');
-  }
-};
-
-  const handleDelete = async (id) => {
-  const token = localStorage.getItem('token');
-  try {
-    const res = await fetch(`${BASE_URL}/api/menu/${id}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-    if (res.ok) {
-      setMenu(menu.filter((item) => item.id !== id));
-      toast.info('✅ Produs șters cu succes 🗑️', {
-        position: 'top-right',
-        autoClose: 2000
-      });
-    } else {
-      toast.error('❌ Nu s-a putut șterge item-ul.');
-    }
-  } catch (err) {
-    console.error('❌ Eroare la ștergere:', err);
-    toast.error('❌ Eroare de rețea la ștergere.');
-  }
-};
-
+  };
 
   const handleEditClick = (item) => {
     setNewMenuItem({
       name: item.name,
       description: item.description,
       price: item.price,
-      image: item.image || null
+      image: null // ✨ Resetăm imaginea pentru input-ul "file"
     });
     setEditingItemId(item.id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -182,6 +183,15 @@ export default function AdminMenu() {
               onChange={handleChange}
               required={!editingItemId}
             />
+            {editingItemId && (() => {
+              const existingItem = menu.find((i) => i.id === editingItemId);
+              return existingItem?.image ? (
+                <div className="mt-2">
+                  <small>Imagine existentă:</small><br />
+                  <img src={existingItem.image} alt="previzualizare" width="100" />
+                </div>
+              ) : null;
+            })()}
           </div>
           <div className="col-md-1">
             <button type="submit" className="btn btn-success w-100">
