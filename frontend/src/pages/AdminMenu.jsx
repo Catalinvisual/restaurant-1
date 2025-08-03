@@ -8,11 +8,13 @@ const BASE_URL = process.env.REACT_APP_API_URL;
 export default function AdminMenu() {
   const [menu, setMenu] = useState([]);
   const [newMenuItem, setNewMenuItem] = useState({
-    name: '',
-    description: '',
-    price: '',
-    image: null
-  });
+  name: '',
+  description: '',
+  price: '',
+  image: null,
+  isNew: false,
+  isPromo: false
+});
   const [editingItemId, setEditingItemId] = useState(null);
 
   useEffect(() => {
@@ -23,18 +25,24 @@ export default function AdminMenu() {
   }, []);
 
   const handleChange = (e) => {
-    if (e.target.name === 'image') {
-      const file = e.target.files[0];
-      if (file && file.type.startsWith('image/')) {
-        setNewMenuItem({ ...newMenuItem, image: file });
-      } else {
-        alert('❌ Fișierul selectat nu este o imagine validă.');
-        setNewMenuItem({ ...newMenuItem, image: null });
-      }
+  const { name, value, type, checked, files } = e.target;
+
+  if (type === 'checkbox') {
+    setNewMenuItem({ ...newMenuItem, [name]: checked });
+  } else if (name === 'image') {
+    const file = files[0];
+    if (file && file.type.startsWith('image/')) {
+      setNewMenuItem({ ...newMenuItem, image: file });
     } else {
-      setNewMenuItem({ ...newMenuItem, [e.target.name]: e.target.value });
+      alert('❌ Fișierul selectat nu este o imagine validă.');
+      setNewMenuItem({ ...newMenuItem, image: null });
     }
-  };
+  } else {
+    setNewMenuItem({ ...newMenuItem, [name]: value });
+  }
+};
+
+
 
   const handleAddOrEdit = async (e) => {
     e.preventDefault();
@@ -45,9 +53,11 @@ export default function AdminMenu() {
     }
 
     const formData = new FormData();
-    formData.append('name', newMenuItem.name);
-    formData.append('description', newMenuItem.description);
-    formData.append('price', Number(newMenuItem.price));
+formData.append('name', newMenuItem.name);
+formData.append('description', newMenuItem.description);
+formData.append('price', Number(newMenuItem.price));
+formData.append('isNew', newMenuItem.isNew);
+formData.append('isPromo', newMenuItem.isPromo);
 
     if (newMenuItem.image instanceof File) {
       formData.append('image', newMenuItem.image);
@@ -109,16 +119,18 @@ export default function AdminMenu() {
     }
   };
 
-  const handleEditClick = (item) => {
-    setNewMenuItem({
-      name: item.name,
-      description: item.description,
-      price: item.price,
-      image: null
-    });
-    setEditingItemId(item.id);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+const handleEditClick = (item) => {
+  setNewMenuItem({
+    name: item.name,
+    description: item.description,
+    price: item.price,
+    image: null,
+    isNew: item.isNew || false,
+    isPromo: item.isPromo || false
+  });
+  setEditingItemId(item.id);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
 
   const handleCancelEdit = () => {
     setNewMenuItem({ name: '', description: '', price: '', image: null });
@@ -189,6 +201,28 @@ export default function AdminMenu() {
               ) : null;
             })()}
           </div>
+          <div className="col-md-1 form-check">
+  <input
+    type="checkbox"
+    className="form-check-input"
+    name="isNew"
+    id="isNew"
+    checked={newMenuItem.isNew}
+    onChange={handleChange}
+  />
+  <label className="form-check-label" htmlFor="isNew">Nou</label>
+</div>
+<div className="col-md-1 form-check">
+  <input
+    type="checkbox"
+    className="form-check-input"
+    name="isPromo"
+    id="isPromo"
+    checked={newMenuItem.isPromo}
+    onChange={handleChange}
+  />
+  <label className="form-check-label" htmlFor="isPromo">Promo</label>
+</div>
           <div className="col-md-1">
             <button type="submit" className="btn btn-success w-100">
               {editingItemId ? 'Salvează' : 'Adaugă'}

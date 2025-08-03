@@ -1,6 +1,6 @@
 /* 🔲 Bara de navigare transparentă FĂRĂ blur, cu scroll hide */
 .transparent-header {
-  background-color: rgba(255, 255, 255,);
+  background-color: rgb(3, 3, 3);
   box-shadow: none;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   transition: top 0.3s ease;

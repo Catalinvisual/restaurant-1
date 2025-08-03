@@ -23,6 +23,12 @@
 }
 
 /* Badge-uri promoționale */
+.badge {
+  font-size: 0.75rem;
+  padding: 0.4em 0.6em;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
 .card .badge {
   position: absolute;
   font-size: 0.75rem;
