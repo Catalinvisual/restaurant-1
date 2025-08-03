@@ -85,4 +85,55 @@ router.post('/', upload.single('image'), async (req, res) => {
   }
 });
 
+// 🗑️ DELETE — șterge produs după ID
+router.delete('/:id', async (req, res) => {
+  try {
+    const deletedCount = await Menu.destroy({ where: { id: req.params.id } });
+    if (deletedCount === 0) {
+      return res.status(404).json({ error: 'Produsul nu a fost găsit sau a fost deja șters' });
+    }
+    res.status(204).send(); // Șters cu succes
+  } catch (error) {
+    console.error('❌ Eroare la DELETE:', error.stack);
+    res.status(500).json({ error: 'Eroare la ștergere produs' });
+  }
+});
+
+// ✏️ PUT — actualizează un produs existent
+router.put('/:id', upload.single('image'), async (req, res) => {
+  try {
+    const { name, price, description } = req.body;
+    const imageUrl = req.file?.path || req.file?.secure_url || req.body.image || null;
+
+    if (
+      !name || typeof name !== 'string' ||
+      !price || isNaN(Number(price)) || Number(price) <= 0
+    ) {
+      return res.status(400).json({
+        error: 'name și price sunt obligatorii și trebuie să fie valide'
+      });
+    }
+
+    const [updatedCount, updatedRows] = await Menu.update({
+      name: name.trim(),
+      price: parseFloat(price),
+      description: description?.trim() || '',
+      image: imageUrl
+    }, {
+      where: { id: req.params.id },
+      returning: true
+    });
+
+    if (updatedCount === 0) {
+      return res.status(404).json({ error: 'Produsul nu a fost găsit' });
+    }
+
+    console.log('✏️ Produs actualizat:', updatedRows[0].toJSON());
+    res.status(200).json(updatedRows[0]);
+  } catch (error) {
+    console.error('❌ Eroare la PUT:', error.stack);
+    res.status(500).json({ error: 'Eroare la actualizarea produsului' });
+  }
+});
+
 module.exports = router;

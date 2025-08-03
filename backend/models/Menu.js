@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../db'); // asigură-te că acest path e corect
+const sequelize = require('../db'); // verifică dacă path-ul e corect
 
 const Menu = sequelize.define('Menu', {
   name: {
@@ -14,12 +14,14 @@ const Menu = sequelize.define('Menu', {
     type: DataTypes.TEXT
   },
   image: {
-    type: DataTypes.STRING, // dacă vrei să salvezi URL-ul pozei
+    type: DataTypes.STRING,
+    allowNull: true, // ✅ permite null dacă nu se trimite imagine
     validate: {
-    isUrl: true
+      isUrl: true
+    }
   }
-
-  }
+}, {
+  timestamps: true // ✅ adaugă createdAt & updatedAt
 });
 
 module.exports = Menu;
