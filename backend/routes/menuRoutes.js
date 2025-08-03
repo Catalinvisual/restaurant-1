@@ -1,36 +1,32 @@
 const express = require('express');
 const router = express.Router();
 const Menu = require('../models/Menu');
-const multer = require('multer');
-const path = require('path');
 require('dotenv').config();
 
-const BASE_URL = process.env.BASE_URL || 'https://restaurant-app-backend.onrender.com';
+// ☁️ Cloudinary config
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const multer = require('multer');
 
-// 📁 Asigură-te că folderul uploads există
-const fs = require('fs');
-const uploadDir = path.join(__dirname, '..', 'uploads');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir);
-}
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_KEY,
+  api_secret: process.env.CLOUDINARY_SECRET
+});
 
-// 🖼️ Configurare Multer pentru fișiere imagine
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads');
-  },
-  filename: function (req, file, cb) {
-    const timestamp = Date.now();
-    const ext = path.extname(file.originalname);
-    const name = path.basename(file.originalname, ext);
-    const uniqueName = `${name}-${timestamp}${ext}`;
-    cb(null, uniqueName);
+// 🖼️ Storage Multer cu Cloudinary
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'restaurant-menu',
+    allowed_formats: ['jpg', 'png', 'jpeg'],
+    transformation: [{ width: 800, height: 600, crop: 'limit' }]
   }
 });
 
-const upload = multer({
+const upload = multer({ 
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // max 5MB
+  limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     if (file.mimetype.startsWith('image/')) {
       cb(null, true);
@@ -56,15 +52,11 @@ router.post('/', upload.single('image'), async (req, res) => {
   try {
     const { name, price, description } = req.body;
 
-    // ✅ Validare de bază
     if (!name || typeof name !== 'string' || !price || isNaN(price)) {
       return res.status(400).json({ error: 'name (text) și price (numeric) sunt obligatorii' });
     }
 
-    // 🔗 Construiește URL complet pentru imagine
-    const imageUrl = req.file
-      ? `${BASE_URL}/uploads/${req.file.filename}`
-      : `${BASE_URL}/uploads/default.jpg`; // fallback opțional
+    const imageUrl = req.file?.path || null; // 🔗 Link direct din Cloudinary
 
     const newItem = await Menu.create({
       name,

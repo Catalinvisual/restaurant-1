@@ -24,17 +24,14 @@ export default function ProductCard({ product }) {
   const handleIncrement = () => setQuantity((prev) => prev + 1);
   const handleDecrement = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
 
-  // 🖼️ Sursă imagine cu fallback și normalizare
+  // 🖼️ Sursă imagine cu fallback
   let imageSrc = 'https://via.placeholder.com/180?text=Fără+imagine';
-  if (product.image) {
-    const imageRaw = String(product.image);
-    try {
-      imageSrc = imageRaw.startsWith('http')
-        ? imageRaw
-        : new URL(imageRaw, BASE_URL).href;
-    } catch {
-      // fallback activat automat
-    }
+  if (
+    product.image &&
+    typeof product.image === 'string' &&
+    product.image.startsWith('http')
+  ) {
+    imageSrc = product.image;
   }
 
   return (
