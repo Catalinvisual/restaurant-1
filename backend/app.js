@@ -40,8 +40,6 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
-// ✅ Servire fișiere statice
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ✅ Rute API
 app.use('/api/auth', authRoutes);

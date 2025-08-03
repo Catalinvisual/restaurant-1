@@ -2,8 +2,29 @@ const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
+
+// ☁️ Cloudinary + Multer
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const multer = require('multer');
-const path = require('path');
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_KEY,
+  api_secret: process.env.CLOUDINARY_SECRET
+});
+
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'products',
+    allowed_formats: ['jpg', 'png', 'jpeg'],
+    transformation: [{ width: 800, height: 600, crop: 'limit' }]
+  }
+});
+
+const upload = multer({ storage });
 
 // 🛡️ Middleware pentru validarea tokenului
 const verifyToken = (req, res, next) => {
@@ -20,20 +41,6 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-// 🖼️ Configurare Multer pentru fișiere
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const base = path.basename(file.originalname, ext);
-    const timestamp = Date.now();
-    cb(null, `${base}-${timestamp}${ext}`);
-  }
-});
-const upload = multer({ storage });
-
 // 📦 Listare produse (GET public)
 router.get('/', async (req, res) => {
   try {
@@ -49,9 +56,7 @@ router.get('/', async (req, res) => {
 router.post('/', verifyToken, upload.single('image'), async (req, res) => {
   const { name, description, price } = req.body;
 
-  // ✅ Construire URL complet pentru imagine
-  const baseUrl = process.env.BASE_URL || 'https://restaurant-app-backend.onrender.com';
-  const imageUrl = req.file ? `${baseUrl}/uploads/${req.file.filename}` : '';
+  const imageUrl = req.file?.path || null; // 🔗 Link public Cloudinary
 
   try {
     const newProduct = await Product.create({
