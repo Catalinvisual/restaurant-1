@@ -27,12 +27,12 @@ export default function Menu() {
       </div>
 
       {/* 🔽 Conținutul paginii */}
-      <div className="container mt-3">
+      <div className="container pt-2">
         <h2 className="text-primary text-center mb-3">Meniu</h2>
 
         <div className="row">
           {products.length === 0 && (
-            <p className="text-muted">Nu există produse disponibile.</p>
+            <p className="text-muted text-center">Nu există produse disponibile.</p>
           )}
 
           {products.map((product) => (
