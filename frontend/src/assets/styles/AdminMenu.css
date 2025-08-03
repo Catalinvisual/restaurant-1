@@ -1,0 +1,80 @@
+/* Container principal */
+.admin-menu-container {
+  margin-top: 3rem;
+  padding-bottom: 2rem;
+}
+
+/* Titlu principal */
+.admin-menu-container h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+/* Inputuri formular */
+.admin-form .form-control {
+  border-radius: 6px;
+  padding: 0.45rem 0.75rem;
+}
+
+/* Butoane formular */
+.admin-form .btn-success,
+.admin-form .btn-secondary {
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+}
+
+/* Imagine existentă preview */
+.preview-image {
+  margin-top: 0.5rem;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* Secțiune previzualizare item */
+.item-preview {
+  margin-bottom: 2rem;
+  border-top: 1px solid #dee2e6;
+  padding-top: 1rem;
+}
+
+/* Butoane de pe card produs (✎ / ✕) */
+.admin-card-controls {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.5rem;
+}
+
+.admin-card-controls .btn-sm {
+  font-size: 0.75rem;
+  padding: 6px 10px;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* Animație hover pentru card */
+.card-admin:hover {
+  transform: scale(1.01);
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .admin-form .d-flex {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .admin-card-controls {
+    flex-direction: column;
+    top: 8px;
+  }
+
+  .item-preview {
+    text-align: center;
+  }
+}

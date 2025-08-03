@@ -1,7 +1,22 @@
-import React from 'react';
-import '../assets/styles/Home.css'; // Stilul separat pentru fundal
+import React, { useEffect, useState } from 'react';
+import ProductCard from '../components/ProductCard';
+import '../assets/styles/Home.css';
+
+const BASE_URL = process.env.REACT_APP_API_URL;
 
 export default function Home() {
+  const [specialItems, setSpecialItems] = useState([]);
+
+  useEffect(() => {
+    fetch(`${BASE_URL}/api/menu`)
+      .then((res) => res.json())
+      .then((data) => {
+        const filtered = data.filter((item) => item.isNew || item.isPromo);
+        setSpecialItems(filtered);
+      })
+      .catch((err) => console.error('❌ Eroare la încărcarea meniului:', err));
+  }, []);
+
   return (
     <div>
       {/* HERO pe tot ecranul */}
@@ -27,6 +42,20 @@ export default function Home() {
             <li>🍝 Happy Hour: -20% la paste între 14:00 - 16:00</li>
           </ul>
         </section>
+
+        {/* PRODUSE PROMO/NOU */}
+        {specialItems.length > 0 && (
+          <section className="my-5">
+            <h3 className="text-warning text-center">🌟 Produse Evidențiate</h3>
+            <div className="row justify-content-center">
+              {specialItems.map((item) => (
+                <div key={item.id} className="col-md-4 d-flex justify-content-center">
+                  <ProductCard product={item} />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         <section className="my-5">
           <h3 className="text-info">📍 Despre Noi</h3>

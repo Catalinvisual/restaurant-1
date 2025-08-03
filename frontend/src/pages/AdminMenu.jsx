@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
 import { toast } from 'react-toastify';
-
+import '../assets/styles/AdminMenu.css';
+import Header from '../components/Header';
 const BASE_URL = process.env.REACT_APP_API_URL;
 
 export default function AdminMenu() {
@@ -65,9 +66,7 @@ export default function AdminMenu() {
     try {
       const response = await fetch(url, {
         method,
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
+        headers: { Authorization: `Bearer ${token}` },
         body: formData
       });
       const result = await response.json();
@@ -75,16 +74,10 @@ export default function AdminMenu() {
       if (response.ok) {
         if (editingItemId) {
           setMenu(menu.map((item) => (item.id === editingItemId ? result : item)));
-          toast.success('✏️ Produs actualizat cu succes!', {
-            position: 'top-right',
-            autoClose: 2000
-          });
+          toast.success('✏️ Produs actualizat cu succes!', { autoClose: 2000 });
         } else {
           setMenu([...menu, result]);
-          toast.success('✅ Produs adăugat cu succes!', {
-            position: 'top-right',
-            autoClose: 2000
-          });
+          toast.success('✅ Produs adăugat cu succes!', { autoClose: 2000 });
         }
         setNewMenuItem({ name: '', description: '', price: '', image: null });
         setEditingItemId(null);
@@ -102,16 +95,11 @@ export default function AdminMenu() {
     try {
       const res = await fetch(`${BASE_URL}/api/menu/${id}`, {
         method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+        headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
         setMenu(menu.filter((item) => item.id !== id));
-        toast.info('✅ Produs șters cu succes 🗑️', {
-          position: 'top-right',
-          autoClose: 2000
-        });
+        toast.info('✅ Produs șters cu succes 🗑️', { autoClose: 2000 });
       } else {
         toast.error('❌ Nu s-a putut șterge item-ul.');
       }
@@ -126,20 +114,28 @@ export default function AdminMenu() {
       name: item.name,
       description: item.description,
       price: item.price,
-      image: null // ✨ Resetăm imaginea pentru input-ul "file"
+      image: null
     });
     setEditingItemId(item.id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleCancelEdit = () => {
+    setNewMenuItem({ name: '', description: '', price: '', image: null });
+    setEditingItemId(null);
+  };
+
   return (
+    <>
+    <Header />
+
     <div className="container mt-5">
       <h2 className="text-primary mb-4">
         {editingItemId ? 'Editare Item' : 'Administrare Meniu'}
       </h2>
 
       <form onSubmit={handleAddOrEdit} className="mb-4" encType="multipart/form-data">
-        <div className="row g-3">
+        <div className="row g-3 align-items-end">
           <div className="col-md-3">
             <input
               type="text"
@@ -174,7 +170,7 @@ export default function AdminMenu() {
               required
             />
           </div>
-          <div className="col-md-3">
+          <div className="col-md-2">
             <input
               type="file"
               className="form-control"
@@ -198,47 +194,52 @@ export default function AdminMenu() {
               {editingItemId ? 'Salvează' : 'Adaugă'}
             </button>
           </div>
+          {editingItemId && (
+            <div className="col-md-1">
+              <button type="button" className="btn btn-secondary w-100" onClick={handleCancelEdit}>
+                Anulează
+              </button>
+            </div>
+          )}
         </div>
       </form>
 
-      {newMenuItem.name &&
-        newMenuItem.description &&
-        newMenuItem.price &&
-        (newMenuItem.image || editingItemId) && (
-          <div className="mb-4">
-            <p className="fw-bold">Previzualizare item:</p>
-            <ProductCard
-              product={{
-                ...newMenuItem,
-                id: 'preview',
-                image:
-                  newMenuItem.image instanceof File
-                    ? URL.createObjectURL(newMenuItem.image)
-                    : newMenuItem.image
-              }}
-            />
-          </div>
-        )}
+      {newMenuItem.name && newMenuItem.description && newMenuItem.price && (newMenuItem.image || editingItemId) && (
+        <div className="mb-4">
+          <p className="fw-bold">Previzualizare item:</p>
+          <ProductCard
+            product={{
+              ...newMenuItem,
+              id: 'preview',
+              image:
+                newMenuItem.image instanceof File
+                  ? URL.createObjectURL(newMenuItem.image)
+                  : newMenuItem.image
+            }}
+          />
+        </div>
+      )}
 
       <div className="row">
         {menu.map((item) => (
           <div key={item.id} className="col-md-4 position-relative">
             <ProductCard product={item} />
-            <button
-              className="btn btn-sm btn-danger position-absolute top-0 end-0 m-2"
-              onClick={() => handleDelete(item.id)}
-            >
-              ✕
-            </button>
-            <button
-              className="btn btn-sm btn-warning position-absolute top-0 start-0 m-2"
-              onClick={() => handleEditClick(item)}
-            >
-              ✎
-            </button>
+            <div className="position-absolute top-0 start-50 translate-middle-x mt-2 d-flex gap-2">
+              <button className="btn btn-sm btn-warning" onClick={() => handleEditClick(item)}>
+                ✎
+              </button>
+              <button
+                className="btn btn-sm btn-danger"
+                style={{ boxShadow: '0 2px 6px rgba(0,0,0,0.3)' }}
+                onClick={() => handleDelete(item.id)}
+              >
+                ✕
+              </button>
+            </div>
           </div>
         ))}
       </div>
     </div>
+    </>
   );
 }

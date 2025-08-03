@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
 import '../assets/styles/Cart.css';
-
+import Header from '../components/Header';
 export default function Checkout() {
   const { cartItems, dispatch } = useCart();
   const [name, setName] = useState('');
@@ -32,6 +32,9 @@ export default function Checkout() {
   };
 
   return (
+    <>
+    <Header />
+
     <div className="container mt-5">
       <h2 className="text-primary mb-4">Finalizare comandă</h2>
       {message && <div className="alert alert-info">{message}</div>}
@@ -101,5 +104,6 @@ export default function Checkout() {
         </button>
       </form>
     </div>
+    </>
   );
 }

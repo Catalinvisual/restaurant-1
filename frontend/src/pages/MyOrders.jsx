@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-
+import Header from '../components/Header';
 export default function MyOrders() {
   const [orders, setOrders] = useState([]);
 
@@ -31,6 +31,9 @@ export default function MyOrders() {
   }, []);
 
   return (
+    <> 
+    <Header />
+
     <div className="container mt-5">
       <h2 className="text-primary mb-4">Comenzile Mele</h2>
       {orders.length === 0 ? (
@@ -57,5 +60,6 @@ export default function MyOrders() {
         ))
       )}
     </div>
+    </>
   );
 }

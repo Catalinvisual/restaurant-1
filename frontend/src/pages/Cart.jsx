@@ -1,7 +1,7 @@
 import React from 'react';
 import { useCart } from '../context/CartContext';
 import '../assets/styles/Cart.css';
-
+import Header from '../components/Header';
 export default function Cart() {
   const { cartItems, dispatch } = useCart();
 
@@ -25,6 +25,9 @@ export default function Cart() {
   };
 
   return (
+    <>
+    <Header />
+
     <div className="container mt-5">
       <h2 className="text-primary mb-4">Coșul meu de cumpărături</h2>
 
@@ -106,5 +109,6 @@ export default function Cart() {
         </>
       )}
     </div>
+    </>
   );
 }

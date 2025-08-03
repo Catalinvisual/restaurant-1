@@ -1,10 +1,12 @@
 /* Card general */
 .card {
   width: 100%;
-  max-width: 300px;
+  max-width: 320px;
   margin: 1rem auto;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   transition: transform 0.2s ease;
+  position: relative;
+  border-radius: 8px;
 }
 
 .card:hover {
@@ -13,9 +15,26 @@
 
 /* Imagine produs */
 .card-img-top {
-  height: 180px;
+  height: 200px;
   width: 100%;
   object-fit: cover;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+/* Badge-uri promoționale */
+.card .badge {
+  position: absolute;
+  font-size: 0.75rem;
+  padding: 0.4em 0.6em;
+  z-index: 5;
+  animation: pulse 2.5s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+  100% { transform: scale(1); }
 }
 
 /* Titlu produs */
@@ -36,9 +55,52 @@
   color: #212529;
 }
 
-/* Input + buton */
+/* Rating ⭐ */
+.rating {
+  color: #f6c343; /* auriu */
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+.rating span {
+  color: #6c757d;
+  font-size: 0.85rem;
+  margin-left: 0.3rem;
+}
+
+/* Buton Detalii */
+.card .btn-outline-primary {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  padding: 0.3rem 0.7rem;
+}
+
+/* Input cantitate */
 .card-body .form-control {
   min-width: 60px;
+}
+
+/* Buton coș și +/− */
+.card-body .d-flex.align-items-center {
+  gap: 0.5rem;
+}
+
+/* Stil previzualizare imagine în formular */
+img.preview-small {
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-top: 5px;
+}
+
+/* Butoane editare/ștergere în AdminMenu */
+.btn-sm.btn-danger {
+  border-radius: 50%;
+  padding: 6px 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  font-weight: bold;
+}
+.btn-sm.btn-warning {
+  padding: 6px 10px;
+  font-weight: bold;
 }
 
 /* Responsivitate */
@@ -58,11 +120,13 @@
     gap: 0.5rem;
   }
 
-  .form-control {
+  .form-control,
+  .btn {
     width: 100% !important;
   }
 
-  .btn {
-    width: 100%;
+  .rating {
+    justify-content: center;
+    text-align: center;
   }
 }

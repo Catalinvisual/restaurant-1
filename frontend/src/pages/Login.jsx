@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import Header from '../components/Header';
 const API_BASE = process.env.REACT_APP_API_URL; // 👈 Variabilă din .env
 
 export default function Login() {
@@ -65,6 +65,9 @@ export default function Login() {
   };
 
   return (
+    <>
+    <Header />
+
     <div className="container mt-5" style={{ maxWidth: '500px' }}>
       <h2 className="text-primary mb-4">
         {isRegistering ? 'Înregistrare' : 'Autentificare'}
@@ -128,5 +131,6 @@ export default function Login() {
         </button>
       </div>
     </div>
+    </>
   );
 }
