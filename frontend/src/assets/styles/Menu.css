@@ -3,6 +3,9 @@
   height: 100vh; /* ocupă tot ecranul */
   overflow: hidden;
   position: relative;
+  margin-bottom: 0;
+  padding-bottom: 0;
+
 }
 
 .banner-img {
@@ -10,4 +13,8 @@
   height: 60%;
   object-fit: cover;
   display: block;
+}
+
+h2 {
+  text-align: center;
 }

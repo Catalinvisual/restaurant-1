@@ -51,7 +51,7 @@ router.post('/', upload.single('image'), async (req, res) => {
     console.log('📥 Body primit:', req.body);
     console.log('🖼️ Fișier primit:', req.file);
 
-    const { name, price, description } = req.body;
+    const { name, price, description, isNew, isPromo } = req.body;
 
     if (
       !name ||
@@ -68,11 +68,13 @@ router.post('/', upload.single('image'), async (req, res) => {
     const imageUrl = req.file?.path || req.file?.secure_url || null;
 
     const newItem = await Menu.create({
-      name: name.trim(),
-      price: parseFloat(price),
-      description: description?.trim() || '',
-      image: imageUrl
-    });
+  name: name.trim(),
+  price: parseFloat(price),
+  description: description?.trim() || '',
+  image: imageUrl,
+  isNew: isNew === 'true',     // conversie din string
+  isPromo: isPromo === 'true'  // conversie din string
+});
 
     console.log('✅ Produs salvat:', newItem.toJSON());
     res.status(201).json(newItem);
@@ -102,7 +104,7 @@ router.delete('/:id', async (req, res) => {
 // ✏️ PUT — actualizează un produs existent
 router.put('/:id', upload.single('image'), async (req, res) => {
   try {
-    const { name, price, description } = req.body;
+    const { name, price, description, isNew, isPromo } = req.body;
     const imageUrl = req.file?.path || req.file?.secure_url || req.body.image || null;
 
     if (
@@ -118,7 +120,9 @@ router.put('/:id', upload.single('image'), async (req, res) => {
       name: name.trim(),
       price: parseFloat(price),
       description: description?.trim() || '',
-      image: imageUrl
+      image: imageUrl,
+      isNew: isNew === 'true',
+isPromo: isPromo === 'true'
     }, {
       where: { id: req.params.id },
       returning: true

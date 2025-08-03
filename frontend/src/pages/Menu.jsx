@@ -6,37 +6,34 @@ export default function Menu() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    // 📦 Folosește variabila de mediu pentru a accesa backend-ul
     const API_URL = process.env.REACT_APP_API_URL;
-    console.log("🌐 Valoarea API_URL este:", API_URL);
+    console.log('🌐 Valoarea API_URL este:', API_URL);
 
     fetch(`${API_URL}/api/menu`)
       .then((res) => res.json())
       .then((data) => setProducts(data))
-      .catch((err) =>
-        console.error('❌ Eroare la preluarea produselor:', err)
-      );
+      .catch((err) => console.error('❌ Eroare la preluarea produselor:', err));
   }, []);
 
   return (
     <>
-      {/* 🔽 Imaginea fullscreen sub Header */}
+      {/* 🔽 Banner fullscreen sub Header */}
       <div className="menu-banner-fullscreen">
-       <img
-  src="/assets/images/signeture-bg.jpg"
-  alt="Banner Signeture"
-  className="banner-img"
-/>
-
+        <img
+          src="/assets/images/signeture-bg.jpg"
+          alt="Banner Signeture"
+          className="banner-img"
+        />
       </div>
 
       {/* 🔽 Conținutul paginii */}
-      <div className="container mt-5">
-        <h2 className="text-primary mb-4">Meniu</h2>
+      <div className="container mt-3">
+        <h2 className="text-primary text-center mb-3">Meniu</h2>
+
         <div className="row">
           {products.length === 0 && (
-    <p className="text-muted">Nu există produse disponibile.</p>
-  )}
+            <p className="text-muted">Nu există produse disponibile.</p>
+          )}
 
           {products.map((product) => (
             <div key={product.id} className="col-md-4">
