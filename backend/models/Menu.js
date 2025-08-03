@@ -14,7 +14,11 @@ const Menu = sequelize.define('Menu', {
     type: DataTypes.TEXT
   },
   image: {
-    type: DataTypes.STRING // dacă vrei să salvezi URL-ul pozei
+    type: DataTypes.STRING, // dacă vrei să salvezi URL-ul pozei
+    validate: {
+    isUrl: true
+  }
+
   }
 });
 
