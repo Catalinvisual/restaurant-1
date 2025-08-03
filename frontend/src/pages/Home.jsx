@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import ProductCard from '../components/ProductCard';
-import '../assets/styles/Home.css';
+import React, { useEffect, useState } from "react";
+import ProductCard from "../components/ProductCard";
+import "../assets/styles/Home.css";
 
 const BASE_URL = process.env.REACT_APP_API_URL;
 
@@ -14,7 +14,7 @@ export default function Home() {
         const filtered = data.filter((item) => item.isNew || item.isPromo);
         setSpecialItems(filtered);
       })
-      .catch((err) => console.error('❌ Eroare la încărcarea meniului:', err));
+      .catch((err) => console.error("❌ Eroare la încărcarea meniului:", err));
   }, []);
 
   return (
@@ -49,7 +49,10 @@ export default function Home() {
             <h3 className="text-warning text-center">🌟 Produse Evidențiate</h3>
             <div className="row justify-content-center">
               {specialItems.map((item) => (
-                <div key={item.id} className="col-md-4 d-flex justify-content-center">
+                <div
+                  key={item.id}
+                  className="col-md-4 d-flex justify-content-center"
+                >
                   <ProductCard product={item} />
                 </div>
               ))}
@@ -60,11 +63,11 @@ export default function Home() {
         <section className="my-5">
           <h3 className="text-info">📍 Despre Noi</h3>
           <p>
-            Cu tradiție din 2005, oferim preparate autentice și servicii de calitate.
-            Ne găsești în Luttelgeest, Strada Gustului nr. 10.
+            Cu tradiție din 2005, oferim preparate autentice și servicii de
+            calitate. Ne găsești în Luttelgeest, Strada Gustului nr. 10.
           </p>
           <img
-            src="https://source.unsplash.com/800x400/?restaurant,interior"
+            src="/assets/images/our-restaurant.jpg"
             alt="Interiorul restaurantului"
             className="img-fluid rounded shadow mt-3"
           />

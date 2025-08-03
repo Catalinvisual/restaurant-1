@@ -23,6 +23,10 @@ const User = sequelize.define('User', {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
     field: 'is_admin'
+  },
+  lastLogin: {
+    type: DataTypes.DATE,
+    field: 'last_login'
   }
 }, {
   tableName: 'users',
