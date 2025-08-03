@@ -4,11 +4,11 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.addColumn('Menus', 'isNew', {
       type: Sequelize.BOOLEAN,
-      defaultValue: false,
+      defaultValue: false
     });
     await queryInterface.addColumn('Menus', 'isPromo', {
       type: Sequelize.BOOLEAN,
-      defaultValue: false,
+      defaultValue: false
     });
   },
 
