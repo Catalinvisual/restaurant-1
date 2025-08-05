@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
-const API_BASE = process.env.REACT_APP_API_URL; // 👈 Variabilă din .env
+import { API_URL } from '../apiConfig'; // 👈 Importăm valoarea centralizată
 
 export default function Login() {
   const [isRegistering, setIsRegistering] = useState(false);
@@ -21,7 +21,7 @@ export default function Login() {
       }
 
       try {
-        const response = await fetch(`${API_BASE}/api/auth/register`, {
+        const response = await fetch(`${API_URL}/api/auth/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username: name, email, password }),
@@ -42,7 +42,7 @@ export default function Login() {
 
     } else {
       try {
-        const response = await fetch(`${API_BASE}/api/auth/login`, {
+        const response = await fetch(`${API_URL}/api/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password }),
@@ -66,71 +66,71 @@ export default function Login() {
 
   return (
     <>
-    <Header />
+      <Header />
 
-    <div className="container mt-5" style={{ maxWidth: '500px' }}>
-      <h2 className="text-primary mb-4">
-        {isRegistering ? 'Înregistrare' : 'Autentificare'}
-      </h2>
+      <div className="container mt-5" style={{ maxWidth: '500px' }}>
+        <h2 className="text-primary mb-4">
+          {isRegistering ? 'Înregistrare' : 'Autentificare'}
+        </h2>
 
-      {error && <div className="alert alert-danger">{error}</div>}
+        {error && <div className="alert alert-danger">{error}</div>}
 
-      <form onSubmit={handleSubmit}>
-        {isRegistering && (
+        <form onSubmit={handleSubmit}>
+          {isRegistering && (
+            <div className="mb-3">
+              <label className="form-label">Nume</label>
+              <input
+                type="text"
+                className="form-control"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                placeholder="Numele complet"
+              />
+            </div>
+          )}
+
           <div className="mb-3">
-            <label className="form-label">Nume</label>
+            <label className="form-label">Email</label>
             <input
-              type="text"
+              type="email"
               className="form-control"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
-              placeholder="Numele complet"
+              placeholder="ex: admin@restaurant.com"
             />
           </div>
-        )}
 
-        <div className="mb-3">
-          <label className="form-label">Email</label>
-          <input
-            type="email"
-            className="form-control"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            placeholder="ex: admin@restaurant.com"
-          />
+          <div className="mb-3">
+            <label className="form-label">Parolă</label>
+            <input
+              type="password"
+              className="form-control"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              placeholder={isRegistering ? 'Creează o parolă' : 'Parola'}
+            />
+          </div>
+
+          <button type="submit" className="btn btn-success w-100">
+            {isRegistering ? 'Înregistrează-te' : 'Login'}
+          </button>
+        </form>
+
+        <div className="text-center mt-3">
+          <button
+            className="btn btn-link"
+            onClick={() => {
+              setIsRegistering(!isRegistering);
+              setError('');
+            }}
+          >
+            {isRegistering ? 'Ai deja cont? Autentifică-te' : 'Nu ai cont? Înregistrează-te'}
+          </button>
         </div>
-
-        <div className="mb-3">
-          <label className="form-label">Parolă</label>
-          <input
-            type="password"
-            className="form-control"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            placeholder={isRegistering ? 'Creează o parolă' : 'Parola'}
-          />
-        </div>
-
-        <button type="submit" className="btn btn-success w-100">
-          {isRegistering ? 'Înregistrează-te' : 'Login'}
-        </button>
-      </form>
-
-      <div className="text-center mt-3">
-        <button
-          className="btn btn-link"
-          onClick={() => {
-            setIsRegistering(!isRegistering);
-            setError('');
-          }}
-        >
-          {isRegistering ? 'Ai deja cont? Autentifică-te' : 'Nu ai cont? Înregistrează-te'}
-        </button>
       </div>
-    </div>
     </>
   );
 }

@@ -3,46 +3,44 @@ import ProductCard from '../components/ProductCard';
 import { toast } from 'react-toastify';
 import '../assets/styles/AdminMenu.css';
 import Header from '../components/Header';
-const BASE_URL = process.env.REACT_APP_API_URL;
+import { API_URL } from '../apiConfig';
 
 export default function AdminMenu() {
   const [menu, setMenu] = useState([]);
   const [newMenuItem, setNewMenuItem] = useState({
-  name: '',
-  description: '',
-  price: '',
-  image: null,
-  isNew: false,
-  isPromo: false
-});
+    name: '',
+    description: '',
+    price: '',
+    image: null,
+    isNew: false,
+    isPromo: false
+  });
   const [editingItemId, setEditingItemId] = useState(null);
 
   useEffect(() => {
-    fetch(`${BASE_URL}/api/menu`)
+    fetch(`${API_URL}/api/menu`)
       .then((res) => res.json())
       .then((data) => setMenu(data))
       .catch((err) => console.error('❌ Eroare la preluare meniu:', err));
   }, []);
 
   const handleChange = (e) => {
-  const { name, value, type, checked, files } = e.target;
+    const { name, value, type, checked, files } = e.target;
 
-  if (type === 'checkbox') {
-    setNewMenuItem({ ...newMenuItem, [name]: checked });
-  } else if (name === 'image') {
-    const file = files[0];
-    if (file && file.type.startsWith('image/')) {
-      setNewMenuItem({ ...newMenuItem, image: file });
+    if (type === 'checkbox') {
+      setNewMenuItem({ ...newMenuItem, [name]: checked });
+    } else if (name === 'image') {
+      const file = files[0];
+      if (file && file.type.startsWith('image/')) {
+        setNewMenuItem({ ...newMenuItem, image: file });
+      } else {
+        alert('❌ Fișierul selectat nu este o imagine validă.');
+        setNewMenuItem({ ...newMenuItem, image: null });
+      }
     } else {
-      alert('❌ Fișierul selectat nu este o imagine validă.');
-      setNewMenuItem({ ...newMenuItem, image: null });
+      setNewMenuItem({ ...newMenuItem, [name]: value });
     }
-  } else {
-    setNewMenuItem({ ...newMenuItem, [name]: value });
-  }
-};
-
-
+  };
 
   const handleAddOrEdit = async (e) => {
     e.preventDefault();
@@ -53,11 +51,11 @@ export default function AdminMenu() {
     }
 
     const formData = new FormData();
-formData.append('name', newMenuItem.name);
-formData.append('description', newMenuItem.description);
-formData.append('price', Number(newMenuItem.price));
-formData.append('isNew', newMenuItem.isNew);
-formData.append('isPromo', newMenuItem.isPromo);
+    formData.append('name', newMenuItem.name);
+    formData.append('description', newMenuItem.description);
+    formData.append('price', Number(newMenuItem.price));
+    formData.append('isNew', newMenuItem.isNew);
+    formData.append('isPromo', newMenuItem.isPromo);
 
     if (newMenuItem.image instanceof File) {
       formData.append('image', newMenuItem.image);
@@ -69,8 +67,8 @@ formData.append('isPromo', newMenuItem.isPromo);
     }
 
     const url = editingItemId
-      ? `${BASE_URL}/api/menu/${editingItemId}`
-      : `${BASE_URL}/api/menu`;
+      ? `${API_URL}/api/menu/${editingItemId}`
+      : `${API_URL}/api/menu`;
     const method = editingItemId ? 'PUT' : 'POST';
 
     try {
@@ -103,7 +101,7 @@ formData.append('isPromo', newMenuItem.isPromo);
   const handleDelete = async (id) => {
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch(`${BASE_URL}/api/menu/${id}`, {
+      const res = await fetch(`${API_URL}/api/menu/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -119,18 +117,18 @@ formData.append('isPromo', newMenuItem.isPromo);
     }
   };
 
-const handleEditClick = (item) => {
-  setNewMenuItem({
-    name: item.name,
-    description: item.description,
-    price: item.price,
-    image: null,
-    isNew: item.isNew || false,
-    isPromo: item.isPromo || false
-  });
-  setEditingItemId(item.id);
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-};
+  const handleEditClick = (item) => {
+    setNewMenuItem({
+      name: item.name,
+      description: item.description,
+      price: item.price,
+      image: null,
+      isNew: item.isNew || false,
+      isPromo: item.isPromo || false
+    });
+    setEditingItemId(item.id);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const handleCancelEdit = () => {
     setNewMenuItem({ name: '', description: '', price: '', image: null });
@@ -139,104 +137,111 @@ const handleEditClick = (item) => {
 
   return (
     <>
-    <Header />
+      <Header />
+      <div className="container mt-5">
+        <h2 className="text-primary mb-4">
+          {editingItemId ? 'Editare Item' : 'Administrare Meniu'}
+        </h2>
 
-    <div className="container mt-5">
-      <h2 className="text-primary mb-4">
-        {editingItemId ? 'Editare Item' : 'Administrare Meniu'}
-      </h2>
-
-      <form onSubmit={handleAddOrEdit} className="mb-4" encType="multipart/form-data">
-        <div className="row g-3 align-items-end">
-          <div className="col-md-3">
-            <input
-              type="text"
-              className="form-control"
-              name="name"
-              placeholder="Nume item"
-              value={newMenuItem.name}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="col-md-3">
-            <input
-              type="text"
-              className="form-control"
-              name="description"
-              placeholder="Descriere"
-              value={newMenuItem.description}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="col-md-2">
-            <input
-              type="number"
-              step="0.01"
-              className="form-control"
-              name="price"
-              placeholder="Preț"
-              value={newMenuItem.price}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="col-md-2">
-            <input
-              type="file"
-              className="form-control"
-              name="image"
-              accept="image/*"
-              onChange={handleChange}
-              required={!editingItemId}
-            />
-            {editingItemId && (() => {
-              const existingItem = menu.find((i) => i.id === editingItemId);
-              return existingItem?.image ? (
-                <div className="mt-2">
-                  <small>Imagine existentă:</small><br />
-                  <img src={existingItem.image} alt="previzualizare" width="100" />
-                </div>
-              ) : null;
-            })()}
-          </div>
-          <div className="col-md-1 form-check">
-  <input
-    type="checkbox"
-    className="form-check-input"
-    name="isNew"
-    id="isNew"
-    checked={newMenuItem.isNew}
-    onChange={handleChange}
-  />
-  <label className="form-check-label" htmlFor="isNew">Nou</label>
-</div>
-<div className="col-md-1 form-check">
-  <input
-    type="checkbox"
-    className="form-check-input"
-    name="isPromo"
-    id="isPromo"
-    checked={newMenuItem.isPromo}
-    onChange={handleChange}
-  />
-  <label className="form-check-label" htmlFor="isPromo">Promo</label>
-</div>
-          <div className="col-md-1">
-            <button type="submit" className="btn btn-success w-100">
-              {editingItemId ? 'Salvează' : 'Adaugă'}
-            </button>
-          </div>
-          {editingItemId && (
+        {/* Form Add/Edit */}
+        <form onSubmit={handleAddOrEdit} className="mb-4" encType="multipart/form-data">
+          <div className="row g-3 align-items-end">
+            {/* Name */}
+            <div className="col-md-3">
+              <input
+                type="text"
+                className="form-control"
+                name="name"
+                placeholder="Nume item"
+                value={newMenuItem.name}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            {/* Description */}
+            <div className="col-md-3">
+              <input
+                type="text"
+                className="form-control"
+                name="description"
+                placeholder="Descriere"
+                value={newMenuItem.description}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            {/* Price */}
+            <div className="col-md-2">
+              <input
+                type="number"
+                step="0.01"
+                className="form-control"
+                name="price"
+                placeholder="Preț"
+                value={newMenuItem.price}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            {/* Image */}
+            <div className="col-md-2">
+              <input
+                type="file"
+                className="form-control"
+                name="image"
+                accept="image/*"
+                onChange={handleChange}
+                required={!editingItemId}
+              />
+              {editingItemId && (() => {
+                const existingItem = menu.find((i) => i.id === editingItemId);
+                return existingItem?.image ? (
+                  <div className="mt-2">
+                    <small>Imagine existentă:</small><br />
+                    <img src={existingItem.image} alt="previzualizare" width="100" />
+                  </div>
+                ) : null;
+              })()}
+            </div>
+            {/* Flags */}
+            <div className="col-md-1 form-check">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                name="isNew"
+                id="isNew"
+                checked={newMenuItem.isNew}
+                onChange={handleChange}
+              />
+              <label className="form-check-label" htmlFor="isNew">Nou</label>
+            </div>
+            <div className="col-md-1 form-check">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                name="isPromo"
+                id="isPromo"
+                checked={newMenuItem.isPromo}
+                onChange={handleChange}
+              />
+              <label className="form-check-label" htmlFor="isPromo">Promo</label>
+            </div>
+            {/* Buttons */}
             <div className="col-md-1">
-              <button type="button" className="btn btn-secondary w-100" onClick={handleCancelEdit}>
-                Anulează
+              <button type="submit" className="btn btn-success w-100">
+                {editingItemId ? 'Salvează' : 'Adaugă'}
               </button>
             </div>
-          )}
-        </div>
-      </form>
+            {editingItemId && (
+              <div className="col-md-1">
+                <button type="button" className="btn btn-secondary w-100" onClick={handleCancelEdit}>
+                  Anulează
+                </button>
+              </div>
+            )}
+          </div>
+        </form>
+
 
       {newMenuItem.name && newMenuItem.description && newMenuItem.price && (newMenuItem.image || editingItemId) && (
         <div className="mb-4">

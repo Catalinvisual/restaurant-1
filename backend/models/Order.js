@@ -1,11 +1,12 @@
-require('dotenv').config({
-  path: process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development'
-});
+require('dotenv').config(); // ✅ citește direct .env
+
 
 const { DataTypes } = require('sequelize');
 const sequelize = require('../db');
 const User = require('./User');
 const Product = require('./Product');
+
+const ENV = process.env.NODE_ENV || 'development';
 
 const Order = sequelize.define(
   'Order',
@@ -15,12 +16,16 @@ const Order = sequelize.define(
       allowNull: false,
       defaultValue: 1,
       validate: {
-        min: 1
+        min: 1,
+        isInt: true // 👈 validare suplimentară
       }
     },
     address: {
       type: DataTypes.STRING,
-      allowNull: true
+      allowNull: true,
+      validate: {
+        len: [0, 255] // 📦 limitează dimensiunea câmpului
+      }
     },
     status: {
       type: DataTypes.STRING,
@@ -33,20 +38,21 @@ const Order = sequelize.define(
   },
   {
     tableName: 'orders',
-    timestamps: true // ✅ createdAt & updatedAt
+    timestamps: true,
+    underscored: true // 🧠 created_at, updated_at în DB
   }
 );
 
 // 🔗 Relații între modele
-User.hasMany(Order, { foreignKey: 'userId' });
-Order.belongsTo(User, { foreignKey: 'userId' });
+User.hasMany(Order, { foreignKey: 'user_id' });
+Order.belongsTo(User, { foreignKey: 'user_id' });
 
-Product.hasMany(Order, { foreignKey: 'productId' });
-Order.belongsTo(Product, { foreignKey: 'productId' });
+Product.hasMany(Order, { foreignKey: 'product_id' });
+Order.belongsTo(Product, { foreignKey: 'product_id' });
 
 // 🛠️ Log pentru dezvoltare
-if (process.env.NODE_ENV === 'development') {
-  console.log('🔧 Modelul Order a fost definit și relațiile stabilite.');
+if (ENV === 'development') {
+  console.log('🔧 [Order Model] definit + relații stabilite.');
 }
 
 module.exports = Order;

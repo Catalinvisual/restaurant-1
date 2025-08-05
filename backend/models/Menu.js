@@ -1,9 +1,9 @@
-require('dotenv').config({
-  path: process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development'
-});
+require('dotenv').config(); // ✅ citește implicit fișierul .env
 
 const { DataTypes } = require('sequelize');
 const sequelize = require('../db');
+
+const ENV = process.env.NODE_ENV || 'development';
 
 const Menu = sequelize.define(
   'Menu',
@@ -12,45 +12,52 @@ const Menu = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        len: [2, 100] // ⛑️ între 2 și 100 caractere
+        notEmpty: true,
+        len: [2, 100]
       }
     },
     price: {
       type: DataTypes.FLOAT,
       allowNull: false,
       validate: {
-        min: 0.01 // 💰 preț minim
+        isFloat: true,
+        min: 0.01
       }
     },
     description: {
       type: DataTypes.TEXT,
-      allowNull: true
+      allowNull: true,
+      defaultValue: ''
     },
     image: {
       type: DataTypes.STRING,
       allowNull: true,
       validate: {
-        isUrl: true // 🔗 validare URL
-      }
+        isUrl: true
+      },
+      field: 'image_url' // 🔗 mapare explicită către DB dacă folosești snake_case
     },
     isNew: {
       type: DataTypes.BOOLEAN,
-      defaultValue: false
+      defaultValue: false,
+      field: 'is_new'
     },
     isPromo: {
       type: DataTypes.BOOLEAN,
-      defaultValue: false
+      defaultValue: false,
+      field: 'is_promo'
     }
   },
   {
     tableName: 'menu',
-    timestamps: true // ✅ include createdAt & updatedAt
+    timestamps: true,
+    underscored: true // 🧠 created_at, updated_at în loc de camelCase
   }
 );
 
 // 🔍 Log în mediu local
-if (process.env.NODE_ENV === 'development') {
-  console.log('🔧 Modelul Menu a fost încărcat cu succes.');
+if (ENV === 'development') {
+  console.log('🔧 [Menu Model] încărcat cu succes');
 }
 
 module.exports = Menu;

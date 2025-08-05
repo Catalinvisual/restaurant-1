@@ -1,10 +1,9 @@
+require('dotenv').config(); // citește direct .env (singurul fișier pe care îl ai)
+
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const sequelize = require('./db');
-require('dotenv').config({
-  path: process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development'
-});
 
 // 🔍 Detectăm mediul curent
 const ENV = process.env.NODE_ENV || 'development';
@@ -64,14 +63,25 @@ app.use((err, req, res, next) => {
 
 // ✅ Pornirea serverului + sincronizare DB
 const PORT = process.env.PORT || 3001;
-sequelize
-  .sync()
-  .then(() => {
-    console.log('✅ Baza de date sincronizată cu succes');
+
+sequelize.authenticate()
+  .then(async () => {
+    console.log('✅ Conexiune DB reușită');
+
+    // 🔁 Sincronizare DB: în local facem alter, în producție doar sync
+    if (ENV !== 'production') {
+      await sequelize.sync({ alter: true });
+      console.log('📦 Sync DB cu alter activat (local)');
+    } else {
+      await sequelize.sync();
+      console.log('📦 Sync DB simplu (Render/live)');
+    }
+
     app.listen(PORT, () => {
       console.log(`🚀 Server pornit pe portul ${PORT}`);
     });
   })
   .catch((error) => {
-    console.error('❌ Eroare la sincronizare DB:', error);
+    console.error('❌ Eroare la conectare/sync:');
+    console.error(error); // log complet
   });

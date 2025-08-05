@@ -1,6 +1,4 @@
-require('dotenv').config({
-  path: process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development'
-});
+require('dotenv').config(); // ✅ citește .env corect
 
 const express = require('express');
 const router = express.Router();
@@ -16,13 +14,14 @@ const multer = require('multer');
 const ENV = process.env.NODE_ENV || 'development';
 console.log(`🚦 Mediul activ: ${ENV}`);
 
-// 🔐 Config Cloudinary (asigură-te că variabilele sunt în .env corespunzător)
+// 🔐 Config Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
   api_key: process.env.CLOUDINARY_KEY,
   api_secret: process.env.CLOUDINARY_SECRET
 });
 
+// 🖼️ Storage Multer + Cloudinary
 const storage = new CloudinaryStorage({
   cloudinary,
   params: {
@@ -45,7 +44,8 @@ const verifyToken = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (error) {
-    res.status(401).json({ error: 'Token invalid' });
+    console.error('❌ JWT invalid:', error.message);
+    return res.status(401).json({ error: 'Token invalid' });
   }
 };
 
@@ -66,10 +66,14 @@ router.post('/', verifyToken, upload.single('image'), async (req, res) => {
   const imageUrl = req.file?.path || null;
 
   try {
+    if (!name || !price) {
+      return res.status(400).json({ error: 'Nume și preț sunt obligatorii' });
+    }
+
     const newProduct = await Product.create({
-      name: name || 'Fără nume',
-      description: description || '',
-      price: parseFloat(price) || 0,
+      name: name.trim(),
+      description: description?.trim() || '',
+      price: parseFloat(price),
       image: imageUrl
     });
 

@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
 import "../assets/styles/Home.css";
-
-const BASE_URL = process.env.REACT_APP_API_URL;
+import { API_URL } from "../apiConfig";
 
 export default function Home() {
   const [specialItems, setSpecialItems] = useState([]);
 
   useEffect(() => {
-    fetch(`${BASE_URL}/api/menu`)
+    fetch(`${API_URL}/api/menu`)
       .then((res) => res.json())
       .then((data) => {
         const filtered = data.filter((item) => item.isNew || item.isPromo);
@@ -43,7 +42,6 @@ export default function Home() {
           </ul>
         </section>
 
-        {/* PRODUSE PROMO/NOU */}
         {specialItems.length > 0 && (
           <section className="my-5">
             <h3 className="text-warning text-center">🌟 Produse Evidențiate</h3>

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
 import '../assets/styles/Menu.css';
+import { API_URL } from '../apiConfig';
 
 export default function Menu() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    const API_URL = process.env.REACT_APP_API_URL;
     console.log('🌐 Valoarea API_URL este:', API_URL);
 
     fetch(`${API_URL}/api/menu`)
@@ -17,7 +17,6 @@ export default function Menu() {
 
   return (
     <>
-      {/* 🔽 Banner fullscreen sub Header */}
       <div className="menu-banner-fullscreen">
         <img
           src="/assets/images/signeture-bg.jpg"
@@ -26,7 +25,6 @@ export default function Menu() {
         />
       </div>
 
-      {/* 🔽 Conținutul paginii */}
       <div className="container pt-2">
         <h2 className="text-primary text-center mb-3">Meniu</h2>
 

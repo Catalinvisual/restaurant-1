@@ -1,9 +1,10 @@
-require('dotenv').config({
-  path: process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development'
-});
+require('dotenv').config(); // ✅ citește implicit fișierul .env
+
 
 const { DataTypes } = require('sequelize');
 const sequelize = require('../db');
+
+const ENV = process.env.NODE_ENV || 'development';
 
 const User = sequelize.define(
   'User',
@@ -11,14 +12,17 @@ const User = sequelize.define(
     username: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true
+      unique: true,
+      validate: {
+        len: [3, 50] // 👤 Evită nume prea scurte
+      }
     },
     email: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
       validate: {
-        isEmail: true // ⛑️ validare email
+        isEmail: true
       }
     },
     password: {
@@ -28,7 +32,7 @@ const User = sequelize.define(
     isAdmin: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
-      field: 'is_admin'
+      field: 'is_admin' // 🛠️ Mapping către coloana DB
     },
     lastLogin: {
       type: DataTypes.DATE,
@@ -37,20 +41,20 @@ const User = sequelize.define(
   },
   {
     tableName: 'users',
-    timestamps: true // ✅ adaugă automat createdAt și updatedAt
+    timestamps: true // Adaugă createdAt / updatedAt automat
   }
 );
 
-// 🔍 Hook opțional pentru logarea ultimei autentificări
+// 🔍 Hook: actualizare lastLogin
 User.beforeUpdate((user, options) => {
-  if (options.fields.includes('lastLogin')) {
+  if (options.fields?.includes('lastLogin')) {
     user.lastLogin = new Date();
   }
 });
 
-// 📦 Log în mediu local
-if (process.env.NODE_ENV === 'development') {
-  console.log('🔧 Modelul User a fost încărcat cu succes.');
+// 📦 Log local pentru confirmare
+if (ENV === 'development') {
+  console.log('🔧 [User Model] încărcat cu succes');
 }
 
 module.exports = User;

@@ -1,6 +1,4 @@
-require('dotenv').config({
-  path: process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development'
-});
+require('dotenv').config(); // citește implicit fișierul .env
 
 const express = require('express');
 const router = express.Router();
@@ -14,20 +12,30 @@ console.log(`🚦 [Order Routes] Mediul activ: ${ENV}`);
 // 📦 Validare simplă pentru input
 const validateOrderInput = (req, res, next) => {
   const { userId, productId, quantity, address } = req.body;
+
   if (!userId || !productId || !quantity || !address) {
     return res.status(400).json({ error: 'Toate câmpurile sunt obligatorii.' });
   }
-  if (isNaN(quantity) || quantity <= 0) {
+
+  if (isNaN(quantity) || Number(quantity) <= 0) {
     return res.status(400).json({ error: 'Cantitate invalidă.' });
   }
+
   next();
 };
 
 // 🛒 Plasare comandă (POST protejat)
 router.post('/', verifyToken, validateOrderInput, async (req, res) => {
   const { userId, productId, quantity, address } = req.body;
+
   try {
-    const newOrder = await Order.create({ userId, productId, quantity, address });
+    const newOrder = await Order.create({
+      userId: parseInt(userId),
+      productId: parseInt(productId),
+      quantity: parseInt(quantity),
+      address: address.trim()
+    });
+
     res.status(201).json(newOrder);
   } catch (error) {
     console.error('❌ Eroare la plasare comandă:', error);
@@ -49,6 +57,7 @@ router.get('/user/:id', verifyToken, async (req, res) => {
       where: { userId },
       order: [['createdAt', 'DESC']]
     });
+
     res.json(orders);
   } catch (error) {
     console.error('❌ Eroare la listare comenzi:', error);

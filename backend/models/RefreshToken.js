@@ -1,16 +1,20 @@
-require('dotenv').config({
-  path: process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development'
-});
+require('dotenv').config(); // ✅ citește implicit fișierul .env
+
 
 const { DataTypes } = require('sequelize');
 const sequelize = require('../db');
+
+const ENV = process.env.NODE_ENV || 'development';
 
 const RefreshToken = sequelize.define(
   'RefreshToken',
   {
     token: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
+      validate: {
+        len: [32, 512] // 🔐 tokenuri JWT sunt lungi
+      }
     },
     userId: {
       type: DataTypes.INTEGER,
@@ -27,13 +31,14 @@ const RefreshToken = sequelize.define(
   },
   {
     tableName: 'refresh_tokens',
-    timestamps: true // ✅ asigură createdAt și updatedAt
+    timestamps: true, // ✅ createdAt & updatedAt
+    underscored: true // 🧠 transformă camelCase în snake_case
   }
 );
 
-// 📦 Log doar în mediu local
-if (process.env.NODE_ENV === 'development') {
-  console.log('🔧 Modelul RefreshToken a fost încărcat.');
+// 📦 Log local pentru confirmare
+if (ENV === 'development') {
+  console.log('🔧 [RefreshToken Model] încărcat cu succes');
 }
 
 module.exports = RefreshToken;
