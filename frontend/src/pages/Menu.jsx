@@ -8,31 +8,21 @@ export default function Menu() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log('🌐 Valoarea API_URL este:', API_URL);
-
-    fetch(`${API_URL}/api/menu`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`Server responded with status ${res.status}`);
-        }
-        return res.json();
-      })
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setProducts(data);
-        } else {
-          console.warn('📛 Răspuns invalid, nu este array:', data);
-          setProducts([]);
-        }
-      })
-      .catch((err) => {
-        console.error('❌ Eroare la preluarea produselor:', err);
+  fetch(`${API_URL}/api/menu`)
+    .then((res) => res.json())
+    .then((data) => {
+      if (Array.isArray(data)) {
+        setProducts(data);
+      } else {
+        console.warn('⚠️ Răspuns invalid, nu este array:', data);
         setProducts([]);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
+      }
+    })
+    .catch((err) => {
+      console.error('❌ Eroare la fetch:', err);
+      setProducts([]);
+    });
+}, []);
 
   return (
     <>

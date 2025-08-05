@@ -1,4 +1,4 @@
-require('dotenv').config(); // ✅ citește implicit fișierul .env
+require('dotenv').config();
 
 const { DataTypes } = require('sequelize');
 const sequelize = require('../db');
@@ -12,16 +12,16 @@ const Menu = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        notEmpty: true,
-        len: [2, 100]
+        notEmpty: { msg: 'Numele nu poate fi gol' },
+        len: { args: [2, 100], msg: 'Numele trebuie să aibă între 2 și 100 de caractere' }
       }
     },
     price: {
       type: DataTypes.FLOAT,
       allowNull: false,
       validate: {
-        isFloat: true,
-        min: 0.01
+        isFloat: { msg: 'Prețul trebuie să fie un număr' },
+        min: { args: [0.01], msg: 'Prețul trebuie să fie pozitiv' }
       }
     },
     description: {
@@ -33,9 +33,9 @@ const Menu = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
       validate: {
-        isUrl: true
+        isUrl: { msg: 'Imaginea trebuie să fie un URL valid' }
       },
-      field: 'image_url' // 🔗 mapare explicită către DB dacă folosești snake_case
+      field: 'image_url'
     },
     isNew: {
       type: DataTypes.BOOLEAN,
@@ -51,13 +51,14 @@ const Menu = sequelize.define(
   {
     tableName: 'menu',
     timestamps: true,
-    underscored: true // 🧠 created_at, updated_at în loc de camelCase
+    underscored: true,
+    freezeTableName: true // 🔒 evită pluralizarea automată
   }
 );
 
-// 🔍 Log în mediu local
+// 🔍 Log în dezvoltare
 if (ENV === 'development') {
-  console.log('🔧 [Menu Model] încărcat cu succes');
+  console.log('🔧 [Menu Model] definit corect pentru PostgreSQL');
 }
 
 module.exports = Menu;
