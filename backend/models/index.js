@@ -7,10 +7,10 @@ const ENV = process.env.NODE_ENV || 'development';
 
 let sequelize;
 
+// 🌍 Conectare producție (ex: Render)
 if (process.env.DATABASE_URL && ENV === 'production') {
-  // 🌍 Conectare producție (ex: Render)
   sequelize = new Sequelize(
-    process.env.DATABASE_URL.replace(/^postgresql/, 'postgres'), // corectăm prefix dacă e nevoie
+    process.env.DATABASE_URL.replace(/^postgresql/, 'postgres'),
     {
       dialect: 'postgres',
       protocol: 'postgres',
@@ -29,11 +29,20 @@ if (process.env.DATABASE_URL && ENV === 'production') {
     {
       host: process.env.DB_HOST,
       dialect: process.env.DB_DIALECT || 'postgres',
-      port: Number(process.env.DB_PORT) || 5432, // port ca număr!
+      port: Number(process.env.DB_PORT) || 5432,
       logging: ENV === 'development'
     }
   );
 }
+
+// ⚙️ Sincronizează schema DB în ambele medii
+sequelize.sync({ alter: true })
+  .then(() => {
+    console.log(`✅ [Sequelize Sync] Schema DB actualizată (${ENV})`);
+  })
+  .catch((err) => {
+    console.error(`❌ [Sequelize Sync] Eroare la sync (${ENV}):`, err);
+  });
 
 // 🔗 Încarcă modelele Sequelize
 const User = require('./User');
@@ -43,7 +52,7 @@ const Order = require('./Order');
 const RefreshToken = require('./RefreshToken');
 
 // 🧩 Relații suplimentare dacă le preferi centralizate (opțional)
-// Ex: Order.belongsTo(User), etc. — deja definite în fișierele individuale
+// Ex: Order.belongsTo(User), etc.
 
 const db = {
   sequelize,
