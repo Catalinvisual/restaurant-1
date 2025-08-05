@@ -1,7 +1,15 @@
+require('dotenv').config({
+  path: process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development'
+});
+
 const express = require('express');
 const router = express.Router();
 const Order = require('../models/Order');
-const verifyToken = require('../middleware/auth'); // Dacă ai middleware-ul de autentificare
+const verifyToken = require('../middleware/auth');
+
+// 🔍 Detectăm mediul activ
+const ENV = process.env.NODE_ENV || 'development';
+console.log(`🚦 [Order Routes] Mediul activ: ${ENV}`);
 
 // 📦 Validare simplă pentru input
 const validateOrderInput = (req, res, next) => {
@@ -22,7 +30,7 @@ router.post('/', verifyToken, validateOrderInput, async (req, res) => {
     const newOrder = await Order.create({ userId, productId, quantity, address });
     res.status(201).json(newOrder);
   } catch (error) {
-    console.error('❌ Eroare plasare comandă:', error);
+    console.error('❌ Eroare la plasare comandă:', error);
     res.status(500).json({ error: 'Eroare la server', details: error.message });
   }
 });
@@ -31,8 +39,8 @@ router.post('/', verifyToken, validateOrderInput, async (req, res) => {
 router.get('/user/:id', verifyToken, async (req, res) => {
   const userId = req.params.id;
 
-  // Opțional: verificare că utilizatorul cere doar comenzile proprii
-  if (req.user.id !== userId) {
+  // ✅ Protejăm accesul la comenzi doar pentru utilizatorul autentificat
+  if (String(req.user.id) !== String(userId)) {
     return res.status(403).json({ error: 'Acces interzis la comenzi altui utilizator.' });
   }
 
@@ -43,7 +51,7 @@ router.get('/user/:id', verifyToken, async (req, res) => {
     });
     res.json(orders);
   } catch (error) {
-    console.error('❌ Eroare listare comenzi:', error);
+    console.error('❌ Eroare la listare comenzi:', error);
     res.status(500).json({ error: 'Eroare la server', details: error.message });
   }
 });

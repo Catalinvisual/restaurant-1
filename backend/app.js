@@ -2,12 +2,22 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const sequelize = require('./db');
-require('dotenv').config(); // 📦 Încarcă variabilele din .env
+require('dotenv').config({
+  path: process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development'
+});
 
-// 🔗 URL-ul public pentru imaginile uploadate
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3001';
+// 🔍 Detectăm mediul curent
+const ENV = process.env.NODE_ENV || 'development';
+console.log(`🚦 Mediul activ: ${ENV}`);
 
-// Modele
+// 🌐 URL-ul aplicației
+const BASE_URL =
+  ENV === 'production'
+    ? process.env.BASE_URL
+    : `http://localhost:${process.env.PORT || 3001}`;
+console.log(`🌐 BASE_URL: ${BASE_URL}`);
+
+// Modele Sequelize
 require('./models/User');
 require('./models/Product');
 require('./models/Menu');
@@ -17,12 +27,13 @@ const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
 const menuRoutes = require('./routes/menuRoutes');
 
+// Express app
 const app = express();
 
-// 🔀 CORS
+// 🔐 CORS dinamic
 const allowedOrigins = [
-  'http://localhost:3000',
-  'https://restaurant-1-frontend.onrender.com',
+  process.env.FRONTEND_URL_LOCAL || 'http://localhost:3000',
+  process.env.FRONTEND_URL_PROD || 'https://restaurant-1-frontend.onrender.com'
 ];
 
 const corsOptions = {
@@ -34,31 +45,29 @@ const corsOptions = {
     }
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true,
+  credentials: true
 };
 
 app.use(cors(corsOptions));
 app.use(express.json());
-
 
 // ✅ Rute API
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/menu', menuRoutes);
 
-// ✅ Fallback pentru erori
+// ✅ Tratamentul erorilor
 app.use((err, req, res, next) => {
   console.error('❌ Eroare server:', err.message);
   res.status(500).json({ error: 'Eroare internă de server' });
 });
 
-// ✅ Start server și sincronizare
+// ✅ Pornirea serverului + sincronizare DB
 const PORT = process.env.PORT || 3001;
 sequelize
   .sync()
   .then(() => {
-    console.log('✅ Baza de date sincronizată');
-    console.log(`🌐 BASE_URL setat ca: ${BASE_URL}`);
+    console.log('✅ Baza de date sincronizată cu succes');
     app.listen(PORT, () => {
       console.log(`🚀 Server pornit pe portul ${PORT}`);
     });
