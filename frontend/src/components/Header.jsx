@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useState, useEffect } from 'react';
 import '../assets/styles/Header.css';
@@ -6,41 +6,47 @@ import { FaUserCircle } from 'react-icons/fa';
 
 export default function Header() {
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isHidden, setIsHidden] = useState(false);
 
-  const toggleNavbar = () => {
-    setIsCollapsed(!isCollapsed);
-  };
-
-  const handleLinkClick = () => {
-    setIsCollapsed(true); // Închide meniul la click pe link
-  };
+  const toggleNavbar = () => setIsCollapsed(!isCollapsed);
+  const handleLinkClick = () => setIsCollapsed(true);
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
-    const navbar = document.querySelector('.navbar');
 
     const handleScroll = () => {
-      if (!navbar) return;
-
       if (window.scrollY > lastScrollY && window.scrollY > 60) {
-        // Scroll în jos — ascundem navbar-ul
-        navbar.classList.add('hidden');
+        setIsHidden(true);
       } else {
-        // Scroll în sus — îl arătăm
-        navbar.classList.remove('hidden');
+        setIsHidden(false);
       }
-
       lastScrollY = window.scrollY;
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const onScroll = () => requestAnimationFrame(handleScroll);
+    window.addEventListener('scroll', onScroll);
+
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  const token = localStorage.getItem('accessToken');
+
   return (
-    <nav className="navbar navbar-expand-lg fixed-top transparent-header">
+    <nav
+      className={`navbar navbar-expand-lg fixed-top transparent-header ${
+        isHidden ? 'hidden' : ''
+      }`}
+    >
       <div className="container">
-        <Link className="navbar-brand text-white" to="/" onClick={handleLinkClick}>Restaurant</Link>
+        <NavLink
+          className={({ isActive }) =>
+            `navbar-brand text-white ${isActive ? 'active' : ''}`
+          }
+          to="/"
+          onClick={handleLinkClick}
+        >
+          Restaurant
+        </NavLink>
         <button
           className="navbar-toggler"
           type="button"
@@ -52,17 +58,84 @@ export default function Header() {
           <span className="navbar-toggler-icon"></span>
         </button>
 
-        <div className={`collapse navbar-collapse ${!isCollapsed ? 'show' : ''}`} id="navbarNav">
+        <div
+          className={`collapse navbar-collapse ${
+            !isCollapsed ? 'show' : ''
+          }`}
+          id="navbarNav"
+        >
           <ul className="navbar-nav ms-auto">
-            <li className="nav-item"><Link className="nav-link text-white" to="/" onClick={handleLinkClick}>Home</Link></li>
-            <li className="nav-item"><Link className="nav-link text-white" to="/menu" onClick={handleLinkClick}>Meniu</Link></li>
-            <li className="nav-item"><Link className="nav-link text-white" to="/cart" onClick={handleLinkClick}>Coș</Link></li>
-            <li className="nav-item"><Link className="nav-link text-white" to="/my-orders" onClick={handleLinkClick}>Comenzile mele</Link></li>
-            <li className="nav-item"><Link className="nav-link text-white" to="/orders" onClick={handleLinkClick}>Toate comenzile</Link></li>
             <li className="nav-item">
-              <Link className="nav-link text-white d-flex align-items-center" to="/login" onClick={handleLinkClick}>
+              <NavLink
+                to="/"
+                className={({ isActive }) =>
+                  `nav-link text-white ${isActive ? 'active' : ''}`
+                }
+                onClick={handleLinkClick}
+              >
+                Home
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink
+                to="/menu"
+                className={({ isActive }) =>
+                  `nav-link text-white ${isActive ? 'active' : ''}`
+                }
+                onClick={handleLinkClick}
+              >
+                Meniu
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink
+                to="/cart"
+                className={({ isActive }) =>
+                  `nav-link text-white ${isActive ? 'active' : ''}`
+                }
+                onClick={handleLinkClick}
+              >
+                Coș
+              </NavLink>
+            </li>
+            {token && (
+              <>
+                <li className="nav-item">
+                  <NavLink
+                    to="/my-orders"
+                    className={({ isActive }) =>
+                      `nav-link text-white ${isActive ? 'active' : ''}`
+                    }
+                    onClick={handleLinkClick}
+                  >
+                    Comenzile mele
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink
+                    to="/orders"
+                    className={({ isActive }) =>
+                      `nav-link text-white ${isActive ? 'active' : ''}`
+                    }
+                    onClick={handleLinkClick}
+                  >
+                    Toate comenzile
+                  </NavLink>
+                </li>
+              </>
+            )}
+            <li className="nav-item login-icon">
+              <NavLink
+                to="/login"
+                className={({ isActive }) =>
+                  `nav-link text-white d-flex align-items-center justify-content-center ${
+                    isActive ? 'active' : ''
+                  }`
+                }
+                onClick={handleLinkClick}
+              >
                 <FaUserCircle size={24} />
-              </Link>
+              </NavLink>
             </li>
           </ul>
         </div>

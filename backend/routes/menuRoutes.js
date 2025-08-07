@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config(); // ✅ citește .env
 
 const express = require('express');
 const router = express.Router();
@@ -29,20 +29,32 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 },
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
   fileFilter: (req, file, cb) => {
     if (file.mimetype?.startsWith('image/')) cb(null, true);
     else cb(new Error('❌ Tip fișier invalid. Doar imagini sunt permise.'));
   }
 });
 
+// Middleware pentru captarea erorilor multer
+const handleUploadError = (req, res, next) => {
+  upload.single('image')(req, res, function (err) {
+    if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(413).json({ error: 'Imaginea este prea mare. Maxim 5MB permis.' });
+    } else if (err) {
+      return res.status(400).json({ error: err.message });
+    }
+    next();
+  });
+};
 
 // 🔽 Rute:
 
 // 1️⃣ GET — toate produsele
 router.get('/', async (req, res) => {
   try {
-    const items = await Menu.findAll();
+    const { category } = req.query;
+    const items = await Menu.findAll({ where: category ? { category } : {} });
     res.status(200).json(items);
   } catch (error) {
     console.error('❌ Eroare GET /api/menu:', error);
@@ -51,12 +63,16 @@ router.get('/', async (req, res) => {
 });
 
 // 2️⃣ POST — adaugă produs
-router.post('/', upload.single('image'), async (req, res) => {
+router.post('/', handleUploadError, async (req, res) => {
   try {
-    const { name, price, description, isNew, isPromo } = req.body;
+    const { name, price, description, isNew, isPromo, category } = req.body;
 
     if (!name || !price || isNaN(price)) {
       return res.status(400).json({ error: 'Name și price valide sunt necesare' });
+    }
+
+    if (!['mancare', 'bautura'].includes(category)) {
+      return res.status(400).json({ error: 'Categoria trebuie să fie "mancare" sau "bautura"' });
     }
 
     const imageUrl = req.file?.path || req.body.image || null;
@@ -67,7 +83,8 @@ router.post('/', upload.single('image'), async (req, res) => {
       description: description?.trim() || '',
       image: imageUrl,
       isNew: String(isNew) === 'true',
-      isPromo: String(isPromo) === 'true'
+      isPromo: String(isPromo) === 'true',
+      category
     });
 
     res.status(201).json(newItem);
@@ -94,13 +111,17 @@ router.delete('/:id', async (req, res) => {
 });
 
 // 4️⃣ PUT — actualizare
-router.put('/:id', upload.single('image'), async (req, res) => {
+router.put('/:id', handleUploadError, async (req, res) => {
   try {
-    const { name, price, description, isNew, isPromo } = req.body;
+    const { name, price, description, isNew, isPromo, category } = req.body;
     const imageUrl = req.file?.path || req.body.image || null;
 
     if (!name || !price || isNaN(price)) {
       return res.status(400).json({ error: 'Name și price valide sunt necesare' });
+    }
+
+    if (!['mancare', 'bautura'].includes(category)) {
+      return res.status(400).json({ error: 'Categoria trebuie să fie "mancare" sau "bautura"' });
     }
 
     const [updatedCount, updatedRows] = await Menu.update({
@@ -109,7 +130,8 @@ router.put('/:id', upload.single('image'), async (req, res) => {
       description: description?.trim() || '',
       image: imageUrl,
       isNew: String(isNew) === 'true',
-      isPromo: String(isPromo) === 'true'
+      isPromo: String(isPromo) === 'true',
+      category
     }, {
       where: { id: req.params.id },
       returning: true

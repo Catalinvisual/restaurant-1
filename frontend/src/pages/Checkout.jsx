@@ -10,27 +10,41 @@ export default function Checkout() {
   const [address, setAddress] = useState('');
   const [message, setMessage] = useState('');
 
-  const total = cartItems.reduce(
-    (acc, item) => acc + item.price * item.quantity,
-    0
-  );
+  const total = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const token = localStorage.getItem('accessToken');
+    console.log('🔐 Token:', token); // DEBUG
+
+    if (!token || token === 'undefined') {
+      setMessage('❗ Token-ul lipsește sau este invalid. Te rugăm să te autentifici.');
+      return;
+    }
 
     if (cartItems.length === 0) {
       setMessage('❌ Coșul este gol. Adaugă produse înainte de a comanda.');
       return;
     }
 
+    const itemsPayload = cartItems.map(item => ({
+      id: item.id,
+      quantity: item.quantity,
+      price: item.price,
+    }));
+
     try {
       const response = await fetch(`${API_URL}/api/orders`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // Dacă folosești token: 'Authorization': `Bearer ${localStorage.getItem('token')}`
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name, address, items: cartItems, total }),
+        body: JSON.stringify({
+          address: address.trim(),
+          items: itemsPayload,
+        }),
       });
 
       if (response.ok) {
@@ -46,14 +60,13 @@ export default function Checkout() {
       }
     } catch (error) {
       console.error('❌ Eroare conexiune:', error);
-      setMessage('Serverul nu răspunde. Încearcă mai târziu.');
+      setMessage('❌ Serverul nu răspunde. Încearcă mai târziu.');
     }
   };
 
   return (
     <>
       <Header />
-
       <div className="container mt-5">
         <h2 className="text-primary mb-4">Finalizare comandă</h2>
         {message && <div className="alert alert-info">{message}</div>}
@@ -83,7 +96,10 @@ export default function Checkout() {
           <h4 className="mt-4">🧾 Sumar comandă</h4>
           <ul className="list-group mb-3">
             {cartItems.map((item) => (
-              <li className="list-group-item d-flex justify-content-between align-items-center" key={item.id}>
+              <li
+                className="list-group-item d-flex justify-content-between align-items-center"
+                key={item.id}
+              >
                 <div className="d-flex align-items-center">
                   <img
                     src={item.image || 'https://via.placeholder.com/40?text=Img'}

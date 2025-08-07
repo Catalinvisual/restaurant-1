@@ -1,28 +1,309 @@
-.hero-section {
-  height: 100vh;
-  background-image: url('../../../public/assets/images/header-bg.jpg'); /* schimbă calea după cum ai imaginea */
-  background-size: cover;
-  background-position: center 10%;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.home-page {
+  font-family: 'Poppins', sans-serif;
+  background-color: transparent;
 }
 
-.overlay-text {
-  background-color: rgba(0, 0, 0, 0.2);
-  padding: 2rem;
-  border-radius: 0.5rem;
+/* MAIN CONTENT */
+.main-content {
+  background-image: url('../../../public/assets/images/dark-texture.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex: 1;
+  min-height: 100vh;
+}
+
+/* Optional: overlay pentru contrast */
+.home-background::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: -1;
+}
+
+/* HERO SECTION */
+.hero-section {
+  background-image: url('../../../public/assets/images/bg-hero.jpg');
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  position: relative;
+}
+
+.hero-overlay {
+  background-color: rgba(0, 0, 0, 0.6);
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.hero-overlay .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* TEXT STÂNGA */
+.hero-text {
   color: white;
+  max-width: 500px;
+  padding: 20px;
 }
 
 .hero-title {
-  font-size: 2.5rem;
+  font-size: 3rem;
   font-weight: bold;
 }
 
 .hero-subtitle {
   font-size: 1.2rem;
-  max-width: 600px;
-  margin: 0 auto;
+  margin-top: 15px;
+  line-height: 1.6;
+}
+
+.btn-book {
+  background-color: #ff4d4d;
+  color: white;
+  padding: 12px 30px;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+
+.btn-book:hover {
+  background-color: #e60000;
+}
+
+/* GRĂTAR DREAPTA */
+.grill-container {
+  width: 500px;
+  height: 500px;
+  position: relative;
+  animation: fadeInGrill 2s ease-out forwards;
+  opacity: 0;
+  filter: drop-shadow(0 0 20px rgba(255, 100, 100, 0.5));
+}
+
+@keyframes fadeInGrill {
+  to {
+    opacity: 1;
+  }
+}
+
+.rotating-grill-small {
+  width: 100%;
+  animation: rotateGrill 40s linear infinite;
+}
+
+@keyframes rotateGrill {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* FUM CINEMATIC */
+.grill-container::before,
+.grill-container::after {
+  content: '';
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 400px;
+  background: url('../../../public/assets/images/smoke.png') no-repeat center;
+  background-size: cover;
+  pointer-events: none;
+  z-index: 2;
+  mask-image: linear-gradient(to top, transparent 0%, black 25%, black 100%);
+  -webkit-mask-image: linear-gradient(to top, transparent 0%, black 25%, black 100%);
+}
+
+.grill-container::before {
+  opacity: 0.5;
+  animation: smokeLoopOne 16s ease-in-out infinite;
+}
+
+.grill-container::after {
+  opacity: 0.3;
+  animation: smokeLoopTwo 20s ease-in-out infinite;
+}
+
+@keyframes smokeLoopOne {
+  0% {
+    transform: translateX(-50%) translateY(0) scale(1);
+    opacity: 0.5;
+  }
+  25% {
+    transform: translateX(-50%) translateY(-40px) scale(1.1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateX(-50%) translateY(-80px) scale(1.2);
+    opacity: 0.4;
+  }
+  75% {
+    transform: translateX(-50%) translateY(-40px) scale(1.1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateX(-50%) translateY(0) scale(1);
+    opacity: 0.5;
+  }
+}
+
+@keyframes smokeLoopTwo {
+  0% {
+    transform: translateX(-50%) translateY(0) scale(1);
+    opacity: 0.3;
+  }
+  25% {
+    transform: translateX(-50%) translateY(-30px) scale(1.05);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateX(-50%) translateY(-60px) scale(1.1);
+    opacity: 0.2;
+  }
+  75% {
+    transform: translateX(-50%) translateY(-30px) scale(1.05);
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateX(-50%) translateY(0) scale(1);
+    opacity: 0.3;
+  }
+}
+
+/* SPECIAL OFFERS */
+.special-offers {
+  background-color: #3e2f23;
+  color: #fff8e1;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.special-offers h3 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #ffcc99;
+}
+
+.offer-list li {
+  font-size: 1.2rem;
+  margin-bottom: 0.75rem;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+/* CAROUSEL */
+.image-carousel h3 {
+  font-weight: bold;
+}
+
+.carousel-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  padding-bottom: 1rem;
+}
+
+.carousel-item img {
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  transition: transform 0.3s ease;
+}
+
+.carousel-item img:hover {
+  transform: scale(1.05);
+}
+
+/* FEATURED SECTION */
+.featured-products {
+  background-color: #f0f4f8; /* schimbat din #fff8e1 */
+  color: #3e2f23;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.featured-products h3 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: #d35400;
+}
+
+/* OUR TEAM */
+.team-section {
+  background-color: #fdf2f8; /* schimbat din #fff8e1 */
+  padding: 3rem 1rem;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+}
+
+.team-section h3 {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #d35400;
+}
+
+.team-section .col-md-4 {
+  margin-bottom: 2rem;
+}
+
+.team-section img {
+  border: 4px solid #f5cba7;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.team-section img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.team-section h5 {
+  margin-top: 1rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #3e2f23;
+}
+
+.team-section p {
+  font-size: 1rem;
+  color: #6c757d;
+}
+
+/* ABOUT SECTION */
+.about-section {
+  background-color: #e8f5e9; /* schimbat din #fefae0 */
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.about-section h3 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.about-values li {
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.about-values li::before {
+  content: "⭐";
+  position: absolute;
+  left: 0;
 }

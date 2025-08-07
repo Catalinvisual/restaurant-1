@@ -1,7 +1,7 @@
-require('dotenv').config();
+require('dotenv').config(); // ✅ citește .env
 
 const { DataTypes } = require('sequelize');
-const sequelize = require('../db');
+const sequelize = require('../db'); // ✅ import direct
 
 const ENV = process.env.NODE_ENV || 'development';
 
@@ -46,6 +46,16 @@ const Menu = sequelize.define(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
       field: 'is_promo'
+    },
+    category: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        isIn: {
+          args: [['mancare', 'bautura']],
+          msg: 'Categoria trebuie să fie "mancare" sau "bautura"'
+        }
+      }
     }
   },
   {

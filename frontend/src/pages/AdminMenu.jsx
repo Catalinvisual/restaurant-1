@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
 import { toast } from 'react-toastify';
-import '../assets/styles/AdminMenu.css';
+import '../../src/assets/styles/AdminMenu.css';
 import Header from '../components/Header';
 import { API_URL } from '../apiConfig';
 
@@ -13,12 +13,13 @@ export default function AdminMenu() {
     price: '',
     image: null,
     isNew: false,
-    isPromo: false
+    isPromo: false,
+    category: ''
   });
   const [editingItemId, setEditingItemId] = useState(null);
 
   useEffect(() => {
-    fetch(`${API_URL}/api/menu`)
+    fetch(`${API_URL}/menu`)
       .then((res) => res.json())
       .then((data) => setMenu(data))
       .catch((err) => console.error('❌ Eroare la preluare meniu:', err));
@@ -43,65 +44,81 @@ export default function AdminMenu() {
   };
 
   const handleAddOrEdit = async (e) => {
-    e.preventDefault();
-    const token = localStorage.getItem('token');
-    if (!token) {
-      toast.error('❌ Token lipsă. Autentifică-te ca admin.');
-      return;
+  e.preventDefault();
+
+  // ✅ Verificare dimensiune imagine (maxim 5MB)
+  if (newMenuItem.image && newMenuItem.image.size > 5 * 1024 * 1024) {
+    toast.error('❌ Imaginea este prea mare. Maxim 5MB.');
+    return;
+  }
+
+  const token = localStorage.getItem('token');
+  if (!token) {
+    toast.error('❌ Token lipsă. Autentifică-te ca admin.');
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('name', newMenuItem.name);
+  formData.append('description', newMenuItem.description);
+  formData.append('price', Number(newMenuItem.price));
+  formData.append('isNew', newMenuItem.isNew);
+  formData.append('isPromo', newMenuItem.isPromo);
+  formData.append('category', newMenuItem.category);
+
+  if (newMenuItem.image instanceof File) {
+    formData.append('image', newMenuItem.image);
+  } else {
+    const oldItem = menu.find((i) => i.id === editingItemId);
+    if (oldItem?.image) {
+      formData.append('image', oldItem.image);
     }
+  }
 
-    const formData = new FormData();
-    formData.append('name', newMenuItem.name);
-    formData.append('description', newMenuItem.description);
-    formData.append('price', Number(newMenuItem.price));
-    formData.append('isNew', newMenuItem.isNew);
-    formData.append('isPromo', newMenuItem.isPromo);
+  const url = editingItemId
+    ? `${API_URL}/menu/${editingItemId}`
+    : `${API_URL}/menu`;
+  const method = editingItemId ? 'PUT' : 'POST';
 
-    if (newMenuItem.image instanceof File) {
-      formData.append('image', newMenuItem.image);
-    } else {
-      const oldItem = menu.find((i) => i.id === editingItemId);
-      if (oldItem?.image) {
-        formData.append('image', oldItem.image);
-      }
-    }
+  try {
+    const response = await fetch(url, {
+      method,
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData
+    });
+    const result = await response.json();
 
-    const url = editingItemId
-      ? `${API_URL}/api/menu/${editingItemId}`
-      : `${API_URL}/api/menu`;
-    const method = editingItemId ? 'PUT' : 'POST';
-
-    try {
-      const response = await fetch(url, {
-        method,
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData
-      });
-      const result = await response.json();
-
-      if (response.ok) {
-        if (editingItemId) {
-          setMenu(menu.map((item) => (item.id === editingItemId ? result : item)));
-          toast.success('✏️ Produs actualizat cu succes!', { autoClose: 2000 });
-        } else {
-          setMenu([...menu, result]);
-          toast.success('✅ Produs adăugat cu succes!', { autoClose: 2000 });
-        }
-        setNewMenuItem({ name: '', description: '', price: '', image: null });
-        setEditingItemId(null);
+    if (response.ok) {
+      if (editingItemId) {
+        setMenu(menu.map((item) => (item.id === editingItemId ? result : item)));
+        toast.success('✏️ Produs actualizat cu succes!', { autoClose: 2000 });
       } else {
-        toast.error(`❌ Eroare: ${result.error}`);
+        setMenu([...menu, result]);
+        toast.success('✅ Produs adăugat cu succes!', { autoClose: 2000 });
       }
-    } catch (err) {
-      console.error('❌ Eroare rețea:', err);
-      toast.error('❌ Serverul nu răspunde.');
+      setNewMenuItem({
+        name: '',
+        description: '',
+        price: '',
+        image: null,
+        isNew: false,
+        isPromo: false,
+        category: ''
+      });
+      setEditingItemId(null);
+    } else {
+      toast.error(`❌ Eroare: ${result.error}`);
     }
-  };
+  } catch (err) {
+    console.error('❌ Eroare rețea:', err);
+    toast.error('❌ Serverul nu răspunde.');
+  }
+};
 
   const handleDelete = async (id) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     try {
-      const res = await fetch(`${API_URL}/api/menu/${id}`, {
+      const res = await fetch(`${API_URL}/menu/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -124,14 +141,23 @@ export default function AdminMenu() {
       price: item.price,
       image: null,
       isNew: item.isNew || false,
-      isPromo: item.isPromo || false
+      isPromo: item.isPromo || false,
+      category: item.category || ''
     });
     setEditingItemId(item.id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleCancelEdit = () => {
-    setNewMenuItem({ name: '', description: '', price: '', image: null });
+    setNewMenuItem({
+      name: '',
+      description: '',
+      price: '',
+      image: null,
+      isNew: false,
+      isPromo: false,
+      category: ''
+    });
     setEditingItemId(null);
   };
 
@@ -143,10 +169,8 @@ export default function AdminMenu() {
           {editingItemId ? 'Editare Item' : 'Administrare Meniu'}
         </h2>
 
-        {/* Form Add/Edit */}
         <form onSubmit={handleAddOrEdit} className="mb-4" encType="multipart/form-data">
           <div className="row g-3 align-items-end">
-            {/* Name */}
             <div className="col-md-3">
               <input
                 type="text"
@@ -158,7 +182,6 @@ export default function AdminMenu() {
                 required
               />
             </div>
-            {/* Description */}
             <div className="col-md-3">
               <input
                 type="text"
@@ -170,7 +193,6 @@ export default function AdminMenu() {
                 required
               />
             </div>
-            {/* Price */}
             <div className="col-md-2">
               <input
                 type="number"
@@ -183,8 +205,20 @@ export default function AdminMenu() {
                 required
               />
             </div>
-            {/* Image */}
             <div className="col-md-2">
+              <select
+                className="form-select"
+                name="category"
+                value={newMenuItem.category}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Selectează categoria</option>
+                <option value="mancare">Mâncare</option>
+                <option value="bautura">Băutură</option>
+              </select>
+            </div>
+                        <div className="col-md-2">
               <input
                 type="file"
                 className="form-control"
@@ -203,7 +237,6 @@ export default function AdminMenu() {
                 ) : null;
               })()}
             </div>
-            {/* Flags */}
             <div className="col-md-1 form-check">
               <input
                 type="checkbox"
@@ -226,7 +259,6 @@ export default function AdminMenu() {
               />
               <label className="form-check-label" htmlFor="isPromo">Promo</label>
             </div>
-            {/* Buttons */}
             <div className="col-md-1">
               <button type="submit" className="btn btn-success w-100">
                 {editingItemId ? 'Salvează' : 'Adaugă'}
@@ -242,43 +274,42 @@ export default function AdminMenu() {
           </div>
         </form>
 
-
-      {newMenuItem.name && newMenuItem.description && newMenuItem.price && (newMenuItem.image || editingItemId) && (
-        <div className="mb-4">
-          <p className="fw-bold">Previzualizare item:</p>
-          <ProductCard
-            product={{
-              ...newMenuItem,
-              id: 'preview',
-              image:
-                newMenuItem.image instanceof File
-                  ? URL.createObjectURL(newMenuItem.image)
-                  : newMenuItem.image
-            }}
-          />
-        </div>
-      )}
-
-      <div className="row">
-        {menu.map((item) => (
-          <div key={item.id} className="col-md-4 position-relative">
-            <ProductCard product={item} />
-            <div className="position-absolute top-0 start-50 translate-middle-x mt-2 d-flex gap-2">
-              <button className="btn btn-sm btn-warning" onClick={() => handleEditClick(item)}>
-                ✎
-              </button>
-              <button
-                className="btn btn-sm btn-danger"
-                style={{ boxShadow: '0 2px 6px rgba(0,0,0,0.3)' }}
-                onClick={() => handleDelete(item.id)}
-              >
-                ✕
-              </button>
-            </div>
+        {newMenuItem.name && newMenuItem.description && newMenuItem.price && (newMenuItem.image || editingItemId) && (
+          <div className="mb-4">
+            <p className="fw-bold">Previzualizare item:</p>
+            <ProductCard
+              product={{
+                ...newMenuItem,
+                id: 'preview',
+                image:
+                  newMenuItem.image instanceof File
+                    ? URL.createObjectURL(newMenuItem.image)
+                    : newMenuItem.image
+              }}
+            />
           </div>
-        ))}
+        )}
+
+        <div className="row">
+          {menu.map((item) => (
+            <div key={item.id} className="col-md-4 position-relative">
+              <ProductCard product={item} />
+              <div className="position-absolute top-0 start-50 translate-middle-x mt-2 d-flex gap-2">
+                <button className="btn btn-sm btn-warning" onClick={() => handleEditClick(item)}>
+                  ✎
+                </button>
+                <button
+                  className="btn btn-sm btn-danger"
+                  style={{ boxShadow: '0 2px 6px rgba(0,0,0,0.3)' }}
+                  onClick={() => handleDelete(item.id)}
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
     </>
   );
 }

@@ -8,6 +8,8 @@
 .admin-menu-container h2 {
   font-size: 1.8rem;
   font-weight: 600;
+  margin-bottom: 2.5rem;
+  text-align: center;
 }
 
 /* Inputuri formular */
@@ -29,7 +31,7 @@
 .preview-image {
   margin-top: 0.5rem;
   border-radius: 4px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 /* Secțiune previzualizare item */
@@ -47,19 +49,74 @@
   transform: translateX(-50%);
   display: flex;
   gap: 0.5rem;
+  z-index: 2;
 }
 
 .admin-card-controls .btn-sm {
   font-size: 0.75rem;
   padding: 6px 10px;
   border-radius: 50%;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Card produs */
+.card-admin {
+  background-color: #fffefc;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  transition: transform 0.2s ease-in-out;
+  position: relative;
+  overflow: hidden;
 }
 
 /* Animație hover pentru card */
 .card-admin:hover {
-  transform: scale(1.01);
-  transition: transform 0.2s ease-in-out;
+  transform: scale(1.015);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Badge-uri pentru Nou / Promo */
+.product-badge {
+  display: inline-block;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 12px;
+  margin-right: 0.5rem;
+  color: #fff;
+  animation: fadeInBadge 0.3s ease-in-out;
+}
+
+.badge-new {
+  background-color: #198754;
+}
+
+.badge-promo {
+  background-color: #dc3545;
+}
+
+@keyframes fadeInBadge {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Categorie produs în colțul imaginii */
+.card-admin .category-label {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 6px;
+  z-index: 1;
 }
 
 /* Responsive */
@@ -76,5 +133,10 @@
 
   .item-preview {
     text-align: center;
+  }
+
+  .product-badge {
+    display: block;
+    margin-bottom: 0.3rem;
   }
 }

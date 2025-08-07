@@ -8,10 +8,7 @@ export default function Cart() {
   const { cartItems, dispatch } = useCart();
   const [message, setMessage] = useState('');
 
-  const total = cartItems.reduce(
-    (acc, item) => acc + item.price * item.quantity,
-    0
-  );
+  const total = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   const handleRemove = (index) => {
     if (window.confirm('Ești sigur că vrei să ștergi acest produs?')) {
@@ -28,33 +25,58 @@ export default function Cart() {
   };
 
   const handleCheckout = async () => {
+    const token = localStorage.getItem('accessToken');
+    const address = localStorage.getItem('deliveryAddress') || 'Strada Florilor 12';
+
+    console.log('🔐 Token trimis în fetch:', token); // DEBUG
+
+    if (!token || token === 'undefined') {
+      setMessage('❗ Token-ul de autentificare lipsește. Te rugăm să te loghezi din nou.');
+      return;
+    }
+
+    if (cartItems.length === 0) {
+      setMessage('❗ Coșul este gol.');
+      return;
+    }
+
+    const mainItem = cartItems[0];
+
     try {
-      const response = await fetch(`${API_URL}/api/orders`, {
+      const response = await fetch(`${API_URL}/orders`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // Dacă folosești token: Authorization: `Bearer ${localStorage.getItem('token')}`
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ items: cartItems, total }),
+        body: JSON.stringify({
+          address,
+          items: [
+            {
+              id: mainItem.id,
+              quantity: mainItem.quantity,
+              price: mainItem.price,
+            },
+          ],
+        }),
       });
 
       if (response.ok) {
-        setMessage('✅ Comanda a fost înregistrată!');
+        setMessage('✅ Comanda a fost înregistrată cu succes!');
         dispatch({ type: 'CLEAR_CART' });
       } else {
         const error = await response.json();
-        setMessage(error.message || '❌ Eroare la plasarea comenzii');
+        setMessage(`❌ Eroare: ${error.error || 'Nu s-a putut plasa comanda.'}`);
       }
     } catch (err) {
       console.error('❌ Eroare de rețea:', err);
-      setMessage('Serverul nu răspunde.');
+      setMessage('❌ Serverul nu răspunde. Încearcă din nou mai târziu.');
     }
   };
 
   return (
     <>
       <Header />
-
       <div className="container mt-5">
         <h2 className="text-primary mb-4">Coșul meu de cumpărături</h2>
 
@@ -130,7 +152,7 @@ export default function Cart() {
                 })}
               </h4>
               <button className="btn btn-success mt-3" onClick={handleCheckout}>
-                Plată la livrare
+                Plata la livrare
               </button>
             </div>
           </>

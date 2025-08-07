@@ -1,8 +1,7 @@
 require('dotenv').config(); // ✅ citește implicit fișierul .env
 
-
 const { DataTypes } = require('sequelize');
-const sequelize = require('../db');
+const sequelize = require('../db'); // ✅ import direct
 
 const ENV = process.env.NODE_ENV || 'development';
 

@@ -2,7 +2,7 @@ require('dotenv').config(); // ✅ citește .env corect
 
 const express = require('express');
 const router = express.Router();
-const Product = require('../models/Product');
+const Product = require('../models/Product'); // ✅ modelul e corect importat
 const jwt = require('jsonwebtoken');
 
 // ☁️ Cloudinary + Multer

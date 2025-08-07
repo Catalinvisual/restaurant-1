@@ -1,32 +1,34 @@
-require('dotenv').config(); // citește direct .env (singurul fișier pe care îl ai)
+require('dotenv').config(); // ✅ citește .env
 
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const sequelize = require('./db');
 
-// 🔍 Detectăm mediul curent
 const ENV = process.env.NODE_ENV || 'development';
-console.log(`🚦 Mediul activ: ${ENV}`);
+const PORT = process.env.PORT || 3001;
 
-// 🌐 URL-ul aplicației
+console.log(`🚦 Mediul activ: ${ENV}`);
 const BASE_URL =
   ENV === 'production'
     ? process.env.BASE_URL
-    : `http://localhost:${process.env.PORT || 3001}`;
+    : `http://localhost:${PORT}`;
 console.log(`🌐 BASE_URL: ${BASE_URL}`);
 
-// Modele Sequelize
+// 🔁 Modele Sequelize
 require('./models/User');
 require('./models/Product');
 require('./models/Menu');
+require('./models/Order');
+require('./models/OrderItem'); // ✅ relație esențială
 
-// Rute
+// 📦 Rute
 const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
 const menuRoutes = require('./routes/menuRoutes');
+const orderRoutes = require('./routes/orderRoutes');
 
-// Express app
+// 🚀 Express app
 const app = express();
 
 // 🔐 CORS dinamic
@@ -50,38 +52,43 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
-// ✅ Rute API
+// ✅ Montare rute
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/menu', menuRoutes);
+app.use('/api/orders', orderRoutes);
 
-// ✅ Tratamentul erorilor
+// 🧱 Servire frontend în producție
+if (ENV === 'production') {
+  app.use(express.static(path.join(__dirname, 'client', 'build')));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
+  });
+}
+
+// 🔥 Middleware de erori
 app.use((err, req, res, next) => {
   console.error('❌ Eroare server:', err.message);
   res.status(500).json({ error: 'Eroare internă de server' });
 });
 
-// ✅ Pornirea serverului + sincronizare DB
-const PORT = process.env.PORT || 3001;
-
+// 🧠 Pornire server + sincronizare DB
 sequelize.authenticate()
   .then(async () => {
     console.log('✅ Conexiune DB reușită');
 
-    // 🔁 Sincronizare DB: în local facem alter, în producție doar sync
     if (ENV !== 'production') {
-      await sequelize.sync({ alter: true });
+      await sequelize.sync({ alter: true }); // 🔁 sincronizare flexibilă
       console.log('📦 Sync DB cu alter activat (local)');
     } else {
       await sequelize.sync();
-      console.log('📦 Sync DB simplu (Render/live)');
+      console.log('📦 Sync DB simplu (producție)');
     }
 
     app.listen(PORT, () => {
-      console.log(`🚀 Server pornit pe portul ${PORT}`);
+      console.log(`🚀 Server pornit pe ${BASE_URL}`);
     });
   })
   .catch((error) => {
-    console.error('❌ Eroare la conectare/sync:');
-    console.error(error); // log complet
+    console.error('❌ Eroare la conectare/sync DB:', error);
   });

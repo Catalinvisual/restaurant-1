@@ -1,56 +1,43 @@
-require('dotenv').config(); // ✅ citește direct .env
-
+require('dotenv').config(); // ✅ citește .env
 
 const { DataTypes } = require('sequelize');
-const sequelize = require('../db');
+const sequelize = require('../db'); // ✅ import corect
 const User = require('./User');
-const Product = require('./Product');
+const OrderItem = require('./OrderItem'); // 👈 asigură-te că fișierul există
 
 const ENV = process.env.NODE_ENV || 'development';
 
 const Order = sequelize.define(
   'Order',
   {
-    quantity: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 1,
-      validate: {
-        min: 1,
-        isInt: true // 👈 validare suplimentară
-      }
-    },
     address: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
       validate: {
-        len: [0, 255] // 📦 limitează dimensiunea câmpului
+        len: [1, 255]
       }
     },
     status: {
-      type: DataTypes.STRING,
+      type: DataTypes.ENUM('pending', 'confirmed', 'shipped', 'delivered', 'cancelled'),
       allowNull: false,
-      defaultValue: 'pending',
-      validate: {
-        isIn: [['pending', 'confirmed', 'shipped', 'delivered', 'cancelled']]
-      }
+      defaultValue: 'pending'
     }
   },
   {
     tableName: 'orders',
     timestamps: true,
-    underscored: true // 🧠 created_at, updated_at în DB
+    underscored: true
   }
 );
 
-// 🔗 Relații între modele
+// 🔗 Relații cu User
 User.hasMany(Order, { foreignKey: 'user_id' });
 Order.belongsTo(User, { foreignKey: 'user_id' });
 
-Product.hasMany(Order, { foreignKey: 'product_id' });
-Order.belongsTo(Product, { foreignKey: 'product_id' });
+// 🔗 Relații cu OrderItems
+Order.hasMany(OrderItem, { foreignKey: 'order_id', as: 'OrderItems' });
+OrderItem.belongsTo(Order, { foreignKey: 'order_id' });
 
-// 🛠️ Log pentru dezvoltare
 if (ENV === 'development') {
   console.log('🔧 [Order Model] definit + relații stabilite.');
 }

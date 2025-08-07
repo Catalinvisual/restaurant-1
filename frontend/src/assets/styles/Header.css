@@ -1,13 +1,14 @@
-/* 🔲 Bara de navigare transparentă FĂRĂ blur, cu scroll hide */
+/* 🔲 Bara de navigare cinematică */
 .transparent-header {
-  background-color: rgb(3, 3, 3);
-  box-shadow: none;
+  background: linear-gradient(to right, #2c1f0f, #3b2a17); /* tonuri lemnoase */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   transition: top 0.3s ease;
   position: fixed;
   top: 0;
   width: 100%;
   z-index: 1000;
+  font-family: 'Playfair Display', serif;
 }
 
 /* 📉 Ascunde header la scroll în jos */
@@ -16,25 +17,34 @@
   transition: top 0.4s ease-in-out;
 }
 
-
 /* 🏷️ Marca restaurantului */
 .navbar-brand {
   font-weight: bold;
-  font-size: 1.5rem;
-  color: #f5f5f5;
+  font-size: 1.8rem;
+  color: #ffcc99;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-shadow: 1px 1px 2px #000;
   transition: color 0.3s ease;
 }
 
 .navbar-brand:hover {
-  color: #ffffff;
+  color: #ffe0b3;
 }
+
+.navbar-nav .nav-link.active {
+  color: #ffcc99;
+  border-bottom: 2px solid #ffcc99;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
 
 /* 🔗 Link-uri din meniu */
 .navbar-nav .nav-link {
   font-size: 1rem;
   padding: 0.5rem 1rem;
-  color: #f0f0f0;
-  background-color: rgba(255, 255, 255,);
+  color: #f5f5f5;
   border-radius: 0.375rem;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
@@ -42,10 +52,9 @@
 /* 🌟 Hover și focus */
 .navbar-nav .nav-link:hover,
 .navbar-nav .nav-link:focus {
-  color: #111;
-  background-color: rgba(255, 255, 255, 0.3);
+  color: #ffcc99;
+  background-color: rgba(255, 255, 255, 0.1);
 }
-
 
 /* 📱 Toggler pe mobil */
 .navbar-toggler {
@@ -53,6 +62,7 @@
   padding: 0.5rem;
   background-color: rgba(255, 255, 255, 0.1);
 }
+
 .navbar-toggler-icon {
   filter: brightness(0) invert(1);
 }
@@ -73,6 +83,17 @@
   }
 
   .navbar-brand {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
+  }
+
+  /* 🔒 Centrare omuleț login pe mobil */
+  .navbar-nav .nav-item.login-icon {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+  }
+
+  .navbar-nav .nav-item.login-icon .nav-link {
+    font-size: 1.3rem;
   }
 }

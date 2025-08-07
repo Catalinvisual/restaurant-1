@@ -45,6 +45,8 @@ export const CartProvider = ({ children }) => {
 
   useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(cartItems));
+    const total = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    console.log(`🧾 Total în coș: €${total.toFixed(2)}`);
   }, [cartItems]);
 
   return (

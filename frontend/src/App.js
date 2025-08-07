@@ -10,8 +10,8 @@ import { CartProvider } from './context/CartContext';
 import Menu from './pages/Menu';
 import Checkout from './pages/Checkout';
 import AdminMenu from './pages/AdminMenu';
-import '../src/App.css';
 import Contact from './pages/Contact';
+import '../src/App.css';
 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -20,7 +20,7 @@ function App() {
   return (
     <CartProvider>
       <Router>
-        {/* 🛎️ ToastContainer e recomandat aici pentru ca notificările să nu fie afectate de layout */}
+        {/* 🛎️ Notificări toast vizibile în orice pagină */}
         <ToastContainer position="top-right" autoClose={3000} />
 
         <div className="app-container">
@@ -32,12 +32,11 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/orders" element={<Orders />} />
-              <Route path="/my-orders" element={<MyOrders />} />
+              <Route path="/my-orders" element={<MyOrders />} /> {/* 🔁 modificat */}
               <Route path="/menu" element={<Menu />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/admin" element={<AdminMenu />} />
               <Route path="/contact" element={<Contact />} />
-
             </Routes>
           </main>
 

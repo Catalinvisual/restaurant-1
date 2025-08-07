@@ -1,8 +1,7 @@
-require('dotenv').config(); // ✅ citește implicit fișierul .env
-
+require('dotenv').config();        // 🔐 Încarcă .env (opțional, o singură dată la intrare)
 
 const { DataTypes } = require('sequelize');
-const sequelize = require('../db');
+const sequelize = require('../db'); // ✅ Import direct instanță
 
 const ENV = process.env.NODE_ENV || 'development';
 
@@ -13,17 +12,13 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
-      validate: {
-        len: [3, 50] // 👤 Evită nume prea scurte
-      }
+      validate: { len: [3, 50] }
     },
     email: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
-      validate: {
-        isEmail: true
-      }
+      validate: { isEmail: true }
     },
     password: {
       type: DataTypes.STRING,
@@ -32,7 +27,7 @@ const User = sequelize.define(
     isAdmin: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
-      field: 'is_admin' // 🛠️ Mapping către coloana DB
+      field: 'is_admin'
     },
     lastLogin: {
       type: DataTypes.DATE,
@@ -41,18 +36,16 @@ const User = sequelize.define(
   },
   {
     tableName: 'users',
-    timestamps: true // Adaugă createdAt / updatedAt automat
+    timestamps: true
   }
 );
 
-// 🔍 Hook: actualizare lastLogin
 User.beforeUpdate((user, options) => {
   if (options.fields?.includes('lastLogin')) {
     user.lastLogin = new Date();
   }
 });
 
-// 📦 Log local pentru confirmare
 if (ENV === 'development') {
   console.log('🔧 [User Model] încărcat cu succes');
 }

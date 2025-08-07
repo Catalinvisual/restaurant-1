@@ -1,60 +1,74 @@
-require('dotenv').config(); // citește implicit fișierul .env
+require('dotenv').config(); // ✅ citește .env
 
 const express = require('express');
 const router = express.Router();
 const Order = require('../models/Order');
+const OrderItem = require('../models/OrderItem');
+const Product = require('../models/Product'); // ✅ importă modelul de produs
 const verifyToken = require('../middleware/auth');
 
-// 🔍 Detectăm mediul activ
+// ✅ definește relația dacă nu era definită
+OrderItem.belongsTo(Product, { foreignKey: 'product_id' });
+
 const ENV = process.env.NODE_ENV || 'development';
 console.log(`🚦 [Order Routes] Mediul activ: ${ENV}`);
 
-// 📦 Validare simplă pentru input
-const validateOrderInput = (req, res, next) => {
-  const { userId, productId, quantity, address } = req.body;
+// 🛒 Plasare comandă — coș multiplu
+router.post('/', verifyToken, async (req, res) => {
+  const { address, items } = req.body;
+  const userId = req.user.id;
 
-  if (!userId || !productId || !quantity || !address) {
-    return res.status(400).json({ error: 'Toate câmpurile sunt obligatorii.' });
+  if (!address || !items || !Array.isArray(items) || items.length === 0) {
+    return res.status(400).json({ error: 'Adresă și produse sunt obligatorii.' });
   }
-
-  if (isNaN(quantity) || Number(quantity) <= 0) {
-    return res.status(400).json({ error: 'Cantitate invalidă.' });
-  }
-
-  next();
-};
-
-// 🛒 Plasare comandă (POST protejat)
-router.post('/', verifyToken, validateOrderInput, async (req, res) => {
-  const { userId, productId, quantity, address } = req.body;
 
   try {
+    // ✅ Creează comanda
     const newOrder = await Order.create({
-      userId: parseInt(userId),
-      productId: parseInt(productId),
-      quantity: parseInt(quantity),
+      user_id: userId,
       address: address.trim()
     });
 
-    res.status(201).json(newOrder);
+    // 🧾 Creează OrderItem pentru fiecare produs
+    const orderItemsData = items.map(item => ({
+      order_id: newOrder.id,
+      product_id: item.id,
+      quantity: item.quantity,
+      price: item.price
+    }));
+
+    await OrderItem.bulkCreate(orderItemsData);
+
+    res.status(201).json({
+      message: '✅ Comanda înregistrată cu succes.',
+      order: newOrder,
+      items: orderItemsData
+    });
   } catch (error) {
     console.error('❌ Eroare la plasare comandă:', error);
     res.status(500).json({ error: 'Eroare la server', details: error.message });
   }
 });
 
-// 📋 Comenzile unui utilizator (GET protejat)
-router.get('/user/:id', verifyToken, async (req, res) => {
-  const userId = req.params.id;
-
-  // ✅ Protejăm accesul la comenzi doar pentru utilizatorul autentificat
-  if (String(req.user.id) !== String(userId)) {
-    return res.status(403).json({ error: 'Acces interzis la comenzi altui utilizator.' });
-  }
+// 📋 Comenzile unui utilizator
+router.get('/user', verifyToken, async (req, res) => {
+  const userId = req.user.id;
 
   try {
     const orders = await Order.findAll({
-      where: { userId },
+      where: { user_id: userId },
+      include: [
+        {
+          model: OrderItem,
+          as: 'OrderItems',
+          include: [
+            {
+              model: Product,
+              attributes: ['id', 'name', 'description', 'image', 'price'] // 🔍 detalii produs
+            }
+          ]
+        }
+      ],
       order: [['createdAt', 'DESC']]
     });
 

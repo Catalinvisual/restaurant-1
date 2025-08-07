@@ -5,20 +5,46 @@ import { API_URL } from '../apiConfig';
 
 export default function Orders() {
   const [orders, setOrders] = useState([]);
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
-    axios.get(`${API_URL}/orders`)
+    const token = localStorage.getItem('accessToken');
+    console.log('🔐 Token în Orders.jsx:', token); // DEBUG
+
+    if (!token || token === 'undefined') {
+      setMessage('❗ Trebuie să fii autentificat pentru a vedea comenzile.');
+      return;
+    }
+
+    axios
+      .get(`${API_URL}/orders`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
       .then(res => {
         setOrders(res.data);
       })
       .catch(err => {
         console.error('❌ Eroare la preluarea comenzilor:', err);
+        setMessage('❌ Nu s-au putut prelua comenzile.');
       });
   }, []);
 
   const handleStatusChange = async (orderId, newStatus) => {
+    const token = localStorage.getItem('accessToken');
+
     try {
-      const response = await axios.put(`${API_URL}/orders/${orderId}`, { status: newStatus });
+      const response = await axios.put(
+        `${API_URL}/orders/${orderId}`,
+        { status: newStatus },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
       const updatedOrder = response.data;
 
       const updatedOrders = orders.map(order =>
@@ -38,7 +64,9 @@ export default function Orders() {
       <div className="container mt-5">
         <h2 className="text-primary mb-4">Comenzi Primite</h2>
 
-        {orders.length === 0 ? (
+        {message && <div className="alert alert-warning">{message}</div>}
+
+        {orders.length === 0 && !message ? (
           <p>Nu există comenzi înregistrate.</p>
         ) : (
           orders.map(order => (

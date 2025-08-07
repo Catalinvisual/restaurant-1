@@ -1,18 +1,263 @@
 .menu-banner-fullscreen {
+  position: relative;
   width: 100%;
-  margin-bottom: 0;
-  padding-bottom: 0;
+  height: 300px;
+  overflow: hidden;
+  border-radius: 12px;
+  margin-bottom: 2rem;
 }
 
+/* Imaginea bannerului */
 .banner-img {
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
+  object-position: center -450px; /* ajustează după cum se vede farfuria */
+  border-radius: 12px;
   display: block;
-  margin-bottom: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
+/* Blur overlay */
+.menu-banner-fullscreen::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(2px);
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  z-index: 1;
+}
+
+/* Gradient overlay */
+.menu-banner-fullscreen::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0));
+  border-radius: 12px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Titlul peste imagine */
+.banner-title {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ffcc99;
+  font-size: 32px;
+  font-weight: 600;
+  font-family: 'Georgia', serif;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
+  text-align: center;
+  z-index: 3;
+}
+
+/* Stil general pentru h2 */
 h2 {
   font-weight: 600;
-  margin-top: 1rem; /* poți reduce mai mult dacă vrei */
+  margin-top: 1rem;
   text-align: center;
+}
+
+.filter-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  background-color: #f8f9fa;
+  border: 2px solid #007bff;
+  color: #007bff;
+  padding: 0.5rem 1.2rem;
+  border-radius: 30px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filter-btn:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.filter-btn.active {
+  background-color: #007bff;
+  color: white;
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.4);
+}
+
+/* 🔹 Animatie pentru carduri */
+.animated-card {
+  animation: fadeSlideUp 0.6s ease forwards;
+  opacity: 0;
+}
+
+@keyframes fadeSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 🔹 Animatie cinematică pentru titlul bannerului */
+.banner-title {
+  animation: zoomFadeIn 1.2s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes zoomFadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translate(-50%, -50%);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translate(-50%, -50%);
+  }
+}
+
+/* 🔹 Animatie pentru butoane de filtrare */
+.filter-btn {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.filter-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 4px;
+  background-color: #007bff;
+  border-radius: 2px;
+  animation: glowBounce 0.5s ease-out;
+}
+
+@keyframes glowBounce {
+  0% {
+    transform: translateX(-50%) scaleX(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: translateX(-50%) scaleX(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-50%) scaleX(1);
+    opacity: 1;
+  }
+}
+
+/* loader container */
+
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 50px 0;
+}
+
+.table-loader {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle at center, #fff 50%, #dcd2c4 100%);
+  border: 8px solid #b8a98c;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  animation: rotateTable 2.5s linear infinite;
+}
+
+@keyframes rotateTable {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.food {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 30px;
+  height: 30px;
+  background: radial-gradient(circle, #ff8c42, #e85d04);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 8px rgba(0,0,0,0.3);
+}
+
+.steam {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  width: 10px;
+  height: 40px;
+  margin-left: -5px;
+  background: linear-gradient(to top, rgba(255,255,255,0.8), transparent);
+  border-radius: 50%;
+  animation: steamRise 2s ease-in-out infinite;
+}
+
+.steam.delay {
+  left: 45%;
+  animation-delay: 0.3s;
+}
+
+.steam.delay2 {
+  left: 55%;
+  animation-delay: 0.6s;
+}
+
+@keyframes steamRise {
+  0% {
+    transform: translateY(0) scaleX(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-20px) scaleX(1.3);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-40px) scaleX(0.8);
+    opacity: 0;
+  }
+}
+
+.cutlery {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+  color: #8b7d6b;
+}
+
+.fork {
+  left: -30px;
+}
+
+.knife {
+  right: -30px;
+}
+
+.text-muted {
+  color: #5c5043;
+  font-size: 1.1rem;
 }

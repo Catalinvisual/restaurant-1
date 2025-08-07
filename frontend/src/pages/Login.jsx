@@ -1,30 +1,32 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
-import { API_URL } from '../apiConfig'; // 👈 Importăm valoarea centralizată
+import { API_URL } from '../apiConfig';
 
 export default function Login() {
   const [isRegistering, setIsRegistering] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [error, setError] = useState('');
-  const navigate = useNavigate();
+  const [email, setEmail]           = useState('');
+  const [password, setPassword]     = useState('');
+  const [name, setName]             = useState('');
+  const [error, setError]           = useState('');
+  const navigate                     = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
 
     if (isRegistering) {
+      // ─────────────── Register ────────────────────
       if (name.trim() === '') {
         setError('Introduceți un nume valid');
         return;
       }
 
       try {
-        const response = await fetch(`${API_URL}/api/auth/register`, {
+        const response = await fetch(`${API_URL}/auth/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: name, email, password }),
+          body: JSON.stringify({ username: name, email, password })
         });
 
         if (response.ok) {
@@ -32,33 +34,38 @@ export default function Login() {
           console.log('✅ Utilizator creat:', user);
           navigate('/');
         } else {
-          const errorData = await response.json();
-          setError(errorData.error || 'Eroare la înregistrare');
+          const { error: msg } = await response.json();
+          setError(msg || 'Eroare la înregistrare');
         }
-      } catch (error) {
-        console.error('❌ Eroare conexiune:', error);
+      } catch (err) {
+        console.error('❌ Eroare conexiune:', err);
         setError('Serverul nu răspunde');
       }
 
     } else {
+      // ─────────────── Login ───────────────────────
       try {
-        const response = await fetch(`${API_URL}/api/auth/login`, {
+        const response = await fetch(`${API_URL}/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password }),
+          body: JSON.stringify({ email, password })
         });
 
         const result = await response.json();
-
         if (response.ok) {
-          localStorage.setItem('token', result.token);
-          console.log('✅ Login cu succes:', result);
+          // ───────────── Stocăm acces și refresh token ─────────────
+          const { accessToken, refreshToken } = result;
+          console.log('✅ Login cu succes, token primit:', accessToken);
+
+          localStorage.setItem('accessToken', accessToken);
+          localStorage.setItem('refreshToken', refreshToken);
+
           navigate('/');
         } else {
           setError(result.error || 'Autentificare eșuată');
         }
-      } catch (error) {
-        console.error('❌ Eroare la login:', error);
+      } catch (err) {
+        console.error('❌ Eroare la login:', err);
         setError('Serverul nu răspunde');
       }
     }
@@ -127,7 +134,9 @@ export default function Login() {
               setError('');
             }}
           >
-            {isRegistering ? 'Ai deja cont? Autentifică-te' : 'Nu ai cont? Înregistrează-te'}
+            {isRegistering
+              ? 'Ai deja cont? Autentifică-te'
+              : 'Nu ai cont? Înregistrează-te'}
           </button>
         </div>
       </div>
