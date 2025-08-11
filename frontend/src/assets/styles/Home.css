@@ -574,10 +574,14 @@
     margin-top: 1.5rem; /* ✅ împinge grătarul mai jos */
   }
 
-  .grill-container::before,
+    .grill-container::before,
   .grill-container::after {
-    top: -140px; /* ✅ ridică fumul mai sus */
+    width: 300px;
+    height: 200px;
+    top: -100px;
+    background-size: contain;
   }
+
 
   .carousel-item {
     max-width: 100px;
