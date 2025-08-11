@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useSwipeable } from "react-swipeable";
 import ProductCard from "../components/ProductCard";
 import "../assets/styles/Home.css";
+import '../assets/styles/ProductCard.css';
 import { API_URL } from "../apiConfig";
 
 export default function Home() {
@@ -134,22 +135,7 @@ export default function Home() {
               </button>
             </div>
 
-            {/* Indicatori */}
-            <div className="mt-3">
-              {carouselImages.map((_, i) => (
-                <span
-                  key={i}
-                  style={{
-                    display: "inline-block",
-                    width: "10px",
-                    height: "10px",
-                    margin: "0 5px",
-                    borderRadius: "50%",
-                    backgroundColor: i === currentIndex ? "#007bff" : "#ccc",
-                  }}
-                ></span>
-              ))}
-            </div>
+           
           </section>
           {/* Produse Evidențiate */}
           {message && (

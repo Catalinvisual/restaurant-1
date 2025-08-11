@@ -204,19 +204,27 @@
   position: relative;
 }
 
-/* ✅ Container carusel */
+/* ✅ Container carusel scrollabil */
 .carousel-wrapper {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
   gap: 1rem;
-  flex-wrap: wrap;
-  margin-bottom: 1rem;
+  padding: 1rem;
+  justify-content: center;
+}
+
+
+/* ✅ Ascunde scrollbar (opțional) */
+.carousel-wrapper::-webkit-scrollbar {
+  display: none;
 }
 
 /* ✅ Element individual din carusel */
 .carousel-item {
   flex: 0 0 auto;
+  scroll-snap-align: center;
   padding: 0.5rem;
   text-align: center;
 }
@@ -237,43 +245,12 @@
   transform: scale(1.05);
 }
 
-
-/* ✅ Butoane navigare carusel */
-.carousel-wrapper button {
-  background: transparent;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 0.5rem 1rem;
-  transition: color 0.3s ease;
-  color: #333;
-}
-
-.carousel-wrapper button:hover {
-  color: #ff4d4d;
-}
-
-/* ✅ Indicatori carusel */
+/* ✅ Elimină complet butoanele și punctele */
+.carousel-wrapper button,
+.carousel-dots,
 .image-carousel .carousel-indicators {
-  margin-top: 1rem;
-  text-align: center;
+  display: none !important;
 }
-
-.image-carousel .carousel-indicators span {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  margin: 0 5px;
-  border-radius: 50%;
-  background-color: #ccc;
-  transition: background-color 0.3s ease;
-}
-
-.image-carousel .carousel-indicators .active {
-  background-color: #007bff;
-}
-
-
 /* FEATURED SECTION */
 .featured-products {
   background-color: #f0f4f8; /* schimbat din #fff8e1 */
@@ -371,12 +348,10 @@
     height: 600px;
   }
 
- .carousel-img {
+  .carousel-img {
     width: 180px;
     height: 180px;
   }
-
-
 
   .team-section img {
     max-width: 300px;
@@ -398,9 +373,56 @@
   gap: 2rem;
 }
 
-/* ✅ Tablete și ecrane medii */
+/* === ECRANE MEDII (între 976px și 1200px) === */
+@media (max-width: 1200px) and (min-width: 976px) {
+  .hero-title {
+    font-size: 2.75rem;
+  }
 
-@media (max-width: 992px) {
+  .hero-subtitle {
+    font-size: 1.05rem;
+  }
+
+  .btn-book {
+    padding: 10px 26px;
+    font-size: 1rem;
+  }
+
+  .hero-overlay .container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    text-align: left;
+  }
+
+  .hero-text {
+    max-width: 55%;
+    padding: 20px;
+  }
+
+  .grill-container {
+    width: 350px;
+    height: 350px;
+    margin: 0;
+  }
+
+  .grill-container::before,
+  .grill-container::after {
+    width: 400px;
+    height: 250px;
+    top: -80px;
+    background-size: contain;
+  }
+
+  .rotating-grill-small {
+    max-width: 100%;
+  }
+}
+
+/* === TABLETE ȘI ECRANE MICI (max-width: 976px) === */
+@media (max-width: 976px) {
   .hero-title {
     font-size: 2.5rem;
   }
@@ -410,8 +432,16 @@
   }
 
   .grill-container {
-    width: 400px;
-    height: 400px;
+    width: 350px;
+    height: 350px;
+  }
+
+  .grill-container::before,
+  .grill-container::after {
+    width: 300px;
+    height: 180px;
+    top: -60px;
+    background-size: contain;
   }
 
   .special-offers h3,
@@ -425,12 +455,10 @@
     gap: 1rem;
   }
 
- .carousel-img {
+  .carousel-img {
     width: 150px;
     height: 150px;
   }
-
-
 
   .btn-book {
     padding: 10px 24px;
@@ -439,7 +467,9 @@
 
   .hero-overlay .container {
     flex-direction: column;
+    align-items: center;
     text-align: center;
+    gap: 3rem;
   }
 
   .hero-text {
@@ -453,7 +483,7 @@
   }
 }
 
-/* Telefoane (max-width: 768px) */
+/* === TELEFOANE (max-width: 768px) === */
 @media (max-width: 768px) {
   .hero-title {
     font-size: 2rem;
@@ -472,24 +502,27 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 2rem; /* ✅ spațiu vertical între text și grătar */
+    gap: 2rem;
   }
 
   .hero-text {
     max-width: 100%;
     padding: 10px;
-    margin-bottom: 1rem; /* ✅ separă textul de grătar */
+    margin-bottom: 1rem;
   }
 
   .grill-container {
     width: 300px;
     height: 300px;
-    margin-top: 1rem; /* ✅ împinge grătarul mai jos */
+    margin-top: 1rem;
   }
 
   .grill-container::before,
   .grill-container::after {
-    top: -120px; /* ✅ ridică fumul mai sus */
+    width: 250px;
+    height: 150px;
+    top: -40px;
+    background-size: contain;
   }
 
   .special-offers,
@@ -523,16 +556,22 @@
     object-fit: cover;
   }
 
-  .carousel-wrapper {
-    flex-direction: row;
-    flex-wrap: wrap;
+   .carousel-wrapper {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 1rem;
+    padding: 1rem;
     justify-content: center;
   }
 
-  .carousel-wrapper button {
-    font-size: 1.2rem;
-    padding: 0.25rem 0.5rem;
+  .carousel-item {
+    flex: 0 0 auto;
+    scroll-snap-align: center;
+    text-align: center;
   }
+
 
   .hero-overlay {
     flex-direction: column;
@@ -540,7 +579,8 @@
     padding: 1rem;
   }
 }
-/* Telefoane mici (max-width: 576px) */
+
+/* === TELEFOANE MICI (max-width: 576px) === */
 @media (max-width: 576px) {
   .hero-title {
     font-size: 1.75rem;
@@ -559,29 +599,28 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 2.5rem; /* ✅ spațiu vertical între text și grătar */
+    gap: 2.5rem;
   }
 
   .hero-text {
     max-width: 100%;
     padding: 10px;
-    margin-bottom: 1.5rem; /* ✅ separare suplimentară */
+    margin-bottom: 1.5rem;
   }
 
   .grill-container {
     width: 250px;
     height: 250px;
-    margin-top: 1.5rem; /* ✅ împinge grătarul mai jos */
+    margin-top: 1.5rem;
   }
 
-    .grill-container::before,
+  .grill-container::before,
   .grill-container::after {
-    width: 300px;
-    height: 200px;
-    top: -100px;
+    width: 200px;
+    height: 120px;
+    top: -30px;
     background-size: contain;
   }
-
 
   .carousel-item {
     max-width: 100px;

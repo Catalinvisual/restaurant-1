@@ -1,13 +1,25 @@
 /* Card general */
 .card {
-  width: 100%;
+  width: auto; /* ← se adaptează la conținut */
   max-width: 320px;
   margin: 1rem auto;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   transition: transform 0.2s ease;
   position: relative;
   border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  min-height: 480px;
 }
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+
+
 
 .card:hover {
   transform: scale(1.02);
@@ -63,7 +75,7 @@
 
 /* Rating ⭐ */
 .rating {
-  color: #f6c343; /* auriu */
+  color: #f6c343;
   font-size: 0.9rem;
   margin-top: 0.5rem;
 }
@@ -80,14 +92,60 @@
   padding: 0.3rem 0.7rem;
 }
 
+/* Container body */
+.card-body {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  padding: 1rem;
+}
+
+/* Conținut text */
+.card-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Grupare butoane */
+.card-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.quantity-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 /* Input cantitate */
 .card-body .form-control {
   min-width: 60px;
 }
 
-/* Buton coș și +/− */
-.card-body .d-flex.align-items-center {
-  gap: 0.5rem;
+/* Animație la adăugare în coș */
+.btn-added {
+  animation: pulseAdded 0.4s ease-in-out;
+}
+
+@keyframes pulseAdded {
+  0% {
+    transform: scale(1);
+    background-color: #28a745;
+  }
+  50% {
+    transform: scale(1.08);
+    background-color: #218838;
+  }
+  100% {
+    transform: scale(1);
+    background-color: #28a745;
+  }
 }
 
 /* Stil previzualizare imagine în formular */
@@ -117,11 +175,10 @@ img.preview-small {
   }
 
   .card-body {
-    padding: 1rem;
     text-align: center;
   }
 
-  .card-body .d-flex {
+  .card-actions {
     flex-direction: column;
     gap: 0.5rem;
   }

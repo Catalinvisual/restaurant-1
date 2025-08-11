@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
 import '../assets/styles/Menu.css';
 import { API_URL } from '../apiConfig';
-
+import '../assets/styles/ProductCard.css';
 export default function Menu() {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -95,13 +95,12 @@ export default function Menu() {
 ) : filteredProducts.length === 0 ? (
   <p className="text-muted text-center">Nu există produse în această categorie.</p>
 ) : (
-  <div className="row">
-    {filteredProducts.map((product, index) => (
-      <div key={product.id || index} className="col-md-4 mb-4 animated-card">
-        <ProductCard product={product} />
-      </div>
-    ))}
-  </div>
+ <div className="card-container">
+  {filteredProducts.map((product, index) => (
+    <ProductCard key={product.id || index} product={product} />
+  ))}
+</div>
+
 )}
       </div>
     </>
