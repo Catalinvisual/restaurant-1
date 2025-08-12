@@ -1,56 +1,229 @@
-/* Lista coșului */
-.cart-list {
-  padding: 1rem;
-  background-color: #f8f9fa;
-  border-radius: 0.5rem;
+/* 🔹 Container principal */
+.cart-container {
+  margin-top: 6rem;
+  padding: 0 1rem;
 }
 
-/* Element individual din coș */
+/* 🔹 Titlu */
+.cart-title {
+  color: #8B4513; /* înlocuiește movul */
+  font-size: 1.8rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+/* 🔹 Listă produse */
+.cart-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* 🔹 Card produs */
 .cart-item {
   display: flex;
+  flex-direction: row;
   align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem 0;
-  border-bottom: 1px solid #dee2e6;
+  gap: 1rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-/* Imagine produs */
+.cart-item:hover {
+  transform: scale(1.01);
+}
+
+/* 🔹 Imagine produs */
 .cart-item img {
-  width: 80px;
-  height: 80px;
+  width: 64px;
+  height: 64px;
   object-fit: cover;
-  border-radius: 0.25rem;
-  margin-right: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
 }
 
-/* Detalii produs */
+/* 🔹 Detalii produs */
 .cart-item-details {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  min-width: 0;
 }
 
-/* Buton remove */
-.remove-button {
-  background-color: transparent;
-  color: #dc3545;
-  border: none;
-  font-size: 0.9rem;
+/* 🔹 Cantitate și preț */
+.qty-price {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: #212529;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+/* 🔹 Butoane + și − */
+.qty-button {
+  width: 24px;
+  height: 24px;
+  font-size: 0.85rem;
+  padding: 0;
+  line-height: 1;
+  border-radius: 4px;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+  border: 1px solid #ccc;
+  background-color: #f8f8f8;
   cursor: pointer;
 }
 
-.remove-button:hover {
-  text-decoration: underline;
+.qty-button:hover {
+  background-color: #e0e0e0;
 }
 
-/* Responsivitate */
+/* 🔹 Buton remove */
+.remove-button {
+  background-color: #f8d7da; /* roz pal, semnal de avertizare */
+  color: #dc3545;            /* roșu Bootstrap */
+  border: 1px solid #dc3545;
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0.3rem 0.6rem;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.remove-button:hover {
+  background-color: #dc3545;
+  color: white;
+  box-shadow: 0 0 6px rgba(220, 53, 69, 0.4);
+}
+/* 🔹 Rezumat coș */
+.cart-summary {
+  border-top: 1px solid #dee2e6;
+  padding-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* 🔹 Total */
+.total-label {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 0.6rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* 🔹 Buton checkout */
+.btn-success {
+  font-size: 0.9rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 0.5rem;
+ 
+}
+
+/* 🔹 Responsivitate */
 @media (max-width: 768px) {
+  .cart-container {
+    margin-top: 5rem;
+    padding: 0 0.5rem;
+  }
+
+  .cart-title {
+    font-size: 1.5rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    color: #5a3e85; /* violet elegant */
+  }
+
+  .cart-list {
+    padding: 0.5rem;
+  }
+
   .cart-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem;
+    margin-bottom: 0.8rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    max-width: 100%;
+    flex-wrap: wrap;
   }
 
   .cart-item img {
-    width: 100%;
-    height: auto;
+    width: 56px;
+    height: 56px;
+    border-radius: 6px;
   }
+
+  .cart-item-details {
+    flex: 1;
+    font-size: 0.85rem;
+    gap: 0.3rem;
+  }
+
+  .qty-price {
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    flex-wrap: wrap;
+  }
+
+  .qty-price button {
+    padding: 0.2rem 0.4rem; /* butoane minus și plus compacte */
+    font-size: 0.85rem;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .remove-button {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.3rem;
+    align-self: flex-start;
+  }
+
+  .cart-summary {
+    align-items: center;
+    text-align: center;
+    padding-top: 1rem;
+  }
+
+  .total-label {
+    font-size: 0.95rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.4rem;
+  }
+
+  .btn-success {
+    width: 100%;
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+  }
+  
 }

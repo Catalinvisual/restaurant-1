@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useSwipeable } from "react-swipeable";
 import ProductCard from "../components/ProductCard";
-import "../assets/styles/Home.css";
+
 import '../assets/styles/ProductCard.css';
+import "../assets/styles/Home.css";
 import { API_URL } from "../apiConfig";
 
 export default function Home() {
@@ -138,28 +139,24 @@ export default function Home() {
            
           </section>
           {/* Produse Evidențiate */}
-          {message && (
-            <div className="alert alert-warning text-center">{message}</div>
-          )}
+{message && (
+  <div className="alert alert-warning text-center">{message}</div>
+)}
 
-          {specialItems.length > 0 && (
-            <section className="featured-products my-5">
-              <h3 className="text-warning text-center">
-                🌟 Produse Evidențiate
-              </h3>
-              <div className="row justify-content-center">
-                {specialItems.map((item) => (
-                  <div
-                    key={item.id}
-                    className="col-md-4 d-flex justify-content-center"
-                  >
-                    <ProductCard product={item} />
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
+{specialItems.length > 0 && (
+  <section className="featured-products my-5">
+    <h3 className="text-warning text-center">
+      🌟 Produse Evidențiate
+    </h3>
 
+    {/* Folosim card-container din ProductCard.css */}
+    <div className="card-container">
+      {specialItems.map((item) => (
+        <ProductCard key={item.id} product={item} />
+      ))}
+    </div>
+  </section>
+)}
           {/* Echipa Noastră */}
           <section className="team-section my-5 text-center">
             <h3 className="text-danger">👨‍🍳 Echipa Noastră</h3>

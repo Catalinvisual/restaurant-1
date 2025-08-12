@@ -1,0 +1,65 @@
+
+
+.my-orders-title {
+  color: #E2725B;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 7rem; /* spațiu sub header */
+  margin-bottom: 2rem;
+}
+
+
+/* Mesaj informativ (alert) */
+.alert-info {
+  background-color: #fff4f0;
+  border-left: 4px solid #E2725B;
+  color: #8B4513;
+  font-weight: 500;
+  padding: 0.75rem 0.25rem; /* padding lateral redus semnificativ */
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  text-align: center; /* text centrat */
+}
+
+/* Mesaj când nu sunt comenzi */
+.no-orders-message {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #E2725B;
+  font-weight: 500;
+  margin-top: 2rem;
+  background-color: #fff4f0;
+  padding: 1rem 0.25rem; /* padding lateral redus semnificativ */
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+
+
+/* Card comandă */
+.card {
+  border: 1px solid #E2725B;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+/* Headerul cardului */
+.card-header {
+  background-color: #fbeae6;
+  color: #8B4513;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #E2725B;
+}
+
+/* Badge status comandă */
+.card .badge {
+  font-size: 0.75rem;
+  background-color: #E2725B;
+  color: white;
+  padding: 0.2rem 0.5rem; /* mai puțin padding */
+  border-radius: 12px;
+  text-align: center;      /* centrăm textul */
+  display: inline-block;   /* asigurăm alinierea corectă */
+}

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Header from '../components/Header';
 import { API_URL } from '../apiConfig';
+import '../assets/styles/MyOrders.css';
 
 export default function MyOrders() {
   const [orders, setOrders] = useState([]);
@@ -35,13 +36,13 @@ export default function MyOrders() {
     <>
       <Header />
 
-      <div className="container mt-5">
-        <h2 className="text-primary mb-4">Comenzile Mele</h2>
+      <div className="container">
+        <h2 className="my-orders-title">Comenzile Mele</h2>
 
         {message && <div className="alert alert-info">{message}</div>}
 
         {orders.length === 0 ? (
-          <p>Nu ai comenzi înregistrate.</p>
+          <p className="no-orders-message">Nu ai comenzi înregistrate.</p>
         ) : (
           orders.map((order) => (
             <div key={order.id} className="card mb-4">

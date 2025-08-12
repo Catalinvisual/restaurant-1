@@ -251,19 +251,21 @@
 .image-carousel .carousel-indicators {
   display: none !important;
 }
-/* FEATURED SECTION */
+/* --- FEATURED SECTION container --- */
+/* Doar styling de secțiune pentru Featured */
 .featured-products {
-  background-color: #f0f4f8; /* schimbat din #fff8e1 */
+  background-color: #f0f4f8;
   color: #3e2f23;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 1.2rem;
+  border-radius: 10px;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.08);
 }
 
 .featured-products h3 {
-  font-size: 2rem;
-  margin-bottom: 2rem;
+  font-size: 1.5rem;
+  margin-bottom: 1.2rem;
   color: #d35400;
+  text-align: center;
 }
 
 /* OUR TEAM */
@@ -654,5 +656,17 @@
 
   .about-values li {
     font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .featured-products {
+    padding: 1rem 0.8rem; /* spațiu sus-jos / stânga-dreapta */
+  }
+
+  /* Adăugăm și spațiu între carduri dacă sunt prea lipite */
+  .featured-products .card {
+    margin-left: 0.4rem;
+    margin-right: 0.4rem;
   }
 }

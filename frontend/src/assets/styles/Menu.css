@@ -1,18 +1,21 @@
+/* Container banner - raport fix pe toate ecranele */
 .menu-banner-fullscreen {
   position: relative;
   width: 100%;
-  height: 300px;
+  height: 35vh;
+  min-height: 200px;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
   border-radius: 12px;
   margin-bottom: 2rem;
 }
 
-/* Imaginea bannerului */
+/* Imaginea bannerului – păstrează centrul imaginii, fără tăiere excesivă */
 .banner-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center -450px; /* ajustează după cum se vede farfuria */
+  object-position: center center; /* focalizare adaptivă */
   border-radius: 12px;
   display: block;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -22,10 +25,7 @@
 .menu-banner-fullscreen::before {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   backdrop-filter: blur(2px);
   background-color: rgba(0, 0, 0, 0.2);
   border-radius: 12px;
@@ -36,11 +36,8 @@
 .menu-banner-fullscreen::after {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0));
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.3), transparent);
   border-radius: 12px;
   pointer-events: none;
   z-index: 2;
@@ -59,13 +56,19 @@
   text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
   text-align: center;
   z-index: 3;
+  animation: zoomFadeIn 1.2s ease-out forwards;
+  opacity: 0;
 }
+
+
 
 /* Stil general pentru h2 */
 h2 {
   font-weight: 600;
   margin-top: 1rem;
   text-align: center;
+  color: #E2725B;
+
 }
 
 .filter-buttons {
@@ -77,26 +80,39 @@ h2 {
 
 .filter-btn {
   background-color: #f8f9fa;
-  border: 2px solid #007bff;
-  color: #007bff;
+  border: 2px solid #8B4513; /* Maro elegant */
+  color: #8B4513;
   padding: 0.5rem 1.2rem;
   border-radius: 30px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
+  position: relative;
 }
 
 .filter-btn:hover {
-  background-color: #007bff;
+  background-color: #8B4513;
   color: white;
 }
 
 .filter-btn.active {
-  background-color: #007bff;
+  background-color: #8B4513;
   color: white;
-  box-shadow: 0 0 10px rgba(0, 123, 255, 0.4);
+  box-shadow: 0 0 10px rgba(139, 69, 19, 0.4);
 }
 
+.filter-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 4px;
+  background-color: #8B4513;
+  border-radius: 2px;
+  animation: glowBounce 0.5s ease-out;
+}
 /* 🔹 Animatie pentru carduri */
 .animated-card {
   animation: fadeSlideUp 0.6s ease forwards;
@@ -115,11 +131,6 @@ h2 {
 }
 
 /* 🔹 Animatie cinematică pentru titlul bannerului */
-.banner-title {
-  animation: zoomFadeIn 1.2s ease-out forwards;
-  opacity: 0;
-}
-
 @keyframes zoomFadeIn {
   0% {
     opacity: 0;
@@ -132,24 +143,6 @@ h2 {
 }
 
 /* 🔹 Animatie pentru butoane de filtrare */
-.filter-btn {
-  position: relative;
-  transition: all 0.3s ease;
-}
-
-.filter-btn.active::after {
-  content: '';
-  position: absolute;
-  bottom: -6px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60%;
-  height: 4px;
-  background-color: #007bff;
-  border-radius: 2px;
-  animation: glowBounce 0.5s ease-out;
-}
-
 @keyframes glowBounce {
   0% {
     transform: translateX(-50%) scaleX(0.5);
@@ -166,7 +159,6 @@ h2 {
 }
 
 /* loader container */
-
 .loader-container {
   display: flex;
   flex-direction: column;
@@ -261,3 +253,14 @@ h2 {
   color: #5c5043;
   font-size: 1.1rem;
 }
+
+/* Responsivitate: păstrăm aceeași poziție a imaginii; doar micșorăm titlul */
+/* Responsive - micșorăm titlul pe ecrane mici */
+@media (max-width: 768px) {
+  .banner-title {
+    font-size: 24px;
+    padding: 0 1rem;
+  }
+}
+
+/* fără alte override-uri pe height sau object-position */

@@ -1,95 +1,150 @@
-/* Card general */
+/* === CARD GENERAL === */
 .card {
-  width: auto; /* ← se adaptează la conținut */
-  max-width: 320px;
-  margin: 1rem auto;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   transition: transform 0.2s ease;
   position: relative;
   border-radius: 8px;
   display: flex;
   flex-direction: column;
-  min-height: 480px;
+  min-height: 300px;
+  font-size: 0.75rem;
+  background: #fff;
+  box-sizing: border-box;
 }
-.card-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  justify-content: center;
-}
-
-
-
 
 .card:hover {
   transform: scale(1.02);
 }
 
-/* Imagine produs */
+.product-card.narrow-card {
+  max-width: 220px;
+}
+
+/* === GRID RESPONSIVE === */
+.card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, max-content));
+
+  justify-content: center;
+  justify-items: center;
+  column-gap: 0.4rem;
+  row-gap: 0.6rem;
+  align-items: stretch;
+  padding: 0.5rem;
+  box-sizing: border-box;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Imagine produs + container */
+.product-media {
+  position: relative;
+}
 .card-img-top {
-  height: 200px;
   width: 100%;
+  aspect-ratio: 16 / 10;
+  height: auto;
   object-fit: cover;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
 }
 
-/* Badge-uri promoționale */
-.badge {
-  font-size: 0.75rem;
-  padding: 0.4em 0.6em;
-  border-radius: 6px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-.card .badge {
+/* === ETICHETE PESTE IMAGINE === */
+.product-badge {
   position: absolute;
-  font-size: 0.75rem;
-  padding: 0.4em 0.6em;
-  z-index: 5;
-  animation: pulse 2.5s infinite;
+  top: 8px;
+  left: 8px;
+  z-index: 10;
+  font-size: 0.65rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+}
+.badge-new {
+  background: #28a745;
+  color: #fff;
+}
+.badge-promo {
+  background: #d35400;
+  color: #fff;
 }
 
+.category-label {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  z-index: 10;
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  font-size: 0.65rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.badge {
+  font-size: 0.65rem;
+  padding: 0.25em 0.4em;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+.card .badge {
+  animation: pulse 2.5s infinite;
+}
 @keyframes pulse {
   0% { transform: scale(1); }
   50% { transform: scale(1.06); }
   100% { transform: scale(1); }
 }
 
-/* Titlu produs */
+/* Titlu */
 .card-title {
-  font-size: 1.2rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.3rem;
 }
 
 /* Descriere */
 .card-text {
-  font-size: 0.95rem;
+  font-size: 0.7rem;
+}
+.product-description {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-/* Preț evidențiat */
+/* Preț */
 .card-text.fw-bold {
-  font-size: 1rem;
+  font-size: 0.8rem;
   color: #212529;
 }
 
-/* Rating ⭐ */
+/* Rating */
 .rating {
   color: #f6c343;
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
+  font-size: 0.7rem;
+  margin-top: 0.3rem;
+  display: flex;
+  align-items: center;
 }
 .rating span {
   color: #6c757d;
-  font-size: 0.85rem;
-  margin-left: 0.3rem;
+  font-size: 0.65rem;
+  margin-left: 0.2rem;
 }
 
 /* Buton Detalii */
 .card .btn-outline-primary {
-  margin-top: 0.5rem;
-  font-size: 0.85rem;
-  padding: 0.3rem 0.7rem;
+  margin-top: 0.3rem;
+  font-size: 0.7rem;
+  padding: 0.2rem 0.4rem;
 }
 
 /* Container body */
@@ -97,99 +152,81 @@
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  padding: 1rem;
+  padding: 0.5rem;
 }
 
-/* Conținut text */
+/* Zonă text */
 .card-content {
-  flex-grow: 1;
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 0.35rem;
+  min-height: 120px;
 }
 
-/* Grupare butoane */
-.card-actions {
+/* Acțiuni */
+.actions-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 0.5rem;
-  margin-top: 1rem;
+  margin-top: auto;
+  padding-top: 0.4rem;
 }
-
 .quantity-controls {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.3rem;
+}
+.quantity-controls button {
+  padding: 0.15rem 0.4rem;
+  font-size: 0.7rem;
 }
 
-/* Input cantitate */
-.card-body .form-control {
-  min-width: 60px;
+.btn {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.4rem;
 }
 
-/* Animație la adăugare în coș */
+/* Animație buton */
 .btn-added {
   animation: pulseAdded 0.4s ease-in-out;
 }
-
 @keyframes pulseAdded {
-  0% {
-    transform: scale(1);
-    background-color: #28a745;
-  }
-  50% {
-    transform: scale(1.08);
-    background-color: #218838;
-  }
-  100% {
-    transform: scale(1);
-    background-color: #28a745;
-  }
+  0% { transform: scale(1); background-color: #28a745; }
+  50% { transform: scale(1.08); background-color: #218838; }
+  100% { transform: scale(1); background-color: #28a745; }
 }
 
-/* Stil previzualizare imagine în formular */
-img.preview-small {
-  border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  margin-top: 5px;
-}
-
-/* Butoane editare/ștergere în AdminMenu */
-.btn-sm.btn-danger {
-  border-radius: 50%;
-  padding: 6px 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-  font-weight: bold;
-}
-.btn-sm.btn-warning {
-  padding: 6px 10px;
-  font-weight: bold;
-}
-
-/* Responsivitate */
+/* === RESPONSIVE === */
 @media (max-width: 768px) {
-  .card {
-    max-width: 100%;
-    margin: 1rem;
-  }
+  .card-container {
+   grid-template-columns: repeat(2, 1fr);
 
-  .card-body {
-    text-align: center;
-  }
-
-  .card-actions {
-    flex-direction: column;
+    justify-items: center;
     gap: 0.5rem;
+    padding-left: 0.6rem;
+    padding-right: 0.6rem;
   }
 
-  .form-control,
-  .btn {
-    width: 100% !important;
+  .product-card {
+    width: 100%;
+    max-width: 240px;
   }
 
-  .rating {
-    justify-content: center;
-    text-align: center;
+  .card-body { text-align: center; }
+  .actions-row { flex-direction: column; gap: 0.3rem; }
+  /* .form-control, .btn { width: 100% !important; } */
+  .rating { justify-content: center; }
+}
+
+@media (max-width: 480px) {
+  .card-container {
+    grid-template-columns: 2fr;
+    gap: 0.4rem;
+    padding-left: 0.8rem;
+    padding-right: 0.8rem;
+  }
+  .card-img-top {
+    aspect-ratio: 16 / 11;
   }
 }
