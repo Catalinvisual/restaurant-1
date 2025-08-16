@@ -1,6 +1,4 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Header from './components/Header';
-import Footer from './components/Footer';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Cart from './pages/Cart';
@@ -12,36 +10,43 @@ import Checkout from './pages/Checkout';
 import AdminMenu from './pages/AdminMenu';
 import Contact from './pages/Contact';
 import '../src/App.css';
+import MainLayout from './layouts/MainLayout';
+import AdminLayout from './layouts/AdminLayout';
 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+// 🛡️ Importăm gardul pentru rute de admin
+import AdminRoute from './components/AdminRoute';
 
 function App() {
   return (
     <CartProvider>
       <Router>
-        {/* 🛎️ Notificări toast vizibile în orice pagină */}
         <ToastContainer position="top-right" autoClose={3000} />
 
-        <div className="app-container">
-          <Header />
+        <Routes>
+          <Route path="/" element={<MainLayout><Home /></MainLayout>} />
+          <Route path="/login" element={<MainLayout><Login /></MainLayout>} />
+          <Route path="/cart" element={<MainLayout><Cart /></MainLayout>} />
+          <Route path="/orders" element={<MainLayout><Orders /></MainLayout>} />
+          <Route path="/my-orders" element={<MainLayout><MyOrders /></MainLayout>} />
+          <Route path="/menu" element={<MainLayout><Menu /></MainLayout>} />
+          <Route path="/checkout" element={<MainLayout><Checkout /></MainLayout>} />
+          <Route path="/contact" element={<MainLayout><Contact /></MainLayout>} />
 
-          <main className="main-content">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/orders" element={<Orders />} />
-              <Route path="/my-orders" element={<MyOrders />} /> {/* 🔁 modificat */}
-              <Route path="/menu" element={<Menu />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/admin" element={<AdminMenu />} />
-              <Route path="/contact" element={<Contact />} />
-            </Routes>
-          </main>
-
-          <Footer />
-        </div>
+          {/* 🔒 Protejăm pagina admin */}
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminLayout>
+                  <AdminMenu />
+                </AdminLayout>
+              </AdminRoute>
+            }
+          />
+        </Routes>
       </Router>
     </CartProvider>
   );

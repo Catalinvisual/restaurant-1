@@ -1,12 +1,9 @@
-require('dotenv').config(); // ✅ folosește implicit fișierul .env
+require('dotenv').config();
 
 const { DataTypes } = require('sequelize');
-const sequelize = require('../db'); // ✅ import corect
+const sequelize = require('../db');
 
 const ENV = process.env.NODE_ENV || 'development';
-
-// 🔁 Importă OrderItem pentru relație
-const OrderItem = require('./OrderItem');
 
 const Product = sequelize.define(
   'Product',
@@ -16,7 +13,7 @@ const Product = sequelize.define(
       allowNull: false,
       validate: {
         notEmpty: true,
-        len: [2, 100] // 📏 nume între 2-100 caractere
+        len: [2, 100]
       }
     },
     description: {
@@ -27,9 +24,9 @@ const Product = sequelize.define(
     image: {
       type: DataTypes.STRING,
       allowNull: true,
-      field: 'image_url', // 🛠️ mapare clară către DB
+      field: 'image_url',
       validate: {
-        isUrl: true // 💡 validare opțională pentru URL imagine
+        isUrl: true
       }
     },
     price: {
@@ -39,6 +36,11 @@ const Product = sequelize.define(
         isFloat: true,
         min: 0.01
       }
+    },
+    category: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'uncategorized'
     }
   },
   {
@@ -48,13 +50,14 @@ const Product = sequelize.define(
   }
 );
 
-// 🔗 Relație: un produs poate avea mai multe OrderItems
-Product.hasMany(OrderItem, { foreignKey: 'product_id' });
-OrderItem.belongsTo(Product, { foreignKey: 'product_id' }); // ✅ relație inversă
-
-// 📦 Log doar în mediul local
 if (ENV === 'development') {
-  console.log('🔧 [Product Model] încărcat cu succes + relații setate');
+  console.log('🔧 [Product Model] încărcat cu succes');
 }
+
+// 🔗 Relații
+Product.associate = (models) => {
+  // Un produs poate apărea în mai multe OrderItems
+  Product.hasMany(models.OrderItem, { foreignKey: 'product_id', as: 'orderItems' });
+};
 
 module.exports = Product;

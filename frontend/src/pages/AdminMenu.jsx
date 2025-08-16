@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
+import Statistics from '../components/Statistics';
+import Orders from './Orders';
+import Clients from './Clients'; // ✅ import nou pentru secțiunea Clienți
 import { toast } from 'react-toastify';
-import '../../src/assets/styles/AdminMenu.css';
-import Header from '../components/Header';
 import { API_URL } from '../apiConfig';
+import '../../src/assets/styles/AdminMenu.css';
 
 export default function AdminMenu() {
+  const [activeSection, setActiveSection] = useState('menu');
   const [menu, setMenu] = useState([]);
-  const [newMenuItem, setNewMenuItem] = useState({
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [newItem, setNewItem] = useState({
     name: '',
     description: '',
     price: '',
@@ -16,140 +20,54 @@ export default function AdminMenu() {
     isPromo: false,
     category: ''
   });
-  const [editingItemId, setEditingItemId] = useState(null);
+  const [editingId, setEditingId] = useState(null);
 
   useEffect(() => {
+    if (activeSection !== 'menu') return; // nu încărcăm meniul când nu suntem pe pagina meniu
     fetch(`${API_URL}/menu`)
       .then((res) => res.json())
       .then((data) => setMenu(data))
       .catch((err) => console.error('❌ Eroare la preluare meniu:', err));
+  }, [activeSection]);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      document.body.classList.add('dark-mode');
+    }
   }, []);
+
+  const toggleTheme = () => {
+    document.body.classList.toggle('dark-mode');
+    localStorage.setItem(
+      'theme',
+      document.body.classList.contains('dark-mode') ? 'dark' : 'light'
+    );
+  };
+
+  const handleOrdersChange = () => {
+    setRefreshKey((k) => k + 1);
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
-
     if (type === 'checkbox') {
-      setNewMenuItem({ ...newMenuItem, [name]: checked });
+      setNewItem((prev) => ({ ...prev, [name]: checked }));
     } else if (name === 'image') {
-      const file = files[0];
-      if (file && file.type.startsWith('image/')) {
-        setNewMenuItem({ ...newMenuItem, image: file });
+      const file = files?.[0];
+      if (file?.type?.startsWith('image/')) {
+        setNewItem((prev) => ({ ...prev, image: file }));
       } else {
-        alert('❌ Fișierul selectat nu este o imagine validă.');
-        setNewMenuItem({ ...newMenuItem, image: null });
+        toast.error('❌ Fișierul selectat nu este valid.');
+        setNewItem((prev) => ({ ...prev, image: null }));
       }
     } else {
-      setNewMenuItem({ ...newMenuItem, [name]: value });
+      setNewItem((prev) => ({ ...prev, [name]: value }));
     }
   };
 
-  const handleAddOrEdit = async (e) => {
-  e.preventDefault();
-
-  // ✅ Verificare dimensiune imagine (maxim 5MB)
-  if (newMenuItem.image && newMenuItem.image.size > 5 * 1024 * 1024) {
-    toast.error('❌ Imaginea este prea mare. Maxim 5MB.');
-    return;
-  }
-
-  const token = localStorage.getItem('token');
-  if (!token) {
-    toast.error('❌ Token lipsă. Autentifică-te ca admin.');
-    return;
-  }
-
-  const formData = new FormData();
-  formData.append('name', newMenuItem.name);
-  formData.append('description', newMenuItem.description);
-  formData.append('price', Number(newMenuItem.price));
-  formData.append('isNew', newMenuItem.isNew);
-  formData.append('isPromo', newMenuItem.isPromo);
-  formData.append('category', newMenuItem.category);
-
-  if (newMenuItem.image instanceof File) {
-    formData.append('image', newMenuItem.image);
-  } else {
-    const oldItem = menu.find((i) => i.id === editingItemId);
-    if (oldItem?.image) {
-      formData.append('image', oldItem.image);
-    }
-  }
-
-  const url = editingItemId
-    ? `${API_URL}/menu/${editingItemId}`
-    : `${API_URL}/menu`;
-  const method = editingItemId ? 'PUT' : 'POST';
-
-  try {
-    const response = await fetch(url, {
-      method,
-      headers: { Authorization: `Bearer ${token}` },
-      body: formData
-    });
-    const result = await response.json();
-
-    if (response.ok) {
-      if (editingItemId) {
-        setMenu(menu.map((item) => (item.id === editingItemId ? result : item)));
-        toast.success('✏️ Produs actualizat cu succes!', { autoClose: 2000 });
-      } else {
-        setMenu([...menu, result]);
-        toast.success('✅ Produs adăugat cu succes!', { autoClose: 2000 });
-      }
-      setNewMenuItem({
-        name: '',
-        description: '',
-        price: '',
-        image: null,
-        isNew: false,
-        isPromo: false,
-        category: ''
-      });
-      setEditingItemId(null);
-    } else {
-      toast.error(`❌ Eroare: ${result.error}`);
-    }
-  } catch (err) {
-    console.error('❌ Eroare rețea:', err);
-    toast.error('❌ Serverul nu răspunde.');
-  }
-};
-
-  const handleDelete = async (id) => {
-    const token = localStorage.getItem('accessToken');
-    try {
-      const res = await fetch(`${API_URL}/menu/${id}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.ok) {
-        setMenu(menu.filter((item) => item.id !== id));
-        toast.info('✅ Produs șters cu succes 🗑️', { autoClose: 2000 });
-      } else {
-        toast.error('❌ Nu s-a putut șterge item-ul.');
-      }
-    } catch (err) {
-      console.error('❌ Eroare la ștergere:', err);
-      toast.error('❌ Eroare de rețea la ștergere.');
-    }
-  };
-
-  const handleEditClick = (item) => {
-    setNewMenuItem({
-      name: item.name,
-      description: item.description,
-      price: item.price,
-      image: null,
-      isNew: item.isNew || false,
-      isPromo: item.isPromo || false,
-      category: item.category || ''
-    });
-    setEditingItemId(item.id);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleCancelEdit = () => {
-    setNewMenuItem({
+  const resetForm = () => {
+    setNewItem({
       name: '',
       description: '',
       price: '',
@@ -158,158 +76,222 @@ export default function AdminMenu() {
       isPromo: false,
       category: ''
     });
-    setEditingItemId(null);
+    setEditingId(null);
   };
 
-  return (
-    <>
-      <Header />
-      <div className="container mt-5">
-        <h2 className="text-primary mb-4">
-          {editingItemId ? 'Editare Item' : 'Administrare Meniu'}
-        </h2>
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (newItem.image?.size > 5 * 1024 * 1024) {
+      toast.error('❌ Imaginea este prea mare. Maxim 5MB.');
+      return;
+    }
 
-        <form onSubmit={handleAddOrEdit} className="mb-4" encType="multipart/form-data">
-          <div className="row g-3 align-items-end">
-            <div className="col-md-3">
-              <input
-                type="text"
-                className="form-control"
-                name="name"
-                placeholder="Nume item"
-                value={newMenuItem.name}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="col-md-3">
-              <input
-                type="text"
-                className="form-control"
-                name="description"
-                placeholder="Descriere"
-                value={newMenuItem.description}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="col-md-2">
-              <input
-                type="number"
-                step="0.01"
-                className="form-control"
-                name="price"
-                placeholder="Preț"
-                value={newMenuItem.price}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="col-md-2">
-              <select
-                className="form-select"
-                name="category"
-                value={newMenuItem.category}
-                onChange={handleChange}
-                required
-              >
+    const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+    if (!token) {
+      toast.error('❌ Token lipsă. Autentifică-te.');
+      return;
+    }
+
+    const formData = new FormData();
+    Object.entries(newItem).forEach(([key, value]) => {
+      if (key === 'image' && value instanceof File) {
+        formData.append('image', value);
+      } else {
+        formData.append(key, key === 'price' ? Number(value) : value);
+      }
+    });
+
+    const url = editingId ? `${API_URL}/menu/${editingId}` : `${API_URL}/menu`;
+    const method = editingId ? 'PUT' : 'POST';
+
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData
+      });
+      const result = await res.json();
+
+      if (res.ok) {
+        const updatedMenu = editingId
+          ? menu.map((item) => (item.id === editingId ? result : item))
+          : [...menu, result];
+        setMenu(updatedMenu);
+        toast.success(editingId ? '✏️ Produs actualizat!' : '✅ Produs adăugat!');
+        resetForm();
+        setRefreshKey((k) => k + 1);
+      } else {
+        toast.error(`❌ Eroare: ${result.error}`);
+      }
+    } catch {
+      toast.error('❌ Serverul nu răspunde.');
+    }
+  };
+
+  const handleEdit = (item) => {
+    setNewItem({
+      name: item.name,
+      description: item.description,
+      price: item.price,
+      image: null,
+      isNew: item.isNew || false,
+      isPromo: item.isPromo || false,
+      category: item.category || ''
+    });
+    setEditingId(item.id);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleDelete = async (id) => {
+    const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+    try {
+      const res = await fetch(`${API_URL}/menu/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        setMenu((prev) => prev.filter((item) => item.id !== id));
+        toast.info('🗑️ Produs șters cu succes');
+        setRefreshKey((k) => k + 1);
+      } else {
+        toast.error('❌ Nu s-a putut șterge produsul.');
+      }
+    } catch {
+      toast.error('❌ Eroare de rețea.');
+    }
+  };
+
+  const sections = [
+    { id: 'menu', label: 'Meniu 🍽️' },
+    { id: 'inventory', label: 'Inventar 📦' },
+    { id: 'orders', label: 'Comenzi 🛒' },
+    { id: 'stats', label: 'Statistici 📊' },
+    { id: 'clients', label: 'Clienți 👥' },
+    { id: 'staff', label: 'Staff 🧑‍🍳' },
+    { id: 'schedule', label: 'Programări 🗓️' }
+  ];
+
+  return (
+    <div className="admin-dashboard">
+      <div className="theme-switch" onClick={toggleTheme}>🌗 Schimbă tema</div>
+
+      <aside className="sidebar">
+        <h2>🍕 Admin Restaurant</h2>
+        <ul>
+          {sections.map((section) => (
+            <li
+              key={section.id}
+              className={activeSection === section.id ? 'active' : ''}
+              onClick={() => setActiveSection(section.id)}
+            >
+              {section.label}
+            </li>
+          ))}
+        </ul>
+      </aside>
+
+      <main className="main-area">
+        <h1>{sections.find(s => s.id === activeSection)?.label}</h1>
+
+        {activeSection === 'menu' && (
+          <>
+            <form className="product-form" onSubmit={handleSubmit}>
+              <input type="text" name="name" placeholder="Nume produs" value={newItem.name} onChange={handleChange} required />
+              <textarea name="description" placeholder="Descriere" value={newItem.description} onChange={handleChange} required />
+              <input type="number" name="price" placeholder="Preț (€)" value={newItem.price} onChange={handleChange} required />
+              <select name="category" value={newItem.category} onChange={handleChange} required>
                 <option value="">Selectează categoria</option>
                 <option value="mancare">Mâncare</option>
                 <option value="bautura">Băutură</option>
               </select>
-            </div>
-                        <div className="col-md-2">
-              <input
-                type="file"
-                className="form-control"
-                name="image"
-                accept="image/*"
-                onChange={handleChange}
-                required={!editingItemId}
-              />
-              {editingItemId && (() => {
-                const existingItem = menu.find((i) => i.id === editingItemId);
-                return existingItem?.image ? (
-                  <div className="mt-2">
-                    <small>Imagine existentă:</small><br />
-                    <img src={existingItem.image} alt="previzualizare" width="100" />
-                  </div>
-                ) : null;
-              })()}
-            </div>
-            <div className="col-md-1 form-check">
-              <input
-                type="checkbox"
-                className="form-check-input"
-                name="isNew"
-                id="isNew"
-                checked={newMenuItem.isNew}
-                onChange={handleChange}
-              />
-              <label className="form-check-label" htmlFor="isNew">Nou</label>
-            </div>
-            <div className="col-md-1 form-check">
-              <input
-                type="checkbox"
-                className="form-check-input"
-                name="isPromo"
-                id="isPromo"
-                checked={newMenuItem.isPromo}
-                onChange={handleChange}
-              />
-              <label className="form-check-label" htmlFor="isPromo">Promo</label>
-            </div>
-            <div className="col-md-1">
-              <button type="submit" className="btn btn-success w-100">
-                {editingItemId ? 'Salvează' : 'Adaugă'}
-              </button>
-            </div>
-            {editingItemId && (
-              <div className="col-md-1">
-                <button type="button" className="btn btn-secondary w-100" onClick={handleCancelEdit}>
-                  Anulează
-                </button>
+
+              <div className="checkbox-row">
+                <label className="tag-new">
+                  <input type="checkbox" name="isNew" checked={newItem.isNew} onChange={handleChange} />
+                  Nou
+                </label>
+                <label className="tag-promo">
+                  <input type="checkbox" name="isPromo" checked={newItem.isPromo} onChange={handleChange} />
+                  Promo
+                </label>
+              </div>
+
+              <input type="file" name="image" accept="image/*" onChange={handleChange} required={!editingId} />
+
+              <div className="form-actions">
+                <button type="submit">{editingId ? 'Salvează' : 'Adaugă'}</button>
+                {editingId && <button type="button" onClick={resetForm}>Anulează</button>}
+              </div>
+            </form>
+
+                       {newItem.name && newItem.description && newItem.price && (
+              <div className="preview">
+                <p>Previzualizare:</p>
+                <ProductCard
+                  product={{
+                    ...newItem,
+                    id: 'preview',
+                    image:
+                      newItem.image instanceof File
+                        ? URL.createObjectURL(newItem.image)
+                        : newItem.image
+                  }}
+                />
               </div>
             )}
-          </div>
-        </form>
 
-        {newMenuItem.name && newMenuItem.description && newMenuItem.price && (newMenuItem.image || editingItemId) && (
-          <div className="mb-4">
-            <p className="fw-bold">Previzualizare item:</p>
-            <ProductCard
-              product={{
-                ...newMenuItem,
-                id: 'preview',
-                image:
-                  newMenuItem.image instanceof File
-                    ? URL.createObjectURL(newMenuItem.image)
-                    : newMenuItem.image
-              }}
-            />
+            <div className="product-grid">
+              {menu.map((item) => (
+                <div key={item.id} className="product-wrapper">
+                  <div className="product-card-wrapper">
+                    <div className="product-actions">
+                      <button
+                        className="btn-edit"
+                        onClick={() => handleEdit(item)}
+                        aria-label={`Editează ${item.name}`}
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        className="btn-delete"
+                        onClick={() => handleDelete(item.id)}
+                        aria-label={`Șterge ${item.name}`}
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                    <ProductCard product={item} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {activeSection === 'orders' && (
+          <div className="admin-panel">
+            <Orders onOrderUpdated={handleOrdersChange} />
           </div>
         )}
 
-        <div className="row">
-          {menu.map((item) => (
-            <div key={item.id} className="col-md-4 position-relative">
-              <ProductCard product={item} />
-              <div className="position-absolute top-0 start-50 translate-middle-x mt-2 d-flex gap-2">
-                <button className="btn btn-sm btn-warning" onClick={() => handleEditClick(item)}>
-                  ✎
-                </button>
-                <button
-                  className="btn btn-sm btn-danger"
-                  style={{ boxShadow: '0 2px 6px rgba(0,0,0,0.3)' }}
-                  onClick={() => handleDelete(item.id)}
-                >
-                  ✕
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </>
+        {activeSection === 'stats' && (
+          <div className="admin-panel">
+            <Statistics refreshKey={refreshKey} />
+          </div>
+        )}
+
+        {activeSection === 'clients' && (
+          <div className="admin-panel">
+            <Clients />
+          </div>
+        )}
+
+        {['inventory', 'staff', 'schedule'].includes(activeSection) && (
+          <section className="placeholder">
+            <p>Funcționalitate în curs de dezvoltare.</p>
+          </section>
+        )}
+      </main>
+    </div>
   );
 }

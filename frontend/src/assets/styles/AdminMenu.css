@@ -1,142 +1,311 @@
-/* Container principal */
-.admin-menu-container {
-  margin-top: 3rem;
-  padding-bottom: 2rem;
+/* === Layout general === */
+.admin-dashboard {
+  display: flex;
+  min-height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f4f4f4;
+  color: #333;
 }
 
-/* Titlu principal */
-.admin-menu-container h2 {
-  font-size: 1.8rem;
-  font-weight: 600;
-  margin-bottom: 2.5rem;
+/* === Tema === */
+.theme-switch {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  background: #eee;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  z-index: 1000;
+}
+
+/* === Sidebar === */
+.sidebar {
+  width: 240px;
+  background-color: #2c3e50;
+  color: white;
+  padding: 2rem 1rem;
+}
+
+.sidebar h2 {
+  font-size: 1.4rem;
+  margin-bottom: 2rem;
   text-align: center;
 }
 
-/* Inputuri formular */
-.admin-form .form-control {
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
   border-radius: 6px;
-  padding: 0.45rem 0.75rem;
+  transition: background 0.3s;
 }
 
-/* Butoane formular */
-.admin-form .btn-success,
-.admin-form .btn-secondary {
-  font-size: 0.9rem;
-  font-weight: 500;
-  padding: 0.4rem 0.8rem;
-  border-radius: 6px;
+.sidebar li:hover,
+.sidebar li.active {
+  background-color: #34495e;
 }
 
-/* Imagine existentă preview */
-.preview-image {
-  margin-top: 0.5rem;
-  border-radius: 4px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+/* === Main content === */
+.main-area {
+  flex: 1;
+  padding: 2rem;
 }
 
-/* Secțiune previzualizare item */
-.item-preview {
+.main-area h1 {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+}
+
+/* === Formular produs === */
+.product-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
   margin-bottom: 2rem;
-  border-top: 1px solid #dee2e6;
-  padding-top: 1rem;
 }
 
-/* Butoane de pe card produs (✎ / ✕) */
-.admin-card-controls {
+.product-form input,
+.product-form textarea,
+.product-form select {
+  padding: 0.3rem 0.5rem;
+  font-size: 0.85rem;
+  line-height: 1.1;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  width: 100%;
+}
+
+.product-form textarea {
+  resize: vertical;
+  min-height: 4rem;
+}
+
+.product-form label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+/* ✅ Checkbox-uri într-un rând */
+.checkbox-row {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  grid-column: span 2;
+}
+
+/* ✅ Stiluri pentru etichete Nou și Promo */
+.checkbox-row label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: white;
+}
+
+.checkbox-row input[type="checkbox"] {
+  appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid white;
+  border-radius: 3px;
+  background-color: transparent;
+  cursor: pointer;
+  position: relative;
+}
+
+.checkbox-row input[type="checkbox"]:checked::after {
+  content: '✔';
   position: absolute;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
+  top: -2px;
+  left: 2px;
+  font-size: 0.8rem;
+  color: white;
+}
+
+/* ✅ Fundal verde pentru Nou */
+.checkbox-row label:nth-child(1) {
+  background-color: #27ae60;
+}
+
+/* ✅ Fundal roșu pentru Promo */
+.checkbox-row label:nth-child(2) {
+  background-color: #e74c3c;
+}
+
+.form-actions {
+  grid-column: span 2;
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.form-actions button {
+  padding: 0.5rem 0.8rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.form-actions button[type="submit"] {
+  background-color: #27ae60;
+  color: white;
+}
+
+.form-actions button[type="button"] {
+  background-color: #95a5a6;
+  color: white;
+}
+
+/* === Previzualizare === */
+.preview {
+  margin-bottom: 2rem;
+}
+
+/* === Card produs === */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  gap: 1.5rem;
+  justify-content: center;
+}
+
+.product-card-wrapper {
+  position: relative;
+  width: 13rem;
+}
+.product-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.product-actions {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
   display: flex;
   gap: 0.5rem;
-  z-index: 2;
+  z-index: 10;
 }
 
-.admin-card-controls .btn-sm {
-  font-size: 0.75rem;
-  padding: 6px 10px;
-  border-radius: 50%;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+.btn-edit,
+.btn-delete {
+  background-color: rgba(255, 255, 255, 0.9);
+  border: none;
+  padding: 0.4rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  transition: background 0.2s;
 }
 
-/* Card produs */
-.card-admin {
-  background-color: #fffefc;
-  border: 1px solid #eaeaea;
-  border-radius: 8px;
-  transition: transform 0.2s ease-in-out;
-  position: relative;
-  overflow: hidden;
+.btn-edit:hover {
+  background-color: #f39c12;
+  color: white;
 }
 
-/* Animație hover pentru card */
-.card-admin:hover {
-  transform: scale(1.015);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+.btn-delete:hover {
+  background-color: #e74c3c;
+  color: white;
 }
 
-/* Badge-uri pentru Nou / Promo */
-.product-badge {
-  display: inline-block;
-  padding: 0.3rem 0.7rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  border-radius: 12px;
-  margin-right: 0.5rem;
-  color: #fff;
-  animation: fadeInBadge 0.3s ease-in-out;
-}
-
-.badge-new {
-  background-color: #198754;
-}
-
-.badge-promo {
-  background-color: #dc3545;
-}
-
-@keyframes fadeInBadge {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* Categorie produs în colțul imaginii */
-.card-admin .category-label {
+/* ✅ Badge-uri vizuale */
+.badge {
   position: absolute;
-  bottom: 8px;
-  right: 8px;
-  background-color: rgba(0, 0, 0, 0.6);
-  color: #fff;
-  font-size: 0.7rem;
-  padding: 2px 6px;
-  border-radius: 6px;
-  z-index: 1;
+  top: 1rem;
+  left: 1rem;
+  background-color: #e67e22;
+  color: white;
+  padding: 0.3rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: bold;
 }
 
-/* Responsive */
+.badge.promo {
+  background-color: #c0392b;
+}
+
+/* === Placeholder secțiuni === */
+.placeholder {
+  text-align: center;
+  padding: 3rem;
+  color: #777;
+}
+
+
+
+/* === Dark mode === */
+body.dark-mode .main-area h1,
+body.dark-mode .main-area h2 {
+  color: #fff;
+}
+body.dark-mode {
+  background-color: #1e1e1e;
+  color: #eee;
+}
+
+body.dark-mode .sidebar {
+  background-color: #111;
+}
+
+body.dark-mode .main-area {
+  background-color: #1e1e1e;
+}
+
+body.dark-mode .product-form input,
+body.dark-mode .product-form textarea,
+body.dark-mode .product-form select {
+  background-color: #333;
+  color: #eee;
+  border-color: #555;
+}
+
+body.dark-mode .product-actions button {
+  background-color: #444;
+  color: #eee;
+}
+
+/* === Responsive === */
 @media (max-width: 768px) {
-  .admin-form .d-flex {
+  .admin-dashboard {
     flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    display: flex;
+    overflow-x: auto;
+  }
+
+  .sidebar ul {
+    display: flex;
     gap: 1rem;
   }
 
-  .admin-card-controls {
+  .main-area {
+    padding: 1rem;
+  }
+
+  .product-form {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
     flex-direction: column;
-    top: 8px;
-  }
-
-  .item-preview {
-    text-align: center;
-  }
-
-  .product-badge {
-    display: block;
-    margin-bottom: 0.3rem;
   }
 }

@@ -27,6 +27,7 @@ const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
 const menuRoutes = require('./routes/menuRoutes');
 const orderRoutes = require('./routes/orderRoutes');
+const statisticsRoutes = require('./routes/statisticsRoutes');
 
 // 🚀 Express app
 const app = express();
@@ -57,19 +58,27 @@ app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/statistics', statisticsRoutes);
+app.use('/api/users', require('./routes/userRoutes'));
 
 // 🧱 Servire frontend în producție
 if (ENV === 'production') {
   app.use(express.static(path.join(__dirname, 'client', 'build')));
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
+    return res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
   });
 }
 
-// 🔥 Middleware de erori
+// 🔥 Middleware de erori (sigur contra răspunsurilor duble)
 app.use((err, req, res, next) => {
-  console.error('❌ Eroare server:', err.message);
-  res.status(500).json({ error: 'Eroare internă de server' });
+  console.error('❌ Eroare server:', err);
+
+  if (res.headersSent) {
+    // Dacă deja am trimis ceva, lăsăm Express să gestioneze
+    return next(err);
+  }
+
+  return res.status(500).json({ error: 'Eroare internă de server' });
 });
 
 // 🧠 Pornire server + sincronizare DB
@@ -78,7 +87,7 @@ sequelize.authenticate()
     console.log('✅ Conexiune DB reușită');
 
     if (ENV !== 'production') {
-      await sequelize.sync({ alter: true }); // 🔁 sincronizare flexibilă
+      await sequelize.sync({ alter: true });
       console.log('📦 Sync DB cu alter activat (local)');
     } else {
       await sequelize.sync();

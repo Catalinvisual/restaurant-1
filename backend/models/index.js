@@ -1,13 +1,13 @@
 'use strict';
 
-require('dotenv').config(); // ✅ citește fișierul .env
+require('dotenv').config();
 
 const { Sequelize } = require('sequelize');
 const ENV = process.env.NODE_ENV || 'development';
 
 let sequelize;
 
-// 🌍 Conectare producție
+// 🔌 Conexiunea DB
 if (process.env.DATABASE_URL && ENV === 'production') {
   sequelize = new Sequelize(
     process.env.DATABASE_URL.replace(/^postgresql/, 'postgres'),
@@ -21,7 +21,6 @@ if (process.env.DATABASE_URL && ENV === 'production') {
     }
   );
 } else {
-  // 💻 Conectare locală
   sequelize = new Sequelize(
     process.env.DB_NAME,
     process.env.DB_USER,
@@ -35,7 +34,7 @@ if (process.env.DATABASE_URL && ENV === 'production') {
   );
 }
 
-// 🔗 Încarcă modelele Sequelize
+// 📦 Import modele
 const User = require('./User');
 const Product = require('./Product');
 const Menu = require('./Menu');
@@ -43,26 +42,34 @@ const Order = require('./Order');
 const OrderItem = require('./OrderItem');
 const RefreshToken = require('./RefreshToken');
 
-// 🧩 Setare relații globale
-User.hasMany(Order, { foreignKey: 'user_id' });
-Order.belongsTo(User, { foreignKey: 'user_id' });
+// 🔗 Relații globale cu aliasuri consistente
+User.hasMany(Order, { foreignKey: 'user_id', as: 'orders' });
+Order.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 
-Order.hasMany(OrderItem, { foreignKey: 'order_id', as: 'OrderItems' });
-OrderItem.belongsTo(Order, { foreignKey: 'order_id' });
+Order.hasMany(OrderItem, { foreignKey: 'order_id', as: 'items' });
+OrderItem.belongsTo(Order, { foreignKey: 'order_id', as: 'order' });
 
-User.hasMany(RefreshToken, { foreignKey: 'userId' });
-RefreshToken.belongsTo(User, { foreignKey: 'userId' });
+OrderItem.belongsTo(Product, { foreignKey: 'product_id', as: 'product' });
+Product.hasMany(OrderItem, { foreignKey: 'product_id', as: 'orderItems' });
 
-// ⚙️ Sincronizează schema DB
-sequelize.sync({ alter: true })
-  .then(() => {
-    console.log(`✅ [Sequelize Sync] Schema DB actualizată (${ENV})`);
-  })
-  .catch((err) => {
-    console.error(`❌ [Sequelize Sync] Eroare la sync (${ENV}):`, err);
-  });
+Order.belongsToMany(Product, {
+  through: OrderItem,
+  foreignKey: 'order_id',
+  otherKey: 'product_id',
+  as: 'orderedProducts'
+});
 
-// 🎯 Export obiect global
+Product.belongsToMany(Order, {
+  through: OrderItem,
+  foreignKey: 'product_id',
+  otherKey: 'order_id',
+  as: 'ordersWithProduct'
+});
+
+User.hasMany(RefreshToken, { foreignKey: 'userId', as: 'refreshTokens' });
+RefreshToken.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+// 📡 Export instanța + modelele
 const db = {
   sequelize,
   Sequelize,
@@ -75,7 +82,7 @@ const db = {
 };
 
 if (ENV === 'development') {
-  console.log('🔧 [Sequelize Init] Modelele au fost încărcate cu succes');
+  console.log('🔧 [Sequelize Init] Modelele + relațiile au fost încărcate cu succes');
 }
 
 module.exports = db;

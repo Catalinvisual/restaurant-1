@@ -1,6 +1,6 @@
 'use strict';
 
-require('dotenv').config(); // 🔐 Încarcă variabilele de mediu
+require('dotenv').config();
 
 const jwt = require('jsonwebtoken');
 
@@ -17,27 +17,25 @@ const verifyToken = (req, res, next) => {
 
   const token = parts[1].trim();
   console.log('🔥 Auth header:', authHeader);
-console.log('🔥 Token raw:', token);
+  console.log('🔥 Token raw:', token);
 
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {
       console.error('❌ [Auth Middleware] Eroare la verificarea tokenului:', err);
-      // Personalizare răspuns în funcție de eroare
       if (err.name === 'TokenExpiredError') {
         return res.status(403).json({ error: 'Token expirat' });
       }
       return res.status(403).json({ error: 'Token invalid sau corupt' });
     }
 
-    // Verificare minimală
     if (!decoded.id) {
       return res.status(403).json({ error: 'Token invalid: ID lipsă' });
     }
 
-    // Atașează user-ul decodat la request
     req.user = {
       id: decoded.id,
-      isAdmin: decoded.isAdmin || false
+      isAdmin: decoded.isAdmin || false,
+      role: decoded.role || (decoded.isAdmin ? 'admin' : 'client')
     };
 
     next();

@@ -42,9 +42,10 @@ export default function Checkout() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          address: address.trim(),
-          items: itemsPayload,
-        }),
+  customer_name: name.trim(), // ← adăugat
+  address: address.trim(),
+  items: itemsPayload,
+}),
       });
 
       if (response.ok) {

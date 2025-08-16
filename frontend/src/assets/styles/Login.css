@@ -1,0 +1,112 @@
+/* Stil doar pentru componenta Login */
+
+.login-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem 1rem;
+  margin-top: 7rem;
+}
+
+.login-card {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 400px;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.login-card h2 {
+  text-align: center;
+  color: #E2725B;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.login-card .form-label {
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.login-card .form-control {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.login-card .form-control:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  outline: none;
+}
+
+.login-card .btn-success {
+  background: linear-gradient(135deg, #2e8b57, #3cb371); /* SeaGreen to MediumSeaGreen */
+  color: #fff;
+  border: none;
+  padding: 0.75rem;
+  font-weight: 600;
+  border-radius: 10px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.3s;
+}
+
+.login-card .btn-success:hover {
+  background: linear-gradient(135deg, #246b45, #2e8b57);
+}
+
+
+
+.login-card .register-link {
+  font-family: 'Quicksand', sans-serif; /* Font rotunjit și modern */
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #00bcd4; /* Cyan elegant */
+  background-color: rgba(0, 188, 212, 0.1);
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  display: inline-block;
+  margin-top: 1rem;
+}
+
+.login-card .register-link:hover {
+  background-color: rgba(0, 188, 212, 0.2);
+  color: #0097a7;
+  transform: translateY(-1px) scale(1.05);
+}
+
+
+
+.login-card .alert-danger {
+  background-color: #f8d7da;
+  color: #842029;
+  border-radius: 10px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  border: 1px solid #f5c2c7;
+}

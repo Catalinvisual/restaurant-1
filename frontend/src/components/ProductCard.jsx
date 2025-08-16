@@ -46,11 +46,8 @@ const ProductCard = ({ product = {} }) => {
           loading="lazy"
         />
 
-        {/* Nou / Promo - sus stânga */}
         {product.isNew && <span className="product-badge badge-new">Nou</span>}
         {product.isPromo && <span className="product-badge badge-promo">Promo</span>}
-
-        {/* Categorie - jos dreapta */}
         {categoryLabel && <span className="category-label bottom-right">{categoryLabel}</span>}
       </div>
 
