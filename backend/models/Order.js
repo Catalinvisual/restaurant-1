@@ -23,11 +23,20 @@ const Order = sequelize.define(
       allowNull: false,
       defaultValue: 'pending'
     },
-    totalPrice: { // 👈 folosit camelCase în model
+    total_price: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
-      defaultValue: 0,
-      field: 'total_price' // mapare la coloana din DB
+      defaultValue: 0
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW
     }
   },
   {
@@ -43,10 +52,7 @@ if (ENV === 'development') {
 
 // 🔗 Relații
 Order.associate = (models) => {
-  // Legătură cu User
   Order.belongsTo(models.User, { foreignKey: 'user_id', as: 'user' });
-
-  // Legătură cu OrderItem
   Order.hasMany(models.OrderItem, { foreignKey: 'order_id', as: 'items' });
 };
 

@@ -9,6 +9,7 @@ export default function Checkout() {
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
   const [message, setMessage] = useState('');
+  const [lastOrderTotal, setLastOrderTotal] = useState(null);
 
   const total = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
@@ -29,9 +30,9 @@ export default function Checkout() {
     }
 
     const itemsPayload = cartItems.map(item => ({
-      id: item.id,
-      quantity: item.quantity,
-      price: item.price,
+      product_id: item.id, // corespunde backend-ului
+      quantity: Number(item.quantity),
+      price: Number(item.price) // forțez numeric
     }));
 
     try {
@@ -42,16 +43,20 @@ export default function Checkout() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-  customer_name: name.trim(), // ← adăugat
-  address: address.trim(),
-  items: itemsPayload,
-}),
+          customer_name: name.trim(),
+          address: address.trim(),
+          items: itemsPayload,
+        }),
       });
 
       if (response.ok) {
         const result = await response.json();
         console.log('✅ Comandă trimisă:', result);
-        setMessage('✅ Comanda ta a fost plasată cu succes!');
+
+        // stochez totalul din răspuns
+        setLastOrderTotal(result.order?.total_price || null);
+
+        setMessage(`✅ Comanda ta a fost plasată cu succes!`);
         setName('');
         setAddress('');
         dispatch({ type: 'CLEAR_CART' });
@@ -70,7 +75,15 @@ export default function Checkout() {
       <Header />
       <div className="container mt-5">
         <h2 className="text-primary mb-4">Finalizare comandă</h2>
-        {message && <div className="alert alert-info">{message}</div>}
+
+        {message && (
+          <div className="alert alert-info">
+            {message}
+            {lastOrderTotal !== null && (
+              <div><strong>Total comandă: </strong>€{Number(lastOrderTotal).toFixed(2)}</div>
+            )}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           <div className="mb-3">

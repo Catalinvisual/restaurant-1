@@ -1,0 +1,114 @@
+/* Dark mode styling pentru tabel Clienți */
+body.dark-mode .clients-table {
+  background-color: #000000; /* negru solid */
+  color: #ffffff; /* text alb */
+}
+
+body.dark-mode .clients-table th {
+  background-color: #111111; /* un negru ușor mai deschis pentru header */
+  color: #ffffff;
+}
+
+body.dark-mode .clients-table td {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+/* Borduri subtile în dark mode */
+body.dark-mode .clients-table th,
+body.dark-mode .clients-table td {
+  border: 1px solid #333333;
+}
+
+/* Hover pe rânduri */
+body.dark-mode .clients-table tr:hover td {
+  background-color: #1a1a1a;
+}
+
+/* ===== Stiluri de bază ===== */
+.clients-page {
+  padding: 1.5rem;
+}
+
+.clients-page h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+/* Tabel desktop */
+.clients-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.clients-table th,
+.clients-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.clients-table th {
+  background-color: #f7f7f7;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  /* Ascundem header-ul pe mobil */
+  .clients-table thead {
+    display: none;
+  }
+
+  /* Fiecare rând devine card */
+  .clients-table,
+  .clients-table tbody,
+  .clients-table tr,
+  .clients-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .clients-table tr {
+    background: #fff;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  .clients-table td {
+    padding: 0.5rem 0.75rem;
+    text-align: right;
+    position: relative;
+    border: none;
+    border-bottom: 1px solid #eee;
+  }
+
+  .clients-table td:last-child {
+    border-bottom: none;
+  }
+
+  /* Etichetele coloanelor pe mobil */
+  .clients-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0.75rem;
+    font-weight: bold;
+    text-transform: capitalize;
+    color: #555;
+    text-align: left;
+  }
+}
+
+/* ===== Ajustări pentru ecrane foarte mici ===== */
+@media (max-width: 480px) {
+  .clients-page {
+    padding: 1rem;
+  }
+  .clients-page h2 {
+    font-size: 1.5rem;
+  }
+}

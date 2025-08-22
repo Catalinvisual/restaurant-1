@@ -1,6 +1,6 @@
 'use strict';
 
-require('dotenv').config(); // 🔐 Încarcă .env
+require('dotenv').config();
 
 const express = require('express');
 const router = express.Router();
@@ -12,7 +12,7 @@ const RefreshToken = require('../models/RefreshToken');
 const ENV = process.env.NODE_ENV || 'development';
 console.log(`🚦 [Auth Routes] Mediul activ: ${ENV}`);
 
-// Middleware verificare token
+// ✅ Middleware verificare token
 const verifyToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader) return res.status(401).json({ error: 'Token lipsă' });
@@ -30,6 +30,7 @@ const verifyToken = (req, res, next) => {
         : 'Token invalid sau corupt';
       return res.status(403).json({ error: msg });
     }
+
     if (!decoded.id) {
       return res.status(403).json({ error: 'Token invalid: ID lipsă' });
     }
@@ -50,14 +51,17 @@ router.post('/register', async (req, res) => {
   if (!username || !email || !password) {
     return res.status(400).json({ error: 'Date lipsă în formular' });
   }
+
   try {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({ error: 'Email invalid' });
     }
+
     if (await User.findOne({ where: { email } })) {
       return res.status(409).json({ error: 'Email deja folosit' });
     }
+
     const hashed = await bcrypt.hash(password, 10);
     const newUser = await User.create({
       username: username.trim(),
@@ -66,6 +70,7 @@ router.post('/register', async (req, res) => {
       isAdmin: email === 'catalin@yahoo.com',
       role: role || (email === 'catalin@yahoo.com' ? 'admin' : 'client')
     });
+
     return res.status(201).json({
       id: newUser.id,
       username: newUser.username,
@@ -82,6 +87,7 @@ router.post('/register', async (req, res) => {
 // 🔑 Login
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
+
   try {
     const user = await User.findOne({ where: { email } });
     if (!user || !(await bcrypt.compare(password, user.password))) {
@@ -94,7 +100,10 @@ router.post('/login', async (req, res) => {
       role: user.role || (user.isAdmin ? 'admin' : 'client')
     };
 
-    const accessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '15m' });
+    // ✅ Token extins la 24h
+    const accessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' });
+
+    // ✅ Refresh token rămâne la 365 zile
     const refreshToken = jwt.sign({ userId: user.id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '365d' });
 
     await RefreshToken.create({
@@ -114,6 +123,7 @@ router.post('/login', async (req, res) => {
 router.post('/refresh', async (req, res) => {
   const { token } = req.body;
   if (!token) return res.status(401).json({ error: 'Token lipsă' });
+
   try {
     const stored = await RefreshToken.findOne({ where: { token } });
     if (!stored) return res.status(403).json({ error: 'Token invalid sau expirat' });
@@ -128,7 +138,9 @@ router.post('/refresh', async (req, res) => {
       role: user.role || (user.isAdmin ? 'admin' : 'client')
     };
 
-    const newAccess = jwt.sign(newPayload, process.env.JWT_SECRET, { expiresIn: '15m' });
+    // ✅ Nou token de acces cu durată extinsă
+    const newAccess = jwt.sign(newPayload, process.env.JWT_SECRET, { expiresIn: '24h' });
+
     return res.json({ accessToken: newAccess });
   } catch (err) {
     console.error('❌ Eroare la refresh:', err);
@@ -136,9 +148,10 @@ router.post('/refresh', async (req, res) => {
   }
 });
 
-// 🚪 Logout — protejat cu verifyToken
+// 🚪 Logout
 router.post('/logout', verifyToken, async (req, res) => {
   const userId = req.user.id;
+
   try {
     await RefreshToken.destroy({ where: { userId } });
     return res.status(204).send();
@@ -148,7 +161,7 @@ router.post('/logout', verifyToken, async (req, res) => {
   }
 });
 
-// 👥 Rută protejată — exemplu
+// 👥 Rută protejată
 router.get('/users', verifyToken, async (req, res) => {
   try {
     const users = await User.findAll({ attributes: { exclude: ['password'] } });

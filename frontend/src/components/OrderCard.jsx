@@ -47,10 +47,11 @@ export default function OrderCard({ order }) {
           </li>
         ))}
         <li className="list-group-item text-end">
-          <strong className="order-total">
-            Total: €{Number(order.total_price).toFixed(2)}
-          </strong>
-        </li>
+  <strong className="order-total">
+    Total: €{Number(order.total_price || order.totalPrice || 0).toFixed(2)}
+  </strong>
+</li>
+
       </ul>
     </div>
   );

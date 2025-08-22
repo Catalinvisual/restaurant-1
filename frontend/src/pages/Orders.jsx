@@ -3,33 +3,64 @@ import axios from 'axios';
 import { API_URL } from '../apiConfig';
 import { getToken, isAdmin } from '../utils/auth';
 import '../assets/styles/Orders.css';
-import OrderCard from '../components/OrderCard'; // ✅ Import adăugat
 
 export default function Orders({ onOrderUpdated }) {
   const [orders, setOrders] = useState([]);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
 
+  const getToday = () => {
+    const today = new Date();
+    return today.toISOString().split('T')[0]; // format YYYY-MM-DD
+  };
+
+  const getDayName = (dateStr) => {
+    const todayStr = getToday();
+    if (dateStr === todayStr) return 'Azi';
+
+    try {
+      const date = new Date(dateStr);
+      return new Intl.DateTimeFormat('ro-RO', { weekday: 'long' }).format(date);
+    } catch {
+      return 'Zi necunoscută';
+    }
+  };
+
+  const [selectedDate, setSelectedDate] = useState(getToday());
+
   useEffect(() => {
     const token = getToken();
 
-    if (!token) {
-      setMessage('❗ Trebuie să fii autentificat pentru a vedea comenzile.');
+    if (!token || !isAdmin()) {
+      setMessage('⛔ Acces interzis. Trebuie să fii autentificat ca admin.');
       setLoading(false);
       return;
     }
 
-    if (!isAdmin()) {
-      setMessage('⛔ Acces interzis. Doar adminii pot vedea această pagină.');
-      setLoading(false);
-      return;
-    }
+    setLoading(true);
+    const query = selectedDate ? `?date=${selectedDate}` : '';
 
     axios
-      .get(`${API_URL}/orders`, {
+      .get(`${API_URL}/orders${query}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
-      .then(res => setOrders(res.data))
+      .then(res => {
+        const normalizedOrders = res.data.map(order => ({
+          ...order,
+          created_at: order.created_at,
+          total_price: Number(order.total_price || 0), // ✅ fix: folosim snake_case
+          items: order.items || [],
+          customer_name: order.customer_name || 'Client necunoscut',
+        }));
+
+        setOrders(normalizedOrders);
+
+        if (normalizedOrders.length === 0) {
+          setMessage(`ℹ️ Nu au fost înregistrate comenzi în data de ${selectedDate || 'toate zilele'}.`);
+        } else {
+          setMessage('');
+        }
+      })
       .catch(err => {
         const status = err?.response?.status;
         if (status === 401) {
@@ -41,10 +72,9 @@ export default function Orders({ onOrderUpdated }) {
         }
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [selectedDate]);
 
   const handleStatusChange = async (orderId, newStatus) => {
-    console.log('PUT ▶', orderId, newStatus); // log frontend
     const token = getToken();
 
     if (!isAdmin()) {
@@ -59,7 +89,13 @@ export default function Orders({ onOrderUpdated }) {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      const updatedOrder = response.data;
+      const updatedOrder = {
+        ...response.data,
+        total_price: Number(response.data.total_price || 0), // ✅ fix aici
+        items: response.data.items || [],
+        customer_name: response.data.customer_name || 'Client necunoscut',
+      };
+
       const updatedOrders = orders.map(order =>
         order.id === updatedOrder.id ? updatedOrder : order
       );
@@ -75,22 +111,53 @@ export default function Orders({ onOrderUpdated }) {
   };
 
   return (
+   <div className="orders-container">
+  {/* Zona filtrare sus */}
+  <div className="orders-filter mb-3">
+    <label htmlFor="dateFilter" className="form-label me-2">
+      Filtrează după dată:
+    </label>
+    <input
+      type="date"
+      id="dateFilter"
+      className="form-control d-inline-block w-auto"
+      value={selectedDate}
+      onChange={(e) => setSelectedDate(e.target.value)}
+    />
+    <button
+      className="btn btn-secondary ms-2"
+      onClick={() => setSelectedDate(getToday())}
+    >
+      {getDayName(selectedDate)}
+    </button>
+    <button
+      className="btn btn-outline-primary ms-2"
+      onClick={() => setSelectedDate('')}
+    >
+      Toate comenzile
+    </button>
+  </div>
+
+  {/* Zona listă comenzi */}
+  {loading && <p>Se încarcă comenzile...</p>}
+
+  {!loading && message && (
+    <div className="alert alert-warning">{message}</div>
+  )}
+
+  {!loading && !message && orders.length === 0 && (
+    <p>Nu există comenzi înregistrate.</p>
+  )}
+
+  {!loading && !message && (
     <div className="orders-list">
-      {loading && <p>Se încarcă comenzile...</p>}
-
-      {!loading && message && (
-        <div className="alert alert-warning">{message}</div>
-      )}
-
-      {!loading && !message && orders.length === 0 && (
-        <p>Nu există comenzi înregistrate.</p>
-      )}
-
-      {!loading && !message && orders.map(order => (
+      {orders.map(order => (
         <div key={order.id} className="order-card">
-          <div className="card-header">
+          <div className="card-header d-flex align-items-center">
             <strong>Comandă #{order.id}</strong>
-            <span className={`status-badge ${order.status}`}>{order.status}</span>
+            <span className={`status-badge ${order.status} ms-2`}>
+              {order.status}
+            </span>
             <select
               value={order.status}
               onChange={(e) => handleStatusChange(order.id, e.target.value)}
@@ -105,15 +172,21 @@ export default function Orders({ onOrderUpdated }) {
           </div>
 
           <div className="card-body">
-            <p><strong>👤 Client:</strong> {order.customer_name || 'N/A'}</p>
+            <p><strong>👤 Client:</strong> {order.customer_name}</p>
             <p><strong>📍 Adresă:</strong> {order.address || 'N/A'}</p>
+            <p>
+              <strong>🕒 Plasată la: </strong> 
+              {order.created_at && !isNaN(new Date(order.created_at))
+                ? new Date(order.created_at).toLocaleString('ro-RO')
+                : 'Data indisponibilă'}
+            </p>
           </div>
 
           <ul className="list-group list-group-flush">
-            {order.OrderItems?.map((item, idx) => (
-              <li key={idx} className="list-group-item">
+            {order.items.map((item, idx) => (
+              <li key={idx} className="list-group-item d-flex justify-content-between">
                 <span className="product-desc">
-                  {item.Product?.name || 'Produs'} x {item.quantity}
+                  {item.product?.name || 'Produs'} x {item.quantity}
                 </span>
                 <span className="product-price">
                   €{(Number(item.price) * Number(item.quantity)).toFixed(2)}
@@ -121,20 +194,14 @@ export default function Orders({ onOrderUpdated }) {
               </li>
             ))}
             <li className="list-group-item text-end">
-              <strong>Total: €{Number(order.total_price).toFixed(2)}</strong>
+              <strong>Total: €{order.total_price.toFixed(2)}</strong>
             </li>
           </ul>
         </div>
       ))}
-
-      {/* ✅ Exemplu de folosire OrderCard în paralel */}
-      {!loading && !message && orders.map(order => (
-        <OrderCard
-          key={`card-${order.id}`}
-          order={order}
-          handleStatusChange={handleStatusChange}
-        />
-      ))}
     </div>
+  )}
+</div>
+
   );
 }

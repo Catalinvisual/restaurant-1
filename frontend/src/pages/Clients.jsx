@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { API_URL } from '../apiConfig';
 import { getToken } from '../utils/auth';
-
+import '../assets/styles/Clients.css';
 export default function Clients() {
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,7 +28,8 @@ export default function Clients() {
   return (
     <div className="clients-page">
       <h2>👥 Clienți</h2>
-      <table className="table table-striped">
+      <table className="table table-striped clients-table">
+
         <thead>
           <tr>
             <th>Email</th>
@@ -38,21 +39,22 @@ export default function Clients() {
             <th>Ultima comandă</th>
           </tr>
         </thead>
-        <tbody>
-          {clients.map(client => (
-            <tr key={client.id}>
-              <td>{client.email}</td>
-              <td>{new Date(client.createdAt).toLocaleDateString()}</td>
-              <td>{client.orderCount || 0}</td>
-              <td>€{(client.totalSpent || 0).toFixed(2)}</td>
-              <td>
-                {client.lastOrder
-                  ? `${client.lastOrder.status} - ${new Date(client.lastOrder.created_at).toLocaleDateString()}`
-                  : '—'}
-              </td>
-            </tr>
-          ))}
-        </tbody>
+       <tbody>
+  {clients.map(client => (
+    <tr key={client.id}>
+      <td data-label="Email">{client.email}</td>
+      <td data-label="Data înregistrării">{new Date(client.createdAt).toLocaleDateString()}</td>
+      <td data-label="Număr comenzi">{client.orderCount || 0}</td>
+      <td data-label="Total cheltuit">€{(client.totalSpent || 0).toFixed(2)}</td>
+      <td data-label="Ultima comandă">
+        {client.lastOrder
+          ? `${client.lastOrder.status} - ${new Date(client.lastOrder.created_at).toLocaleDateString()}`
+          : '—'}
+      </td>
+    </tr>
+  ))}
+</tbody>
+
       </table>
     </div>
   );
