@@ -1,65 +1,182 @@
-
-
+/* Titlu pagină */
 .my-orders-title {
-  color: #E2725B;
-  font-weight: 600;
-  text-align: center;
-  margin-top: 7rem; /* spațiu sub header */
+  font-weight: 700;
+  letter-spacing: 0.2px;
   margin-bottom: 2rem;
-}
-
-
-/* Mesaj informativ (alert) */
-.alert-info {
-  background-color: #fff4f0;
-  border-left: 4px solid #E2725B;
+  margin-top: 8rem;
   color: #8B4513;
-  font-weight: 500;
-  padding: 0.75rem 0.25rem; /* padding lateral redus semnificativ */
-  border-radius: 6px;
-  margin-bottom: 1rem;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-  text-align: center; /* text centrat */
+}
+body.dark-mode .my-orders-title {
+  color: #e8eefc;
 }
 
-/* Mesaj când nu sunt comenzi */
-.no-orders-message {
-  text-align: center;
-  font-size: 1.1rem;
-  color: #E2725B;
-  font-weight: 500;
-  margin-top: 2rem;
-  background-color: #fff4f0;
-  padding: 1rem 0.25rem; /* padding lateral redus semnificativ */
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+/* Cardurile din MyOrders */
+.my-orders-title ~ .card {
+  border: 1px solid #eaeef5;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(31, 42, 68, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.my-orders-title ~ .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 36px rgba(31, 42, 68, 0.12);
+  border-color: #e0e6f2;
 }
 
-
-
-/* Card comandă */
-.card {
-  border: 1px solid #E2725B;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+/* Header card */
+.my-orders-title ~ .card .card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: linear-gradient(180deg, #f8fbff, #f3f7fe);
+  border-bottom: 1px solid #e7ecf7;
+  padding: 0.9rem 1.2rem;
+  font-size: 0.98rem;
+  color: #233352;
 }
-
-/* Headerul cardului */
-.card-header {
-  background-color: #fbeae6;
-  color: #8B4513;
+.my-orders-title ~ .card .card-header strong {
+  font-weight: 700;
+}
+.my-orders-title ~ .card .card-header .badge {
+  position: static;
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
   font-weight: 600;
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid #E2725B;
+  background: #8b9bb4;
+  color: #fff;
 }
 
-/* Badge status comandă */
-.card .badge {
-  font-size: 0.75rem;
-  background-color: #E2725B;
-  color: white;
-  padding: 0.2rem 0.5rem; /* mai puțin padding */
-  border-radius: 12px;
-  text-align: center;      /* centrăm textul */
-  display: inline-block;   /* asigurăm alinierea corectă */
+/* Body card */
+.my-orders-title ~ .card .card-body {
+  padding: 1rem 1.2rem 0.6rem 1.2rem;
+}
+.my-orders-title ~ .card .card-body p {
+  margin-bottom: 0.35rem;
+  color: #33415c;
+}
+.my-orders-title ~ .card .card-body strong {
+  color: #1f2a44;
+}
+
+/* Listă produse */
+.my-orders-title ~ .card .list-group-item {
+  border-color: #eef2f7 !important;
+  padding: 0.85rem 1.2rem;
+}
+.my-orders-title ~ .card .list-group-item.d-flex {
+  gap: 0.75rem;
+}
+
+/* Imagine produs */
+.my-orders-title ~ .card .list-group-item img {
+  box-shadow: 0 4px 14px rgba(31, 42, 68, 0.12);
+  border: 1px solid #eef2f7;
+}
+
+/* Nume + descriere produs */
+.my-orders-title ~ .card .list-group-item .fw-bold {
+  color: #1f2a44;
+  font-weight: 700 !important;
+}
+.my-orders-title ~ .card .list-group-item .text-muted {
+  color: #6c7a96 !important;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Preț produs */
+.my-orders-title ~ .card .list-group-item .text-end span {
+  color: #455887;
+}
+.my-orders-title ~ .card .list-group-item .text-end strong {
+  color: #0e8f5b;
+  font-size: 1rem;
+}
+
+/* Rând total */
+.my-orders-title ~ .card .list-group-item.text-end {
+  background: linear-gradient(180deg, #f9fbff, #f2f6ff);
+  border-top: 1px solid #e6ecf7 !important;
+  font-size: 1.05rem;
+}
+.my-orders-title ~ .card .list-group-item.text-end strong {
+  color: #0a7a4c;
+  letter-spacing: 0.2px;
+}
+
+/* Dark mode */
+body.dark-mode .my-orders-title ~ .card {
+  background: #1b2230;
+  border-color: #2a3242;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+body.dark-mode .my-orders-title ~ .card:hover {
+  border-color: #39455c;
+  box-shadow: 0 14px 36px rgba(0,0,0,0.38);
+}
+body.dark-mode .my-orders-title ~ .card .card-header {
+  background: linear-gradient(180deg, #1f2839, #1c2433);
+  border-bottom-color: #2d3648;
+  color: #dae6ff;
+}
+body.dark-mode .my-orders-title ~ .card .card-header .badge {
+  background: #4c607f;
+}
+body.dark-mode .my-orders-title ~ .card .card-body p {
+  color: #bcc8e2;
+}
+body.dark-mode .my-orders-title ~ .card .card-body strong {
+  color: #e8eefc;
+}
+body.dark-mode .my-orders-title ~ .card .list-group-item {
+  border-color: #2a3446 !important;
+  background: #1b2230;
+}
+body.dark-mode .my-orders-title ~ .card .list-group-item img {
+  border-color: #2a3446;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+}
+body.dark-mode .my-orders-title ~ .card .list-group-item .text-muted {
+  color: #8ea0c5 !important;
+}
+body.dark-mode .my-orders-title ~ .card .list-group-item .text-end span {
+  color: #c7d4f1;
+}
+body.dark-mode .my-orders-title ~ .card .list-group-item .text-end strong {
+  color: #2adf9e;
+}
+body.dark-mode .my-orders-title ~ .card .list-group-item.text-end {
+  background: linear-gradient(180deg, #20293b, #1c2536);
+  border-top-color: #2a3446 !important;
+}
+
+/* Status colors opționale */
+.my-orders-title ~ .card .card-header .badge.pending { background: #f39c12; }
+.my-orders-title ~ .card .card-header .badge.confirmed { background: #3498db; }
+.my-orders-title ~ .card .card-header .badge.shipped { background: #9b59b6; }
+.my-orders-title ~ .card .card-header .badge.delivered { background: #2ecc71; }
+.my-orders-title ~ .card .card-header .badge.cancelled { background: #e74c3c; }
+
+/* Responsive */
+@media (max-width: 576px) {
+  .my-orders-title ~ .card .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+  }
+  .my-orders-title ~ .card .list-group-item.d-flex {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+  }
+  .my-orders-title ~ .card .list-group-item .text-end {
+    align-self: stretch;
+    text-align: left !important;
+    display: flex;
+    justify-content: space-between;
+  }
 }

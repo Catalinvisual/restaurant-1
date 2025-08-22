@@ -112,15 +112,7 @@ export default function Header() {
                   </NavLink>
                 </li>
                 <li className="nav-item">
-                  <NavLink
-                    to="/orders"
-                    className={({ isActive }) =>
-                      `nav-link text-white ${isActive ? 'active' : ''}`
-                    }
-                    onClick={handleLinkClick}
-                  >
-                    Toate comenzile
-                  </NavLink>
+              
                 </li>
               </>
             )}

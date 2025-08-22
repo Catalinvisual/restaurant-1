@@ -45,13 +45,14 @@ export default function Orders({ onOrderUpdated }) {
         headers: { Authorization: `Bearer ${token}` }
       })
       .then(res => {
-        const normalizedOrders = res.data.map(order => ({
-          ...order,
-          created_at: order.created_at,
-          total_price: Number(order.total_price || 0), // ✅ fix: folosim snake_case
-          items: order.items || [],
-          customer_name: order.customer_name || 'Client necunoscut',
-        }));
+     const normalizedOrders = res.data.map(order => ({
+  ...order,
+  created_at: order.created_at, // ✅ adăugat explicit
+  total_price: Number(order.totalPrice || 0),
+  items: order.items || [],
+  customer_name: order.customer_name || 'Client necunoscut',
+}));
+
 
         setOrders(normalizedOrders);
 
@@ -91,7 +92,7 @@ export default function Orders({ onOrderUpdated }) {
 
       const updatedOrder = {
         ...response.data,
-        total_price: Number(response.data.total_price || 0), // ✅ fix aici
+        total_price: Number(response.data.totalPrice || 0),
         items: response.data.items || [],
         customer_name: response.data.customer_name || 'Client necunoscut',
       };
@@ -111,53 +112,45 @@ export default function Orders({ onOrderUpdated }) {
   };
 
   return (
-   <div className="orders-container">
-  {/* Zona filtrare sus */}
-  <div className="orders-filter mb-3">
-    <label htmlFor="dateFilter" className="form-label me-2">
-      Filtrează după dată:
-    </label>
-    <input
-      type="date"
-      id="dateFilter"
-      className="form-control d-inline-block w-auto"
-      value={selectedDate}
-      onChange={(e) => setSelectedDate(e.target.value)}
-    />
-    <button
-      className="btn btn-secondary ms-2"
-      onClick={() => setSelectedDate(getToday())}
-    >
-      {getDayName(selectedDate)}
-    </button>
-    <button
-      className="btn btn-outline-primary ms-2"
-      onClick={() => setSelectedDate('')}
-    >
-      Toate comenzile
-    </button>
-  </div>
-
-  {/* Zona listă comenzi */}
-  {loading && <p>Se încarcă comenzile...</p>}
-
-  {!loading && message && (
-    <div className="alert alert-warning">{message}</div>
-  )}
-
-  {!loading && !message && orders.length === 0 && (
-    <p>Nu există comenzi înregistrate.</p>
-  )}
-
-  {!loading && !message && (
     <div className="orders-list">
-      {orders.map(order => (
+      <div className="filter-bar mb-4">
+        <label htmlFor="dateFilter" className="form-label me-2">Filtrează după dată:</label>
+        <input
+          type="date"
+          id="dateFilter"
+          className="form-control d-inline-block w-auto"
+          value={selectedDate}
+          onChange={(e) => setSelectedDate(e.target.value)}
+        />
+        <button
+          className="btn btn-secondary ms-2"
+          onClick={() => setSelectedDate(getToday())}
+        >
+          {getDayName(selectedDate)}
+        </button>
+        <button
+          className="btn btn-outline-primary ms-2"
+          onClick={() => setSelectedDate('')}
+        >
+          Toate comenzile
+        </button>
+      </div>
+
+      {loading && <p>Se încarcă comenzile...</p>}
+
+      {!loading && message && (
+        <div className="alert alert-warning">{message}</div>
+      )}
+
+      {!loading && !message && orders.length === 0 && (
+        <p>Nu există comenzi înregistrate.</p>
+      )}
+
+      {!loading && !message && orders.map(order => (
         <div key={order.id} className="order-card">
-          <div className="card-header d-flex align-items-center">
+          <div className="card-header">
             <strong>Comandă #{order.id}</strong>
-            <span className={`status-badge ${order.status} ms-2`}>
-              {order.status}
-            </span>
+            <span className={`status-badge ${order.status}`}>{order.status}</span>
             <select
               value={order.status}
               onChange={(e) => handleStatusChange(order.id, e.target.value)}
@@ -174,17 +167,17 @@ export default function Orders({ onOrderUpdated }) {
           <div className="card-body">
             <p><strong>👤 Client:</strong> {order.customer_name}</p>
             <p><strong>📍 Adresă:</strong> {order.address || 'N/A'}</p>
-            <p>
-              <strong>🕒 Plasată la: </strong> 
-              {order.created_at && !isNaN(new Date(order.created_at))
-                ? new Date(order.created_at).toLocaleString('ro-RO')
-                : 'Data indisponibilă'}
-            </p>
+            <p><strong>🕒 Plasată la:</strong> 
+  {order.created_at && !isNaN(new Date(order.created_at))
+    ? new Date(order.created_at).toLocaleString('ro-RO')
+    : 'Data indisponibilă'}
+</p>
+
           </div>
 
           <ul className="list-group list-group-flush">
             {order.items.map((item, idx) => (
-              <li key={idx} className="list-group-item d-flex justify-content-between">
+              <li key={idx} className="list-group-item">
                 <span className="product-desc">
                   {item.product?.name || 'Produs'} x {item.quantity}
                 </span>
@@ -200,8 +193,5 @@ export default function Orders({ onOrderUpdated }) {
         </div>
       ))}
     </div>
-  )}
-</div>
-
   );
 }

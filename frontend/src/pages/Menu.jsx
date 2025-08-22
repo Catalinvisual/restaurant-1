@@ -56,7 +56,7 @@ export default function Menu() {
       <BannerSection />
 
       <div className="container pt-2">
-        <h2 className="terracotta-title text-center mb-3">Meniu</h2>
+        <h2 className="text-center mb-3">Meniu</h2>
 
 
         <div className="filter-buttons text-center mb-4">

@@ -151,6 +151,33 @@ router.post('/', verifyToken, async (req, res) => {
     return res.status(500).json({ error: 'Eroare la server', details: error.message });
   }
 });
+// 📦 Comenzile utilizatorului autentificat
+router.get('/user', verifyToken, async (req, res) => {
+  try {
+    const orders = await Order.findAll({
+      where: { user_id: req.user.id },
+      include: [
+        {
+          model: OrderItem,
+          as: 'items',
+          include: [
+            {
+              model: Product,
+              as: 'product',
+              attributes: ['id', 'name', 'price', 'category', 'image', 'description']
+            }
+          ]
+        }
+      ],
+      order: [['created_at', 'DESC']]
+    });
+
+    res.json(orders);
+  } catch (error) {
+    console.error('❌ Eroare la preluarea comenzilor utilizatorului:', error);
+    res.status(500).json({ error: 'Eroare la server', details: error.message });
+  }
+});
 
 
 module.exports = router;

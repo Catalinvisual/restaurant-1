@@ -63,11 +63,11 @@
 
 
 /* Stil general pentru h2 */
-h2 {
+.container > h2.text-center{
   font-weight: 600;
   margin-top: 1rem;
   text-align: center;
-  color: #E2725B;
+  color: #8B4513 ;
 
 }
 
