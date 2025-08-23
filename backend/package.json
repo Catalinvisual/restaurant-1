@@ -12,6 +12,9 @@
   "author": "Catalin",
   "license": "ISC",
   "type": "commonjs",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cloudinary": "^1.30.0",
