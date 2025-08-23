@@ -1,23 +1,28 @@
-require('dotenv').config();        // 🔐 Încarcă .env
+// 🔐 Încarcă variabilele din .env
+require('dotenv').config();
 const { Sequelize } = require('sequelize');
 
 const ENV = process.env.NODE_ENV || 'development';
+const useSSL = process.env.DB_SSL === 'true';
 
 let sequelize;
 
+// 🌐 Conexiune producție (Render / alt server)
 if (process.env.DATABASE_URL && ENV === 'production') {
-  sequelize = new Sequelize(                           
+  sequelize = new Sequelize(
     process.env.DATABASE_URL.replace(/^postgresql/, 'postgres'),
     {
       dialect: 'postgres',
       protocol: 'postgres',
       dialectOptions: {
-        ssl: { require: true, rejectUnauthorized: false }
+        ssl: useSSL ? { require: true, rejectUnauthorized: false } : false
       },
       logging: false
     }
   );
-} else {
+}
+// 💻 Conexiune locală
+else {
   sequelize = new Sequelize(
     process.env.DB_NAME,
     process.env.DB_USER,
@@ -26,14 +31,17 @@ if (process.env.DATABASE_URL && ENV === 'production') {
       host: process.env.DB_HOST,
       dialect: process.env.DB_DIALECT || 'postgres',
       port: Number(process.env.DB_PORT) || 5432,
+      dialectOptions: {
+        ssl: useSSL ? { require: true, rejectUnauthorized: false } : false
+      },
       logging: ENV === 'development'
     }
   );
 }
 
-sequelize
-  .authenticate()
+// 🔎 Test conexiune DB
+sequelize.authenticate()
   .then(() => console.log(`✅ Conexiune DB reușită (${ENV})`))
   .catch(err => console.error('❌ Eroare conectare DB:', err));
 
-module.exports = sequelize;     // ✅ Export direct instanță
+module.exports = sequelize;
