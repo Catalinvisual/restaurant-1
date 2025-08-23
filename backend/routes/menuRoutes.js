@@ -1,10 +1,9 @@
-require('dotenv').config(); // ✅ citește .env
+require('dotenv').config();
 
 const express = require('express');
 const router = express.Router();
 const Menu = require('../models/Menu');
 
-// ☁️ Cloudinary + Multer setup
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const multer = require('multer');
@@ -29,14 +28,13 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     if (file.mimetype?.startsWith('image/')) cb(null, true);
     else cb(new Error('❌ Tip fișier invalid. Doar imagini sunt permise.'));
   }
 });
 
-// Middleware pentru captarea erorilor multer
 const handleUploadError = (req, res, next) => {
   upload.single('image')(req, res, function (err) {
     if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
@@ -48,9 +46,21 @@ const handleUploadError = (req, res, next) => {
   });
 };
 
-// 🔽 Rute:
+// 🔧 Helpers
+const toBool = (value) => String(value).toLowerCase() === 'true';
 
-// 1️⃣ GET — toate produsele
+const validateProduct = ({ name, price, category }) => {
+  if (!name || !price || isNaN(price)) {
+    return 'Name și price valide sunt necesare';
+  }
+  if (!['mancare', 'bautura'].includes(category)) {
+    return 'Categoria trebuie să fie "mancare" sau "bautura"';
+  }
+  return null;
+};
+
+// 🔽 Rute
+
 router.get('/', async (req, res) => {
   try {
     const { category } = req.query;
@@ -62,18 +72,11 @@ router.get('/', async (req, res) => {
   }
 });
 
-// 2️⃣ POST — adaugă produs
 router.post('/', handleUploadError, async (req, res) => {
   try {
     const { name, price, description, isNew, isPromo, category } = req.body;
-
-    if (!name || !price || isNaN(price)) {
-      return res.status(400).json({ error: 'Name și price valide sunt necesare' });
-    }
-
-    if (!['mancare', 'bautura'].includes(category)) {
-      return res.status(400).json({ error: 'Categoria trebuie să fie "mancare" sau "bautura"' });
-    }
+    const validationError = validateProduct({ name, price, category });
+    if (validationError) return res.status(400).json({ error: validationError });
 
     const imageUrl = req.file?.path || req.body.image || null;
 
@@ -82,8 +85,8 @@ router.post('/', handleUploadError, async (req, res) => {
       price: parseFloat(price),
       description: description?.trim() || '',
       image: imageUrl,
-      isNew: String(isNew) === 'true',
-      isPromo: String(isPromo) === 'true',
+      isNew: toBool(isNew),
+      isPromo: toBool(isPromo),
       category
     });
 
@@ -94,15 +97,10 @@ router.post('/', handleUploadError, async (req, res) => {
   }
 });
 
-// 3️⃣ DELETE — ștergere
 router.delete('/:id', async (req, res) => {
   try {
     const deleted = await Menu.destroy({ where: { id: req.params.id } });
-
-    if (!deleted) {
-      return res.status(404).json({ error: 'Produsul nu a fost găsit sau deja șters' });
-    }
-
+    if (!deleted) return res.status(404).json({ error: 'Produsul nu a fost găsit sau deja șters' });
     res.sendStatus(204);
   } catch (error) {
     console.error('❌ Eroare DELETE /api/menu/:id:', error);
@@ -110,27 +108,21 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-// 4️⃣ PUT — actualizare
 router.put('/:id', handleUploadError, async (req, res) => {
   try {
     const { name, price, description, isNew, isPromo, category } = req.body;
+    const validationError = validateProduct({ name, price, category });
+    if (validationError) return res.status(400).json({ error: validationError });
+
     const imageUrl = req.file?.path || req.body.image || null;
-
-    if (!name || !price || isNaN(price)) {
-      return res.status(400).json({ error: 'Name și price valide sunt necesare' });
-    }
-
-    if (!['mancare', 'bautura'].includes(category)) {
-      return res.status(400).json({ error: 'Categoria trebuie să fie "mancare" sau "bautura"' });
-    }
 
     const [updatedCount, updatedRows] = await Menu.update({
       name: name.trim(),
       price: parseFloat(price),
       description: description?.trim() || '',
       image: imageUrl,
-      isNew: String(isNew) === 'true',
-      isPromo: String(isPromo) === 'true',
+      isNew: toBool(isNew),
+      isPromo: toBool(isPromo),
       category
     }, {
       where: { id: req.params.id },
