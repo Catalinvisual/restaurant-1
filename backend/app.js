@@ -64,9 +64,10 @@ app.use('/api/users', require('./routes/userRoutes'));
 // 🧱 Servire frontend în producție
 if (ENV === 'production') {
   app.use(express.static(path.join(__dirname, 'client', 'build')));
- app.get('/*', (req, res) => {
+app.get('/:splat(*)', (req, res) => {
   return res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
 });
+
 
 }
 
