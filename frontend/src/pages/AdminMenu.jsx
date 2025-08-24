@@ -27,20 +27,30 @@ export default function AdminMenu() {
   const navigate = useNavigate();
 
   // ✅ Verificare token la accesare
-  useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (!token || token === "undefined") {
-      navigate("/login?expired=true");
-      return;
-    }
-    const payload = parseJwt(token);
-    const now = Date.now() / 1000;
-    if (!payload || payload.exp < now) {
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      navigate("/login?expired=true");
-    }
-  }, [navigate]);
+useEffect(() => {
+  const token = localStorage.getItem("accessToken");
+  if (!token || token === "undefined") {
+    navigate("/login?expired=true");
+    return;
+  }
+
+  const payload = parseJwt(token);
+  const now = Date.now() / 1000;
+
+  if (!payload || payload.exp < now) {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    navigate("/login?expired=true");
+    return;
+  }
+
+  if (!payload.isAdmin) {
+    toast.error("⛔ Acces restricționat: doar adminii pot accesa această pagină.");
+    navigate("/login?unauthorized=true");
+    return;
+  }
+}, [navigate]);
+
 
   // ✅ Preluare meniu doar când secțiunea "menu" e activă
   useEffect(() => {
