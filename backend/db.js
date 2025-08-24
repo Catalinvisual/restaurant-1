@@ -15,12 +15,13 @@ if (process.env.DATABASE_URL && ENV === 'production') {
       dialect: 'postgres',
       protocol: 'postgres',
       dialectOptions: {
-        ssl: useSSL ? { require: true, rejectUnauthorized: false } : false
+        ssl: { require: true, rejectUnauthorized: false } // 🔐 activat direct
       },
       logging: false
     }
   );
 }
+
 // 💻 Conexiune locală
 else {
   sequelize = new Sequelize(

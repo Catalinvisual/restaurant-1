@@ -5,9 +5,9 @@
   margin-bottom: 2rem;
   margin-top: 8rem;
   color: #8B4513;
-}
-body.dark-mode .my-orders-title {
-  color: #e8eefc;
+  text-align: center;     /* ✅ aliniere pe centru */
+  display: block;         /* ✅ ocupă toată lățimea */
+  width: 100%;            /* ✅ asigură centrare completă */
 }
 
 /* Cardurile din MyOrders */
@@ -106,52 +106,6 @@ body.dark-mode .my-orders-title {
 .my-orders-title ~ .card .list-group-item.text-end strong {
   color: #0a7a4c;
   letter-spacing: 0.2px;
-}
-
-/* Dark mode */
-body.dark-mode .my-orders-title ~ .card {
-  background: #1b2230;
-  border-color: #2a3242;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-}
-body.dark-mode .my-orders-title ~ .card:hover {
-  border-color: #39455c;
-  box-shadow: 0 14px 36px rgba(0,0,0,0.38);
-}
-body.dark-mode .my-orders-title ~ .card .card-header {
-  background: linear-gradient(180deg, #1f2839, #1c2433);
-  border-bottom-color: #2d3648;
-  color: #dae6ff;
-}
-body.dark-mode .my-orders-title ~ .card .card-header .badge {
-  background: #4c607f;
-}
-body.dark-mode .my-orders-title ~ .card .card-body p {
-  color: #bcc8e2;
-}
-body.dark-mode .my-orders-title ~ .card .card-body strong {
-  color: #e8eefc;
-}
-body.dark-mode .my-orders-title ~ .card .list-group-item {
-  border-color: #2a3446 !important;
-  background: #1b2230;
-}
-body.dark-mode .my-orders-title ~ .card .list-group-item img {
-  border-color: #2a3446;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.35);
-}
-body.dark-mode .my-orders-title ~ .card .list-group-item .text-muted {
-  color: #8ea0c5 !important;
-}
-body.dark-mode .my-orders-title ~ .card .list-group-item .text-end span {
-  color: #c7d4f1;
-}
-body.dark-mode .my-orders-title ~ .card .list-group-item .text-end strong {
-  color: #2adf9e;
-}
-body.dark-mode .my-orders-title ~ .card .list-group-item.text-end {
-  background: linear-gradient(180deg, #20293b, #1c2536);
-  border-top-color: #2a3446 !important;
 }
 
 /* Status colors opționale */
