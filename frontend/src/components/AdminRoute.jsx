@@ -1,37 +1,51 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+
+// importă corect utilitarele
 import { getToken, parseJwt, isTokenExpired } from '../utils/auth';
 
 export default function AdminRoute({ children }) {
   const location = useLocation();
-  const [authorized, setAuthorized] = useState(null); // null = loading
+  const [authorized, setAuthorized] = useState(null);
 
   useEffect(() => {
-    const token = getToken();
-    if (!token || isTokenExpired(token)) {
-      setAuthorized(false);
-      return;
-    }
+    const verifyAccess = async () => {
+      const token = getToken();
+      if (!token || isTokenExpired(token)) {
+        setAuthorized(false);
+        return;
+      }
 
-    const decoded = parseJwt(token);
-    const isAdmin = decoded?.role === 'admin';
+      const decoded = parseJwt(token);
+      if (decoded?.role && decoded.role !== 'admin' && !decoded?.isAdmin) {
+        setAuthorized(false);
+        return;
+      }
 
-    setAuthorized(isAdmin);
+      try {
+        const res = await fetch('http://localhost:3001/api/auth/me', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) {
+          setAuthorized(false);
+          return;
+        }
+        const userData = await res.json();
+        setAuthorized(userData.role === 'admin' || userData.isAdmin === true);
+      } catch (err) {
+        console.error('Eroare validare admin:', err);
+        setAuthorized(false);
+      }
+    };
+
+    verifyAccess();
   }, []);
 
   if (authorized === null) {
-    return <div>Se verifică accesul admin...</div>;
+    return <div style={{ padding: '2rem', textAlign: 'center' }}>Se verifică accesul de administrator...</div>;
   }
-
   if (!authorized) {
-    return (
-      <div style={{ padding: '2rem', color: 'red', textAlign: 'center' }}>
-        <h2>Acces restricționat</h2>
-        <p>Doar administratorii pot accesa această pagină.</p>
-        <Navigate to="/login" state={{ from: location.pathname }} replace />
-      </div>
-    );
+    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
-
   return children;
 }
