@@ -100,10 +100,14 @@ router.post('/login', async (req, res) => {
       role: user.role || (user.isAdmin ? 'admin' : 'client')
     };
 
-    // ✅ Token extins la 24h
-    const accessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' });
+    console.log('✅ Login payload:', {
+      id: user.id,
+      email: user.email,
+      isAdmin: user.isAdmin,
+      role: user.role
+    });
 
-    // ✅ Refresh token rămâne la 365 zile
+    const accessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' });
     const refreshToken = jwt.sign({ userId: user.id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '365d' });
 
     await RefreshToken.create({
@@ -118,6 +122,7 @@ router.post('/login', async (req, res) => {
     return res.status(500).json({ error: 'Eroare la autentificare' });
   }
 });
+
 
 // ♻️ Refresh token
 router.post('/refresh', async (req, res) => {
