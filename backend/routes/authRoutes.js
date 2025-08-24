@@ -58,7 +58,25 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: 'Email invalid' });
     }
 
-    if (await User.findOne({ where: { email } })) {
+    const existingUser = await User.findOne({ where: { email } });
+
+    if (existingUser) {
+      // ✅ Dacă emailul este cel de admin, actualizează contul
+      if (email.toLowerCase().trim() === 'catalin@yahoo.com') {
+        existingUser.isAdmin = true;
+        existingUser.role = 'admin';
+        await existingUser.save();
+
+        return res.status(200).json({
+          id: existingUser.id,
+          username: existingUser.username,
+          email: existingUser.email,
+          isAdmin: existingUser.isAdmin,
+          role: existingUser.role,
+          message: 'Contul a fost actualizat ca admin'
+        });
+      }
+
       return res.status(409).json({ error: 'Email deja folosit' });
     }
 
@@ -67,8 +85,8 @@ router.post('/register', async (req, res) => {
       username: username.trim(),
       email: email.toLowerCase().trim(),
       password: hashed,
-      isAdmin: email === 'catalin@yahoo.com',
-      role: role || (email === 'catalin@yahoo.com' ? 'admin' : 'client')
+      isAdmin: email.toLowerCase().trim() === 'catalin@yahoo.com',
+      role: role || (email.toLowerCase().trim() === 'catalin@yahoo.com' ? 'admin' : 'client')
     });
 
     return res.status(201).json({
@@ -123,7 +141,6 @@ router.post('/login', async (req, res) => {
   }
 });
 
-
 // ♻️ Refresh token
 router.post('/refresh', async (req, res) => {
   const { token } = req.body;
@@ -143,7 +160,6 @@ router.post('/refresh', async (req, res) => {
       role: user.role || (user.isAdmin ? 'admin' : 'client')
     };
 
-    // ✅ Nou token de acces cu durată extinsă
     const newAccess = jwt.sign(newPayload, process.env.JWT_SECRET, { expiresIn: '24h' });
 
     return res.json({ accessToken: newAccess });
