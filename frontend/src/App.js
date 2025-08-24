@@ -13,12 +13,10 @@ import "../src/App.css";
 import MainLayout from "./layouts/MainLayout";
 import AdminLayout from "./layouts/AdminLayout";
 import RequireAuth from "./components/RequireAuth";
+import AdminRoute from "./components/AdminRoute";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
-// 🛡️ Importăm gardul pentru rute de admin
-import AdminRoute from "./components/AdminRoute";
 
 function App() {
   return (
@@ -94,8 +92,17 @@ function App() {
             }
           />
 
-          {/* 🔒 Protejăm pagina admin */}
-         <Route path="/admin" element={<AdminMenu/>} />
+          {/* 🔒 Protejăm pagina admin cu AdminRoute */}
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminLayout>
+                  <AdminMenu />
+                </AdminLayout>
+              </AdminRoute>
+            }
+          />
         </Routes>
       </Router>
     </CartProvider>

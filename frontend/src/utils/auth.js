@@ -1,6 +1,9 @@
 // utils/auth.js
+
+// ✅ Returnează tokenul JWT din localStorage
 export const getToken = () => localStorage.getItem('accessToken');
 
+// ✅ Decodează un JWT și returnează payload-ul ca obiect
 export function parseJwt(token) {
   try {
     const base64Url = token.split('.')[1];
@@ -17,7 +20,7 @@ export function parseJwt(token) {
   }
 }
 
-
+// ✅ Verifică dacă utilizatorul este admin
 export const isAdmin = () => {
   const token = getToken();
   if (!token) return false;
@@ -25,6 +28,7 @@ export const isAdmin = () => {
   return decoded?.role === 'admin';
 };
 
+// ✅ Returnează rolul utilizatorului (admin, user etc.)
 export const getUserRole = () => {
   const token = getToken();
   if (!token) return null;
@@ -32,9 +36,10 @@ export const getUserRole = () => {
   return decoded?.role || null;
 };
 
-
+// ✅ Verifică dacă tokenul a expirat
 export function isTokenExpired(token) {
   const payload = parseJwt(token);
   if (!payload?.exp) return true;
-  return payload.exp * 1000 < Date.now();
+  const now = Date.now();
+  return payload.exp * 1000 < now;
 }
