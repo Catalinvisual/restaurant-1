@@ -43,70 +43,74 @@ export default function Login({ redirectTo = "/" }) {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
+  e.preventDefault();
+  setError("");
 
-    if (isRegistering) {
-      try {
-        const response = await fetch(`${API_URL}/auth/register`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username: name, email, password }),
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-          setIsRegistering(false);
-          setError("✅ Înregistrare reușită. Te poți autentifica.");
-        } else {
-          setError(result.error || "Înregistrare eșuată");
-        }
-      } catch (err) {
-        console.error("❌ Eroare la înregistrare:", err);
-        setError("Serverul nu răspunde");
-      }
-      return;
-    }
-
+  if (isRegistering) {
     try {
-      const response = await fetch(`${API_URL}/auth/login`, {
+      const response = await fetch(`${API_URL}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username: name, email, password }),
       });
 
       const result = await response.json();
 
       if (response.ok) {
-        const { accessToken, refreshToken } = result;
-
-        localStorage.setItem("accessToken", accessToken);
-        localStorage.setItem("refreshToken", refreshToken);
-
-        const decoded = parseJwt(accessToken);
-
-        localStorage.setItem("user", JSON.stringify({
-          id: decoded.id,
-          email: decoded.email,
-          role: decoded.role,
-          isAdmin: decoded.isAdmin
-        }));
-
-        if (from === "/admin" && decoded.role !== "admin") {
-          setError("Acest cont nu are rol de admin.");
-          return;
-        }
-
-        navigate(from, { replace: true });
+        setIsRegistering(false);
+        setError("✅ Înregistrare reușită. Te poți autentifica.");
       } else {
-        setError(result.error || "Autentificare eșuată");
+        setError(result.error || "Înregistrare eșuată");
       }
     } catch (err) {
-      console.error("❌ Eroare la login:", err);
+      console.error("❌ Eroare la înregistrare:", err);
       setError("Serverul nu răspunde");
     }
-  };
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      const { accessToken, refreshToken } = result;
+
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
+
+      const decoded = parseJwt(accessToken);
+
+      // Normalizează și corectează datele
+      const isAdmin = decoded.isAdmin === true || decoded.isAdmin === "true";
+      const role = decoded.role === "admin" || isAdmin ? "admin" : "client";
+
+      localStorage.setItem("user", JSON.stringify({
+        id: decoded.id,
+        email: decoded.email,
+        role,
+        isAdmin
+      }));
+
+      if (from === "/admin" && role !== "admin") {
+        setError("Acest cont nu are rol de admin.");
+        return;
+      }
+
+      navigate(from, { replace: true });
+    } else {
+      setError(result.error || "Autentificare eșuată");
+    }
+  } catch (err) {
+    console.error("❌ Eroare la login:", err);
+    setError("Serverul nu răspunde");
+  }
+};
 
   console.log("API_URL:", API_URL);
 
