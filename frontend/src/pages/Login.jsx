@@ -99,6 +99,7 @@ export default function Login({ redirectTo = "/" }) {
       setError("Serverul nu răspunde");
     }
   };
+console.log("API_URL:", API_URL);
 
   return (
     <>
