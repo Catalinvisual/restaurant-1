@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-
-// importă corect utilitarele
 import { getToken, parseJwt, isTokenExpired } from '../utils/auth';
+
+const API_URL = process.env.REACT_APP_API_URL || '';
 
 export default function AdminRoute({ children }) {
   const location = useLocation();
@@ -23,7 +23,7 @@ export default function AdminRoute({ children }) {
       }
 
       try {
-        const res = await fetch('http://localhost:3001/api/auth/me', {
+        const res = await fetch(`${API_URL}/api/auth/me`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (!res.ok) {

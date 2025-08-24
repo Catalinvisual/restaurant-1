@@ -194,4 +194,14 @@ router.get('/users', verifyToken, async (req, res) => {
   }
 });
 
+router.get('/me', verifyToken, (req, res) => {
+  res.json({
+    id: req.user.id,
+    name: req.user.name,
+    email: req.user.email,
+    role: req.user.role,
+    isAdmin: req.user.isAdmin
+  });
+});
+
 module.exports = router;

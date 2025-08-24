@@ -33,17 +33,19 @@ const userRoutes = require('./routes/userRoutes');
 // 🚀 Inițializare Express
 const app = express();
 
-// 🔐 CORS
+// 🔐 CORS – acceptă doar local + producție Render
 const allowedOrigins = [
   process.env.FRONTEND_URL_LOCAL || 'http://localhost:3000',
   process.env.FRONTEND_URL_PROD || 'https://restaurant-1-frontend.onrender.com'
 ];
+
 app.use(cors({
   origin(origin, callback) {
+    // Permite cereri fără Origin (ex: Postman) sau din lista permisă
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('❌ Origin not allowed by CORS'));
+      callback(new Error(`❌ Origin not allowed by CORS: ${origin}`));
     }
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
@@ -53,7 +55,7 @@ app.use(cors({
 app.use(express.json());
 
 // ✅ Montare rute API
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes);       // include și GET /api/auth/me
 app.use('/api/products', productRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/orders', orderRoutes);
@@ -62,7 +64,6 @@ app.use('/api/users', userRoutes);
 
 // 🧱 Servire frontend în producție
 if (ENV === 'production') {
-  // 🔹 schimbat din 'client/build' în 'frontend/build'
   app.use(express.static(path.join(__dirname, 'frontend', 'build')));
 
   // 🔁 Fallback pentru rute non-API (React Router)
@@ -87,7 +88,6 @@ app.use((err, req, res, next) => {
     await sequelize.authenticate();
     console.log('✅ Conexiune DB reușită');
 
-    // 🔄 Sincronizare completă în orice mediu
     await sequelize.sync({ alter: true });
     console.log(`📦 DB sincronizată cu \`alter: true\` (${ENV})`);
 

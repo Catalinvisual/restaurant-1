@@ -5,7 +5,8 @@ const router = express.Router();
 
 const { Op } = require('sequelize'); // ✅ Import pentru filtrare
 const { Order, OrderItem, Product, User } = require('../models');
-const verifyToken = require('../middleware/auth');
+const verifyToken = require('../middleware/verifyToken');
+
 const verifyAdmin = require('../middleware/verifyAdmin');
 
 const ENV = process.env.NODE_ENV || 'development';
