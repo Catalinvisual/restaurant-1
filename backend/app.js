@@ -62,14 +62,15 @@ app.use('/api/users', userRoutes);
 
 // 🧱 Servire frontend în producție
 if (ENV === 'production') {
-  app.use(express.static(path.join(__dirname, 'client', 'build')));
+  // 🔹 schimbat din 'client/build' în 'frontend/build'
+  app.use(express.static(path.join(__dirname, 'frontend', 'build')));
 
   // 🔁 Fallback pentru rute non-API (React Router)
   app.get('*', (req, res, next) => {
     if (req.originalUrl.startsWith('/api')) {
       return next(); // Lasă rutele API să fie tratate normal
     }
-    res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
+    res.sendFile(path.join(__dirname, 'frontend', 'build', 'index.html'));
   });
 }
 
