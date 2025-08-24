@@ -26,31 +26,30 @@ export default function AdminMenu() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
-  // ✅ Verificare token la accesare
-useEffect(() => {
-  const token = localStorage.getItem("accessToken");
-  if (!token || token === "undefined") {
-    navigate("/login?expired=true");
-    return;
-  }
+  // ✅ Verificare token și rol admin la accesare
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (!token || token === "undefined") {
+      navigate("/login?expired=true");
+      return;
+    }
 
-  const payload = parseJwt(token);
-  const now = Date.now() / 1000;
+    const payload = parseJwt(token);
+    const now = Date.now() / 1000;
 
-  if (!payload || payload.exp < now) {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    navigate("/login?expired=true");
-    return;
-  }
+    if (!payload || payload.exp < now) {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      navigate("/login?expired=true");
+      return;
+    }
 
-  if (!payload.isAdmin) {
-    toast.error("⛔ Acces restricționat: doar adminii pot accesa această pagină.");
-    navigate("/login?unauthorized=true");
-    return;
-  }
-}, [navigate]);
-
+    if (payload.role !== "admin") {
+      toast.error("⛔ Acces restricționat: doar adminii pot accesa această pagină.");
+      navigate("/login?unauthorized=true");
+      return;
+    }
+  }, [navigate]);
 
   // ✅ Preluare meniu doar când secțiunea "menu" e activă
   useEffect(() => {
@@ -196,19 +195,29 @@ useEffect(() => {
     { id: "schedule", label: "Programări 🗓️" },
   ];
 
+ 
+
   return (
     <>
       {/* Buton Hamburger */}
       <button
         className="hamburger"
         onClick={() => setSidebarOpen(!sidebarOpen)}
+        aria-label="Deschide/închide meniul"
       >
         ☰
       </button>
 
       <div className="admin-dashboard">
         {/* Schimbare temă */}
-        <div className="theme-switch" onClick={toggleTheme}>
+        <div
+          className="theme-switch"
+          onClick={toggleTheme}
+          role="button"
+          tabIndex={0}
+          aria-label="Schimbă tema"
+          onKeyDown={(e) => e.key === "Enter" && toggleTheme()}
+        >
           🌗 Schimbă tema
         </div>
 
@@ -263,7 +272,7 @@ useEffect(() => {
                     onChange={handleChange}
                     required
                   />
-                                    <select
+                  <select
                     name="category"
                     value={newItem.category}
                     onChange={handleChange}
@@ -329,7 +338,7 @@ useEffect(() => {
                       image:
                         newItem.image instanceof File
                           ? URL.createObjectURL(newItem.image)
-                          : newItem.image,
+                          : newItem.image || "/default-product.jpg",
                     }}
                   />
                 </div>
