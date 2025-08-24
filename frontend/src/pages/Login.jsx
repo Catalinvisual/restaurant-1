@@ -38,6 +38,7 @@ export default function Login({ redirectTo = "/" }) {
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
+    localStorage.removeItem("user");
     navigate("/login", { replace: true });
   };
 
@@ -83,9 +84,16 @@ export default function Login({ redirectTo = "/" }) {
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
 
-        const role = parseJwt(accessToken)?.role;
+        const decoded = parseJwt(accessToken);
 
-        if (from === "/admin" && role !== "admin") {
+        localStorage.setItem("user", JSON.stringify({
+          id: decoded.id,
+          email: decoded.email,
+          role: decoded.role,
+          isAdmin: decoded.isAdmin
+        }));
+
+        if (from === "/admin" && decoded.role !== "admin") {
           setError("Acest cont nu are rol de admin.");
           return;
         }
@@ -99,7 +107,8 @@ export default function Login({ redirectTo = "/" }) {
       setError("Serverul nu răspunde");
     }
   };
-console.log("API_URL:", API_URL);
+
+  console.log("API_URL:", API_URL);
 
   return (
     <>

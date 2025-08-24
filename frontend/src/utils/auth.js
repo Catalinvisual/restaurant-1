@@ -1,18 +1,21 @@
 // utils/auth.js
 export const getToken = () => localStorage.getItem('accessToken');
 
-export const parseJwt = (token) => {
+export function parseJwt(token) {
   try {
-    const base64 = token.split('.')[1];
-    const base64Url = base64.replace(/-/g, '+').replace(/_/g, '/');
-    const padded = base64Url.padEnd(base64Url.length + (4 - base64Url.length % 4) % 4, '=');
-    const decoded = JSON.parse(decodeURIComponent(escape(window.atob(padded))));
-    return decoded;
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(c => `%${('00' + c.charCodeAt(0).toString(16)).slice(-2)}`)
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
   } catch (e) {
-    console.error("❌ Eroare la decodarea JWT:", e);
     return null;
   }
-};
+}
 
 
 export const isAdmin = () => {
