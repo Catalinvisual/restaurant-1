@@ -75,19 +75,15 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Eroare internă de server' });
 });
 
-// 🧠 Pornire server + conexiune DB
+// 🧠 Pornire server + sincronizare DB
 (async () => {
   try {
     await sequelize.authenticate();
     console.log('✅ Conexiune DB reușită');
 
-    if (ENV !== 'production') {
-      await sequelize.sync({ alter: true });
-      console.log('📦 DB sincronizată cu `alter` (development)');
-    } else {
-      await sequelize.sync();
-      console.log('📦 DB sincronizată (production)');
-    }
+    // 🔄 Sincronizare completă în orice mediu
+    await sequelize.sync({ alter: true });
+    console.log(`📦 DB sincronizată cu \`alter: true\` (${ENV})`);
 
     app.listen(PORT, () => {
       console.log(`🚀 Server pornit pe ${BASE_URL}`);
