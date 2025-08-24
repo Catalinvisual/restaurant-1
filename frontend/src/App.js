@@ -95,7 +95,7 @@ function App() {
           />
 
           {/* 🔒 Protejăm pagina admin */}
-         <Route path="/admin" element={<AdminPage />} />
+         <Route path="/admin" element={<AdminMenu/>} />
         </Routes>
       </Router>
     </CartProvider>
