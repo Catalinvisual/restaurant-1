@@ -112,11 +112,12 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Credențiale incorecte' });
     }
 
-    const payload = {
-      id: user.id,
-      isAdmin: user.isAdmin,
-      role: user.role || (user.isAdmin ? 'admin' : 'client')
-    };
+   const payload = {
+  id: user.id,
+  email: user.email,           // ← adaugă emailul în payload
+  isAdmin: user.isAdmin,
+  role: user.role || (user.isAdmin ? 'admin' : 'client')
+};
 
     console.log('✅ Login payload:', {
       id: user.id,
