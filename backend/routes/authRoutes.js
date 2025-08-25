@@ -12,38 +12,7 @@ const RefreshToken = require('../models/RefreshToken');
 const ENV = process.env.NODE_ENV || 'development';
 console.log(`🚦 [Auth Routes] Mediul activ: ${ENV}`);
 
-// ✅ Middleware verificare token
-const verifyToken = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ error: 'Token lipsă' });
-
-  const parts = authHeader.trim().split(/\s+/);
-  if (parts.length !== 2 || parts[0] !== 'Bearer') {
-    return res.status(401).json({ error: 'Format token invalid' });
-  }
-
-  const token = parts[1];
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) {
-      const msg = err.name === 'TokenExpiredError'
-        ? 'Token expirat'
-        : 'Token invalid sau corupt';
-      return res.status(403).json({ error: msg });
-    }
-
-    if (!decoded.id) {
-      return res.status(403).json({ error: 'Token invalid: ID lipsă' });
-    }
-
-    req.user = {
-      id: decoded.id,
-      isAdmin: decoded.isAdmin || false,
-      role: decoded.role || (decoded.isAdmin ? 'admin' : 'client')
-    };
-
-    next();
-  });
-};
+const verifyToken = require('../middlewares/verifyToken');
 
 // 📝 Înregistrare
 router.post('/register', async (req, res) => {
@@ -53,15 +22,9 @@ router.post('/register', async (req, res) => {
   }
 
   try {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ error: 'Email invalid' });
-    }
-
     const existingUser = await User.findOne({ where: { email } });
 
     if (existingUser) {
-      // ✅ Dacă emailul este cel de admin, actualizează contul
       if (email.toLowerCase().trim() === 'catalin@yahoo.com') {
         existingUser.isAdmin = true;
         existingUser.role = 'admin';
@@ -76,7 +39,6 @@ router.post('/register', async (req, res) => {
           message: 'Contul a fost actualizat ca admin'
         });
       }
-
       return res.status(409).json({ error: 'Email deja folosit' });
     }
 
@@ -109,6 +71,8 @@ router.post('/login', async (req, res) => {
 
   try {
     const user = await User.findOne({ where: { email } });
+    console.log('🔎 [login] User din DB:', user?.toJSON());
+
     if (!user) {
       console.warn('⚠️ Utilizator inexistent:', email);
       return res.status(401).json({ error: 'Credențiale incorecte' });
@@ -126,6 +90,7 @@ router.post('/login', async (req, res) => {
       isAdmin: user.isAdmin,
       role: user.role || (user.isAdmin ? 'admin' : 'client')
     };
+    console.log('📦 [login] Payload pentru JWT:', payload);
 
     const accessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' });
     const refreshToken = jwt.sign({ userId: user.id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '365d' });
@@ -158,9 +123,11 @@ router.post('/refresh', async (req, res) => {
 
     const newPayload = {
       id: user.id,
+      email: user.email,
       isAdmin: user.isAdmin,
       role: user.role || (user.isAdmin ? 'admin' : 'client')
     };
+    console.log('♻️ [refresh] Payload nou pentru JWT:', newPayload);
 
     const newAccess = jwt.sign(newPayload, process.env.JWT_SECRET, { expiresIn: '24h' });
 
