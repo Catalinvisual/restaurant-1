@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Header from "../components/Header";
-import { API_URL } from "../apiConfig";
+import { apiFetch } from "../apiConfig"; // schimbat: import apiFetch, nu API_URL
 import "../assets/styles/Login.css";
 import { parseJwt } from "../utils/auth";
 
@@ -43,76 +43,74 @@ export default function Login({ redirectTo = "/" }) {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError("");
+    e.preventDefault();
+    setError("");
 
-  if (isRegistering) {
+    if (isRegistering) {
+      try {
+        const response = await apiFetch("/api/auth/register", {
+          method: "POST",
+          body: JSON.stringify({ username: name, email, password }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          setIsRegistering(false);
+          setError("✅ Înregistrare reușită. Te poți autentifica.");
+        } else {
+          setError(result.error || "Înregistrare eșuată");
+        }
+      } catch (err) {
+        console.error("❌ Eroare la înregistrare:", err);
+        setError("Serverul nu răspunde");
+      }
+      return;
+    }
+
     try {
-      const response = await fetch(`${API_URL}/auth/register`, {
+      const response = await apiFetch("/api/auth/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: name, email, password }),
+        body: JSON.stringify({ email, password }),
       });
 
       const result = await response.json();
 
       if (response.ok) {
-        setIsRegistering(false);
-        setError("✅ Înregistrare reușită. Te poți autentifica.");
+        const { accessToken, refreshToken } = result;
+
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
+
+        const decoded = parseJwt(accessToken);
+
+        const isAdmin = decoded.isAdmin === true || decoded.isAdmin === "true";
+        const role = decoded.role === "admin" || isAdmin ? "admin" : "client";
+
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            id: decoded.id,
+            email: decoded.email,
+            role,
+            isAdmin,
+          })
+        );
+
+        if (from === "/admin" && role !== "admin") {
+          setError("Acest cont nu are rol de admin.");
+          return;
+        }
+
+        navigate(from, { replace: true });
       } else {
-        setError(result.error || "Înregistrare eșuată");
+        setError(result.error || "Autentificare eșuată");
       }
     } catch (err) {
-      console.error("❌ Eroare la înregistrare:", err);
+      console.error("❌ Eroare la login:", err);
       setError("Serverul nu răspunde");
     }
-    return;
-  }
-
-  try {
-    const response = await fetch(`${API_URL}/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-
-    const result = await response.json();
-
-    if (response.ok) {
-      const { accessToken, refreshToken } = result;
-
-      localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("refreshToken", refreshToken);
-
-      const decoded = parseJwt(accessToken);
-
-      // Normalizează și corectează datele
-      const isAdmin = decoded.isAdmin === true || decoded.isAdmin === "true";
-      const role = decoded.role === "admin" || isAdmin ? "admin" : "client";
-
-      localStorage.setItem("user", JSON.stringify({
-        id: decoded.id,
-        email: decoded.email,
-        role,
-        isAdmin
-      }));
-
-      if (from === "/admin" && role !== "admin") {
-        setError("Acest cont nu are rol de admin.");
-        return;
-      }
-
-      navigate(from, { replace: true });
-    } else {
-      setError(result.error || "Autentificare eșuată");
-    }
-  } catch (err) {
-    console.error("❌ Eroare la login:", err);
-    setError("Serverul nu răspunde");
-  }
-};
-
-  console.log("API_URL:", API_URL);
+  };
 
   return (
     <>
@@ -127,9 +125,7 @@ export default function Login({ redirectTo = "/" }) {
             </div>
           )}
 
-          {error && (
-            <div className="alert alert-danger">{error}</div>
-          )}
+          {error && <div className="alert alert-danger">{error}</div>}
 
           {isAuthenticated ? (
             <>
@@ -137,7 +133,10 @@ export default function Login({ redirectTo = "/" }) {
                 ✅ Ești autentificat
               </div>
               <div className="text-center mt-3">
-                <button className="btn btn-outline-danger" onClick={handleLogout}>
+                <button
+                  className="btn btn-outline-danger"
+                  onClick={handleLogout}
+                >
                   Logout
                 </button>
               </div>
@@ -195,7 +194,7 @@ export default function Login({ redirectTo = "/" }) {
                       fill="white"
                       viewBox="0 0 16 16"
                     >
-                      <path d="M8 1a4 4 0 0 0-4 4v2H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-1V5a4 4 0 0 0-4-4zM5 5a3 3 0 1 1 6 0v2H5V5zm3 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
+                      <path d="M8 1a4 4 0 0 0-4 4v2H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-1V5a4 4 0 0 0-4-4zM5 5a3 3 0 1 1 6 0v2H5V5zm3 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
                     </svg>
                   )}
                   {isRegistering ? "Înregistrează-te" : "Login"}

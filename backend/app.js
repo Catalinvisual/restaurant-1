@@ -1,14 +1,17 @@
-// ✅ Citește variabilele din .env
+'use strict';
+
+// ✅ Citește variabilele din .env (ale backend-ului)
 require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
-const sequelize = require('./db'); // folosește config-ul Sequelize
+const sequelize = require('./db');
 
 const ENV = process.env.NODE_ENV || 'development';
 const PORT = process.env.PORT || 3001;
 
 console.log(`🚦 Mediul activ: ${ENV}`);
+
 const BASE_URL = ENV === 'production'
   ? process.env.BASE_URL
   : `http://localhost:${PORT}`;
@@ -32,41 +35,43 @@ const userRoutes = require('./routes/userRoutes');
 // 🚀 Inițializare Express
 const app = express();
 
-// 🔐 CORS – acceptă doar local + producție Render
+// 🔐 CORS – acceptă doar origini permise, cu fallback pentru local
+
 const allowedOrigins = [
-  process.env.FRONTEND_URL_LOCAL || 'http://localhost:3000',
-  process.env.FRONTEND_URL_PROD || 'https://restaurant-1-frontend.onrender.com'
-];
+  'http://localhost:3000',           // frontend (React/Next dev)
+  process.env.FRONTEND_URL_DEV,      // setat în .env pentru dev
+  process.env.FRONTEND_URL_PROD      // setat în .env pentru producție
+].filter(Boolean);
 
 app.use(cors({
   origin(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error(`❌ Origin not allowed by CORS: ${origin}`));
-    }
+    if (!origin) return callback(null, true); // Postman / curl
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error(`❌ Origin not allowed by CORS: ${origin}`));
   },
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
 
+
+
 app.use(express.json());
 
-// ✅ Montare rute API – backend răspunde doar la /api/*
-app.use('/api/auth', authRoutes);       // include și GET /api/auth/me
+// ✅ Montare rute API
+app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/statistics', statisticsRoutes);
 app.use('/api/users', userRoutes);
 
-// ❌ Eliminat codul de servire frontend/build → backend-ul NU mai servește React-ul
-
-// 🔥 Middleware global pentru erori
+// 🔥 Middleware global pentru erori (unificat)
 app.use((err, req, res, next) => {
-  console.error('❌ Eroare server:', err);
+  console.error('❌ Eroare server:', err); // log complet
   if (res.headersSent) return next(err);
-  res.status(500).json({ error: 'Eroare internă de server' });
+  res.status(500).json({
+    success: false,
+    message: err.message || 'Eroare internă de server'
+  });
 });
 
 // 🧠 Pornire server + sincronizare DB

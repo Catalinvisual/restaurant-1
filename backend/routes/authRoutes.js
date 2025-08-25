@@ -105,26 +105,27 @@ router.post('/register', async (req, res) => {
 // 🔑 Login
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
+  console.log('🛠 Login request body:', req.body);
 
   try {
     const user = await User.findOne({ where: { email } });
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    if (!user) {
+      console.warn('⚠️ Utilizator inexistent:', email);
       return res.status(401).json({ error: 'Credențiale incorecte' });
     }
 
-   const payload = {
-  id: user.id,
-  email: user.email,           // ← adaugă emailul în payload
-  isAdmin: user.isAdmin,
-  role: user.role || (user.isAdmin ? 'admin' : 'client')
-};
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+      console.warn('⚠️ Parolă greșită pentru:', email);
+      return res.status(401).json({ error: 'Credențiale incorecte' });
+    }
 
-    console.log('✅ Login payload:', {
+    const payload = {
       id: user.id,
       email: user.email,
       isAdmin: user.isAdmin,
-      role: user.role
-    });
+      role: user.role || (user.isAdmin ? 'admin' : 'client')
+    };
 
     const accessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' });
     const refreshToken = jwt.sign({ userId: user.id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '365d' });
@@ -135,10 +136,10 @@ router.post('/login', async (req, res) => {
       expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
     });
 
-    return res.json({ accessToken, refreshToken });
+    res.json({ accessToken, refreshToken });
   } catch (err) {
     console.error('❌ Eroare la login:', err);
-    return res.status(500).json({ error: 'Eroare la autentificare' });
+    res.status(500).json({ error: 'Eroare la autentificare', details: err.message });
   }
 });
 
