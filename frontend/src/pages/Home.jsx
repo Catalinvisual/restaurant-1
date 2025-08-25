@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useSwipeable } from "react-swipeable";
 import ProductCard from "../components/ProductCard";
 
-import '../assets/styles/ProductCard.css';
+import "../assets/styles/ProductCard.css";
 import "../assets/styles/Home.css";
 import { API_URL } from "../apiConfig";
 
@@ -11,6 +11,7 @@ export default function Home() {
   const [message, setMessage] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // Imagini statice servite de frontend — nu au nevoie de /api
   const carouselImages = [
     "dish1.jpg",
     "dish2.jpg",
@@ -24,12 +25,20 @@ export default function Home() {
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-    fetch(`${API_URL}/menu`, {
+
+    // Backend endpoint — are nevoie de /api
+    fetch(`${API_URL}/api/menu`, {
       headers: {
         Authorization: token ? `Bearer ${token}` : "",
       },
     })
-      .then((res) => res.json())
+      .then(async (res) => {
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(`Eroare ${res.status}: ${text || res.statusText}`);
+        }
+        return res.json();
+      })
       .then((data) => {
         const filtered = data.filter((item) => item.isNew || item.isPromo);
         setSpecialItems(filtered);
@@ -83,11 +92,13 @@ export default function Home() {
                   Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit.
                   Aliqu diam amet diam et eos.
                 </p>
+                {/* Ruta frontend — nu are nevoie de /api */}
                 <a href="/menu" className="btn btn-book mt-3">
                   Book a Table
                 </a>
               </div>
               <div className="grill-container">
+                {/* Imagine statică — nu are nevoie de /api */}
                 <img
                   src="assets/images/grill-round.png"
                   alt="Grătar rotund"
@@ -119,44 +130,37 @@ export default function Home() {
               </button>
 
               {visibleImages.map((img, index) => (
-  <img
-    key={index}
-    src={`/assets/images/${img}`}
-    alt={`Imagine ${index + 1}`}
-    className="carousel-img"
-  />
-))}
-
-
-
-
+                <img
+                  key={index}
+                  src={`/assets/images/${img}`} // static — fără /api
+                  alt={`Imagine ${index + 1}`}
+                  className="carousel-img"
+                />
+              ))}
 
               <button className="btn btn-outline-secondary" onClick={nextSlide}>
                 ▶
               </button>
             </div>
-
-           
           </section>
+
           {/* Produse Evidențiate */}
-{message && (
-  <div className="alert alert-warning text-center">{message}</div>
-)}
+          {message && (
+            <div className="alert alert-warning text-center">{message}</div>
+          )}
 
-{specialItems.length > 0 && (
-  <section className="featured-products my-5">
-    <h3 className="text-warning text-center">
-      🌟 Produse Evidențiate
-    </h3>
+          {specialItems.length > 0 && (
+            <section className="featured-products my-5">
+              <h3 className="text-warning text-center">🌟 Produse Evidențiate</h3>
 
-    {/* Folosim card-container din ProductCard.css */}
-    <div className="card-container">
-      {specialItems.map((item) => (
-        <ProductCard key={item.id} product={item} />
-      ))}
-    </div>
-  </section>
-)}
+              <div className="card-container">
+                {specialItems.map((item) => (
+                  <ProductCard key={item.id} product={item} />
+                ))}
+              </div>
+            </section>
+          )}
+
           {/* Echipa Noastră */}
           <section className="team-section my-5 text-center">
             <h3 className="text-danger">👨‍🍳 Echipa Noastră</h3>
@@ -166,11 +170,7 @@ export default function Home() {
                   src="assets/images/cheftom.jpg"
                   alt="Chef Tom"
                   className="rounded-circle shadow"
-                  style={{
-                    width: "200px",
-                    height: "200px",
-                    objectFit: "cover",
-                  }}
+                  style={{ width: "200px", height: "200px", objectFit: "cover" }}
                 />
                 <h5 className="mt-3">Chef Tom</h5>
                 <p>
@@ -183,11 +183,7 @@ export default function Home() {
                   src="assets/images/chefalexandra.jpg"
                   alt="Chef Alexandra"
                   className="rounded-circle shadow"
-                  style={{
-                    width: "200px",
-                    height: "200px",
-                    objectFit: "cover",
-                  }}
+                  style={{ width: "200px", height: "200px", objectFit: "cover" }}
                 />
                 <h5 className="mt-3">Chef Alexandra</h5>
                 <p>
@@ -200,11 +196,7 @@ export default function Home() {
                   src="assets/images/chefcristina.jpg"
                   alt="Chef Ana"
                   className="rounded-circle shadow"
-                  style={{
-                    width: "200px",
-                    height: "200px",
-                    objectFit: "cover",
-                  }}
+                  style={{ width: "200px", height: "200px", objectFit: "cover" }}
                 />
                 <h5 className="mt-3">Chef Ana</h5>
                 <p>

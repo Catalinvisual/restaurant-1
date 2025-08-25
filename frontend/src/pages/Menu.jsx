@@ -14,7 +14,7 @@ export default function Menu() {
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
 
-    fetch(`${API_URL}/menu`, {
+    fetch(`${API_URL}/api/menu`, {
       headers: {
         Authorization: token ? `Bearer ${token}` : '',
       },
