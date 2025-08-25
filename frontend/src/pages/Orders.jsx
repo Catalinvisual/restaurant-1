@@ -28,88 +28,88 @@ export default function Orders({ onOrderUpdated }) {
 
   const [selectedDate, setSelectedDate] = useState(getToday());
 
-  useEffect(() => {
-    const token = getToken();
+ useEffect(() => {
+  const token = getToken();
 
-    if (!token || !isAdmin()) {
-      setMessage('⛔ Acces interzis. Trebuie să fii autentificat ca admin.');
-      setLoading(false);
-      return;
-    }
+  if (!token || !isAdmin()) {
+    setMessage('⛔ Acces interzis. Trebuie să fii autentificat ca admin.');
+    setLoading(false);
+    return;
+  }
 
-    setLoading(true);
-    const query = selectedDate ? `?date=${selectedDate}` : '';
+  setLoading(true);
+  const query = selectedDate ? `?date=${selectedDate}` : '';
 
-    axios
-      .get(`${API_URL}/orders${query}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      .then(res => {
-     const normalizedOrders = res.data.map(order => ({
-  ...order,
-  created_at: order.created_at, // ✅ adăugat explicit
-  total_price: Number(order.totalPrice || 0),
-  items: order.items || [],
-  customer_name: order.customer_name || 'Client necunoscut',
-}));
+  axios
+    .get(`${API_URL}/api/orders${query}`, {   // 🔹 adăugat /api/
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    .then(res => {
+      const normalizedOrders = res.data.map(order => ({
+        ...order,
+        created_at: order.created_at,
+        total_price: Number(order.totalPrice || 0),
+        items: order.items || [],
+        customer_name: order.customer_name || 'Client necunoscut',
+      }));
 
+      setOrders(normalizedOrders);
 
-        setOrders(normalizedOrders);
-
-        if (normalizedOrders.length === 0) {
-          setMessage(`ℹ️ Nu au fost înregistrate comenzi în data de ${selectedDate || 'toate zilele'}.`);
-        } else {
-          setMessage('');
-        }
-      })
-      .catch(err => {
-        const status = err?.response?.status;
-        if (status === 401) {
-          setMessage('🔒 Autentificare necesară.');
-        } else if (status === 403) {
-          setMessage('⛔ Doar adminii pot accesa comenzile.');
-        } else {
-          setMessage('❌ Nu s-au putut prelua comenzile.');
-        }
-      })
-      .finally(() => setLoading(false));
-  }, [selectedDate]);
-
-  const handleStatusChange = async (orderId, newStatus) => {
-    const token = getToken();
-
-    if (!isAdmin()) {
-      setMessage('⛔ Doar adminii pot schimba statusul comenzilor.');
-      return;
-    }
-
-    try {
-      const response = await axios.put(
-        `${API_URL}/orders/${orderId}`,
-        { status: newStatus },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      const updatedOrder = {
-        ...response.data,
-        total_price: Number(response.data.totalPrice || 0),
-        items: response.data.items || [],
-        customer_name: response.data.customer_name || 'Client necunoscut',
-      };
-
-      const updatedOrders = orders.map(order =>
-        order.id === updatedOrder.id ? updatedOrder : order
-      );
-
-      setOrders(updatedOrders);
-
-      if (typeof onOrderUpdated === 'function') {
-        onOrderUpdated();
+      if (normalizedOrders.length === 0) {
+        setMessage(`ℹ️ Nu au fost înregistrate comenzi în data de ${selectedDate || 'toate zilele'}.`);
+      } else {
+        setMessage('');
       }
-    } catch (error) {
-      setMessage('❌ Eroare la actualizarea statusului comenzii.');
+    })
+    .catch(err => {
+      const status = err?.response?.status;
+      if (status === 401) {
+        setMessage('🔒 Autentificare necesară.');
+      } else if (status === 403) {
+        setMessage('⛔ Doar adminii pot accesa comenzile.');
+      } else {
+        setMessage('❌ Nu s-au putut prelua comenzile.');
+      }
+    })
+    .finally(() => setLoading(false));
+}, [selectedDate]);
+
+const handleStatusChange = async (orderId, newStatus) => {
+  const token = getToken();
+
+  if (!isAdmin()) {
+    setMessage('⛔ Doar adminii pot schimba statusul comenzilor.');
+    return;
+  }
+
+  try {
+    const response = await axios.put(
+      `${API_URL}/api/orders/${orderId}`,       // 🔹 adăugat /api/
+      { status: newStatus },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    const updatedOrder = {
+      ...response.data,
+      total_price: Number(response.data.totalPrice || 0),
+      items: response.data.items || [],
+      customer_name: response.data.customer_name || 'Client necunoscut',
+    };
+
+    const updatedOrders = orders.map(order =>
+      order.id === updatedOrder.id ? updatedOrder : order
+    );
+
+    setOrders(updatedOrders);
+
+    if (typeof onOrderUpdated === 'function') {
+      onOrderUpdated();
     }
-  };
+  } catch (error) {
+    setMessage('❌ Eroare la actualizarea statusului comenzii.');
+  }
+};
+
 
   return (
     <div className="orders-list">

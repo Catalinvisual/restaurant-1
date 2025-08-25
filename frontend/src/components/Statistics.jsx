@@ -69,45 +69,46 @@ export default function Statistics({ refreshKey = 0 }) {
     });
   };
 
-  const loadStatistics = useCallback((days) => {
-    setLoading(true);
-    fetch(`${API_URL}/statistics?days=${days}`)
-      .then(res => res.ok ? res.json() : Promise.reject(res))
-      .then(data => {
-        let baseSeries;
-        if (Array.isArray(data.salesByDate) && data.salesByDate.length) {
-          baseSeries = buildDailySeries(data.salesByDate, days);
-        } else if (Array.isArray(data.salesByDay) && data.salesByDay.length) {
-          baseSeries = buildWeeklyFallback(data.salesByDay);
-        } else {
-          baseSeries = buildDailySeries([], days);
-        }
-        const maxReal = baseSeries.reduce((m, s) => Math.max(m, s.sales || 0), 0);
-        const halfHeight = maxReal > 0 ? maxReal / 2 : 0.5;
-        const series = baseSeries.map(s => ({
-          ...s,
-          salesVisual: s.sales === 0 ? halfHeight : s.sales
-        }));
-        setStats({ ...data, series, _maxReal: maxReal });
-      })
-      .catch(err => {
-        console.error('❌ Eroare la preluare statistici:', err);
-        setStats({ series: buildDailySeries([], days), _maxReal: 0 });
-      })
-      .finally(() => setLoading(false));
-  }, []);
+ const loadStatistics = useCallback((days) => {
+  setLoading(true);
+  fetch(`${API_URL}/api/statistics?days=${days}`)   // 🔹 adăugat /api/
+    .then(res => res.ok ? res.json() : Promise.reject(res))
+    .then(data => {
+      let baseSeries;
+      if (Array.isArray(data.salesByDate) && data.salesByDate.length) {
+        baseSeries = buildDailySeries(data.salesByDate, days);
+      } else if (Array.isArray(data.salesByDay) && data.salesByDay.length) {
+        baseSeries = buildWeeklyFallback(data.salesByDay);
+      } else {
+        baseSeries = buildDailySeries([], days);
+      }
+      const maxReal = baseSeries.reduce((m, s) => Math.max(m, s.sales || 0), 0);
+      const halfHeight = maxReal > 0 ? maxReal / 2 : 0.5;
+      const series = baseSeries.map(s => ({
+        ...s,
+        salesVisual: s.sales === 0 ? halfHeight : s.sales
+      }));
+      setStats({ ...data, series, _maxReal: maxReal });
+    })
+    .catch(err => {
+      console.error('❌ Eroare la preluare statistici:', err);
+      setStats({ series: buildDailySeries([], days), _maxReal: 0 });
+    })
+    .finally(() => setLoading(false));
+}, []);
 
-  const loadCategoryDistribution = useCallback((days) => {
-    setLoadingCategories(true);
-    fetch(`${API_URL}/statistics?categoryDays=${days}`)
-      .then(res => res.ok ? res.json() : Promise.reject(res))
-      .then(data => setCategoryData(Array.isArray(data.categoryDistribution) ? data.categoryDistribution : []))
-      .catch(err => {
-        console.error('❌ Eroare la distribuție categorii:', err);
-        setCategoryData([]);
-      })
-      .finally(() => setLoadingCategories(false));
-  }, []);
+const loadCategoryDistribution = useCallback((days) => {
+  setLoadingCategories(true);
+  fetch(`${API_URL}/api/statistics?categoryDays=${days}`)  // 🔹 adăugat /api/
+    .then(res => res.ok ? res.json() : Promise.reject(res))
+    .then(data => setCategoryData(Array.isArray(data.categoryDistribution) ? data.categoryDistribution : []))
+    .catch(err => {
+      console.error('❌ Eroare la distribuție categorii:', err);
+      setCategoryData([]);
+    })
+    .finally(() => setLoadingCategories(false));
+}, []);
+
 
   useEffect(() => {
     loadStatistics(period);

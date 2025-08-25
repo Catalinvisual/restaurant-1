@@ -9,18 +9,19 @@ export default function Clients() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    axios.get(`${API_URL}/users`, {
-      headers: { Authorization: `Bearer ${getToken()}` }
-    })
-    .then(res => {
-      setClients(res.data);
-    })
-    .catch(err => {
-      console.error(err);
-      setError('Nu s-au putut încărca clienții.');
-    })
-    .finally(() => setLoading(false));
-  }, []);
+  axios.get(`${API_URL}/api/users`, {   // 🔹 adăugat /api/
+    headers: { Authorization: `Bearer ${getToken()}` }
+  })
+  .then(res => {
+    setClients(res.data);
+  })
+  .catch(err => {
+    console.error(err);
+    setError('Nu s-au putut încărca clienții.');
+  })
+  .finally(() => setLoading(false));
+}, []);
+
 
   if (loading) return <p>Se încarcă clienții...</p>;
   if (error) return <div className="alert alert-danger">{error}</div>;
