@@ -3,7 +3,6 @@ require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 const sequelize = require('./db'); // folosește config-ul Sequelize
 
 const ENV = process.env.NODE_ENV || 'development';
@@ -41,7 +40,6 @@ const allowedOrigins = [
 
 app.use(cors({
   origin(origin, callback) {
-    // Permite cereri fără Origin (ex: Postman) sau din lista permisă
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -54,7 +52,7 @@ app.use(cors({
 
 app.use(express.json());
 
-// ✅ Montare rute API
+// ✅ Montare rute API – backend răspunde doar la /api/*
 app.use('/api/auth', authRoutes);       // include și GET /api/auth/me
 app.use('/api/products', productRoutes);
 app.use('/api/menu', menuRoutes);
@@ -62,18 +60,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/statistics', statisticsRoutes);
 app.use('/api/users', userRoutes);
 
-// 🧱 Servire frontend în producție
-if (ENV === 'production') {
-  app.use(express.static(path.join(__dirname, 'frontend', 'build')));
-
-  // 🔁 Fallback pentru rute non-API (React Router)
-  app.get('*', (req, res, next) => {
-    if (req.originalUrl.startsWith('/api')) {
-      return next(); // Lasă rutele API să fie tratate normal
-    }
-    res.sendFile(path.join(__dirname, 'frontend', 'build', 'index.html'));
-  });
-}
+// ❌ Eliminat codul de servire frontend/build → backend-ul NU mai servește React-ul
 
 // 🔥 Middleware global pentru erori
 app.use((err, req, res, next) => {
