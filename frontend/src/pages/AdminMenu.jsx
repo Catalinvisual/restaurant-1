@@ -54,11 +54,24 @@ export default function AdminMenu() {
   // ✅ Preluare meniu doar când secțiunea "menu" e activă
   useEffect(() => {
     if (activeSection !== "menu") return;
-    fetch(`${API_URL}/menu`)
-      .then((res) => res.json())
+
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      toast.error("❌ Token lipsă. Autentifică-te.");
+      navigate("/login?expired=true");
+      return;
+    }
+
+    fetch(`${API_URL}/api/menu`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error(`Eroare ${res.status}`);
+        return res.json();
+      })
       .then((data) => setMenu(data))
       .catch((err) => console.error("❌ Eroare la preluare meniu:", err));
-  }, [activeSection]);
+  }, [activeSection, refreshKey]); // adăugat refreshKey
 
   // ✅ Tema salvată
   useEffect(() => {
@@ -127,7 +140,7 @@ export default function AdminMenu() {
         formData.append(key, key === "price" ? Number(value) : value);
       }
     });
-    const url = editingId ? `${API_URL}/menu/${editingId}` : `${API_URL}/menu`;
+    const url = editingId ? `${API_URL}/api/menu/${editingId}` : `${API_URL}/api/menu`;
     const method = editingId ? "PUT" : "POST";
     try {
       const res = await fetch(url, {
@@ -169,7 +182,7 @@ export default function AdminMenu() {
   const handleDelete = async (id) => {
     const token = localStorage.getItem("accessToken");
     try {
-      const res = await fetch(`${API_URL}/menu/${id}`, {
+      const res = await fetch(`${API_URL}/api/menu/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -195,7 +208,7 @@ export default function AdminMenu() {
     { id: "schedule", label: "Programări 🗓️" },
   ];
 
- 
+
 
   return (
     <>
