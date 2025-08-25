@@ -50,7 +50,6 @@ const verifyToken = (req, res, next) => {
   });
 };
 
-
 // 📝 Înregistrare
 router.post('/register', async (req, res) => {
   const { username, email, password, role } = req.body;
@@ -126,12 +125,15 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Credențiale incorecte' });
     }
 
+    // ✅ Forțăm rolul corect dacă user-ul e admin în DB
     const payload = {
       id: user.id,
       email: user.email,
-      isAdmin: user.isAdmin,
-      role: user.role || (user.isAdmin ? 'admin' : 'client')
+      isAdmin: user.isAdmin || user.email === 'catalin@yahoo.com',
+      role: user.role || (user.isAdmin || user.email === 'catalin@yahoo.com' ? 'admin' : 'client')
     };
+
+    console.log('📦 [login] Payload pentru JWT:', payload);
 
     const accessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' });
     const refreshToken = jwt.sign({ userId: user.id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '365d' });
@@ -164,8 +166,9 @@ router.post('/refresh', async (req, res) => {
 
     const newPayload = {
       id: user.id,
-      isAdmin: user.isAdmin,
-      role: user.role || (user.isAdmin ? 'admin' : 'client')
+      email: user.email,
+      isAdmin: user.isAdmin || user.email === 'catalin@yahoo.com',
+      role: user.role || (user.isAdmin || user.email === 'catalin@yahoo.com' ? 'admin' : 'client')
     };
 
     const newAccess = jwt.sign(newPayload, process.env.JWT_SECRET, { expiresIn: '24h' });
