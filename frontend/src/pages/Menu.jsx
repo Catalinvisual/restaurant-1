@@ -27,14 +27,14 @@ export default function Menu() {
         } else {
           setProducts([]);
           setFilteredProducts([]);
-          setMessage('⚠️ Nu s-au putut încărca produsele.');
+          setMessage('⚠️ Could not load products.');
         }
         setLoading(false);
       })
       .catch(() => {
         setProducts([]);
         setFilteredProducts([]);
-        setMessage('❌ Eroare de conexiune cu serverul.');
+        setMessage('❌ Server connection error.');
         setLoading(false);
       });
   }, []);
@@ -56,27 +56,26 @@ export default function Menu() {
       <BannerSection />
 
       <div className="container pt-2">
-        <h2 className="text-center mb-3">Meniu</h2>
-
+        <h2 className="text-center mb-3">Menu</h2>
 
         <div className="filter-buttons text-center mb-4">
           <button
             className={`filter-btn ${activeCategory === 'all' ? 'active' : ''}`}
             onClick={() => handleFilter('all')}
           >
-            Toate
+            All
           </button>
           <button
             className={`filter-btn ${activeCategory === 'mancare' ? 'active' : ''}`}
             onClick={() => handleFilter('mancare')}
           >
-            🥘 Mâncăruri
+            🥘 Food
           </button>
           <button
             className={`filter-btn ${activeCategory === 'bautura' ? 'active' : ''}`}
             onClick={() => handleFilter('bautura')}
           >
-            🍹 Băuturi
+            🍹 Drinks
           </button>
         </div>
 
@@ -90,12 +89,12 @@ export default function Menu() {
               <div className="cutlery fork">🍴</div>
               <div className="cutlery knife">🔪</div>
             </div>
-            <p className="text-muted mt-3">Gătim cu grijă pentru tine...</p>
+            <p className="text-muted mt-3">Cooking with care for you...</p>
           </div>
         ) : message ? (
           <div className="alert alert-warning text-center">{message}</div>
         ) : filteredProducts.length === 0 ? (
-          <p className="text-muted text-center">Nu există produse în această categorie.</p>
+          <p className="text-muted text-center">No products in this category.</p>
         ) : (
           <div className="card-container">
             {filteredProducts.map((product, index) => (
@@ -120,19 +119,17 @@ function BannerSection() {
     img.src = defaultUrl;
   }, []);
 
-
   return (
-   <div className="menu-banner-fullscreen">
-  <img
-    src="/assets/images/signeture-bg.jpg"
-    alt="Banner Signeture"
-    className="banner-img"
-    onError={(e) => {
-      e.target.src = 'https://via.placeholder.com/1600x900?text=Banner+Unavailable';
-    }}
-  />
-  <h2 className="banner-title">Every Plate Tells a Story</h2>
-</div>
-
+    <div className="menu-banner-fullscreen">
+      <img
+        src="/assets/images/signeture-bg.jpg"
+        alt="Signature Banner"
+        className="banner-img"
+        onError={(e) => {
+          e.target.src = 'https://via.placeholder.com/1600x900?text=Banner+Unavailable';
+        }}
+      />
+      <h2 className="banner-title">Every Plate Tells a Story</h2>
+    </div>
   );
 }

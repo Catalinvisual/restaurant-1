@@ -33,7 +33,7 @@ export default function AdminRoute({ children }) {
         const userData = await res.json();
         setAuthorized(userData.role === 'admin' || userData.isAdmin === true);
       } catch (err) {
-        console.error('Eroare validare admin:', err);
+        console.error('Admin validation error:', err);
         setAuthorized(false);
       }
     };
@@ -42,7 +42,7 @@ export default function AdminRoute({ children }) {
   }, []);
 
   if (authorized === null) {
-    return <div style={{ padding: '2rem', textAlign: 'center' }}>Se verifică accesul de administrator...</div>;
+    return <div style={{ padding: '2rem', textAlign: 'center' }}>Checking admin access...</div>;
   }
   if (!authorized) {
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;

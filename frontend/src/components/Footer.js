@@ -1,5 +1,5 @@
 import React from 'react';
-import '../assets/styles/Footer.css'; // Stiluri personalizate
+import '../assets/styles/Footer.css'; // Custom styles
 
 const Footer = () => {
   return (
@@ -7,24 +7,24 @@ const Footer = () => {
       <div className="container">
         <div className="row">
 
-          {/* Adresă */}
+          {/* Address */}
           <div className="col-md-4 mb-4">
-            <h5>📍 Adresă</h5>
+            <h5>📍 Address</h5>
             <p>
-              Str. Gustului nr. 10<br />
-              Luttelgeest, NL 8309<br />
+              Gustului Street no. 10<br />
+              Emmeloord, NL 8309<br />
               Tel: +31 612 345 678
             </p>
           </div>
 
-          {/* Formular Contact */}
+          {/* Contact Form */}
           <div className="col-md-4 mb-4">
-            <h5>✉️ Contactează-ne</h5>
+            <h5>✉️ Contact Us</h5>
             <form className="contact-form">
-              <input type="text" className="form-control mb-2" placeholder="Nume" />
+              <input type="text" className="form-control mb-2" placeholder="Name" />
               <input type="email" className="form-control mb-2" placeholder="Email" />
-              <textarea className="form-control mb-2" rows="3" placeholder="Mesajul tău" />
-              <button type="submit" className="btn btn-outline-light btn-sm">Trimite</button>
+              <textarea className="form-control mb-2" rows="3" placeholder="Your message" />
+              <button type="submit" className="btn btn-outline-light btn-sm">Send</button>
             </form>
           </div>
 
@@ -40,9 +40,9 @@ const Footer = () => {
 
         </div>
 
-        {/* Drepturi */}
+        {/* Rights */}
         <div className="text-center mt-3">
-          <p>&copy; {new Date().getFullYear()} Restaurantul Meu. Toate drepturile rezervate.</p>
+          <p>&copy; {new Date().getFullYear()} My Restaurant. All rights reserved.</p>
         </div>
       </div>
     </footer>

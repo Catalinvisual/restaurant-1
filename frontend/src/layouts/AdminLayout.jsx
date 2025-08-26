@@ -13,7 +13,7 @@ export default function AdminLayout({ children }) {
       localStorage.removeItem('refreshToken');
       navigate('/login?expired=true', { replace: true });
     }
-  }, [navigate]); // ✅ adăugat pentru a elimina warning-ul
+  }, [navigate]); // ✅ added to remove warning
 
   return (
     <div className="admin-layout">

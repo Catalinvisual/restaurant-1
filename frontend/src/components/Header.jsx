@@ -84,7 +84,7 @@ export default function Header() {
                 }
                 onClick={handleLinkClick}
               >
-                Meniu
+                Menu
               </NavLink>
             </li>
             <li className="nav-item">
@@ -95,7 +95,7 @@ export default function Header() {
                 }
                 onClick={handleLinkClick}
               >
-                Coș
+                Cart
               </NavLink>
             </li>
             {token && (
@@ -108,12 +108,10 @@ export default function Header() {
                     }
                     onClick={handleLinkClick}
                   >
-                    Comenzile mele
+                    My Orders
                   </NavLink>
                 </li>
-                <li className="nav-item">
-              
-                </li>
+                <li className="nav-item">{/* Reserved for future links */}</li>
               </>
             )}
             <li className="nav-item login-icon">

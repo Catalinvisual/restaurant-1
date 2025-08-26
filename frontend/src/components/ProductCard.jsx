@@ -13,7 +13,7 @@ const ProductCard = ({ product = {} }) => {
   const handleBuyClick = () => {
     if (!product?.id || quantity < 1 || buying) return;
     dispatch({ type: "ADD_TO_CART", payload: { ...product, quantity } });
-    toast.success(`${product.name || "Produs"} a fost adăugat în coș! 🛒`, {
+    toast.success(`${product.name || "Product"} has been added to the cart! 🛒`, {
       position: "top-right",
       autoClose: 2000,
     });
@@ -27,7 +27,7 @@ const ProductCard = ({ product = {} }) => {
   const imageSrc =
     typeof product?.image === "string" && product.image.trim().startsWith("https://")
       ? product.image
-      : "https://via.placeholder.com/320x200?text=Fara+imagine";
+      : "https://via.placeholder.com/320x200?text=No+Image";
 
   const priceValue = Number.isFinite(Number(product.price)) ? Number(product.price) : 0;
 
@@ -37,83 +37,82 @@ const ProductCard = ({ product = {} }) => {
       : null;
 
   return (
-  <article className="card product-card narrow-card h-100">
-  <div className="product-media">
-    <img
-      src={imageSrc}
-      className="card-img-top"
-      alt={product.name || "Fără nume"}
-      loading="lazy"
-    />
+    <article className="card product-card narrow-card h-100">
+      <div className="product-media">
+        <img
+          src={imageSrc}
+          className="card-img-top"
+          alt={product.name || "No name"}
+          loading="lazy"
+        />
 
-    {product.isNew && <span className="product-badge badge-new">Nou</span>}
-    {product.isPromo && <span className="product-badge badge-promo">Promo</span>}
-    {categoryLabel && <span className="category-label bottom-right">{categoryLabel}</span>}
-  </div>
-
-  <div className="card-body">
-    <div className="card-content">
-      <h5 className="card-title">{product.name || "Produs fără nume"}</h5>
-
-      <p className="card-text product-description">
-        {product.description || "Fără descriere disponibilă."}
-      </p>
-
-      {/* Grupare preț + cantitate + buton */}
-      <div className="action-row">
-        <p className="card-text fw-bold">€{priceValue.toFixed(2)}</p>
-
-        {product.id !== "preview" && (
-          <div className="quantity-controls">
-            <button
-              type="button"
-              className="btn btn-outline-secondary btn-sm"
-              onClick={handleDecrement}
-              aria-label="Scade cantitatea"
-            >
-              −
-            </button>
-            <span className="qty" aria-live="polite">{quantity}</span>
-            <button
-              type="button"
-              className="btn btn-outline-secondary btn-sm"
-              onClick={handleIncrement}
-              aria-label="Crește cantitatea"
-            >
-              +
-            </button>
-          </div>
-        )}
-
-        {product.id !== "preview" && (
-          <button
-            className={`btn btn-success btn-xs ${buying ? "btn-added" : ""}`}
-            onClick={handleBuyClick}
-            disabled={buying || quantity < 1}
-          >
-            {buying ? "✔ Adăugat!" : "Add to cart"}
-          </button>
-        )}
+        {product.isNew && <span className="product-badge badge-new">New</span>}
+        {product.isPromo && <span className="product-badge badge-promo">Promo</span>}
+        {categoryLabel && <span className="category-label bottom-right">{categoryLabel}</span>}
       </div>
 
-      {/* Rating + link */}
-      {typeof product.rating === "number" && (
-        <div className="rating mt-2">
-          {"★".repeat(Math.round(product.rating))}
-          <span>({product.rating.toFixed(1)})</span>
+      <div className="card-body">
+        <div className="card-content">
+          <h5 className="card-title">{product.name || "Unnamed product"}</h5>
+
+          <p className="card-text product-description">
+            {product.description || "No description available."}
+          </p>
+
+          {/* Price + quantity + button group */}
+          <div className="action-row">
+            <p className="card-text fw-bold">€{priceValue.toFixed(2)}</p>
+
+            {product.id !== "preview" && (
+              <div className="quantity-controls">
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary btn-sm"
+                  onClick={handleDecrement}
+                  aria-label="Decrease quantity"
+                >
+                  −
+                </button>
+                <span className="qty" aria-live="polite">{quantity}</span>
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary btn-sm"
+                  onClick={handleIncrement}
+                  aria-label="Increase quantity"
+                >
+                  +
+                </button>
+              </div>
+            )}
+
+            {product.id !== "preview" && (
+              <button
+                className={`btn btn-success btn-xs ${buying ? "btn-added" : ""}`}
+                onClick={handleBuyClick}
+                disabled={buying || quantity < 1}
+              >
+                {buying ? "✔ Added!" : "Add to cart"}
+              </button>
+            )}
+          </div>
+
+          {/* Rating + link */}
+          {typeof product.rating === "number" && (
+            <div className="rating mt-2">
+              {"★".repeat(Math.round(product.rating))}
+              <span>({product.rating.toFixed(1)})</span>
+            </div>
+          )}
+
+          {product.link && (
+            <a href={product.link} className="btn btn-outline-primary btn-sm mt-2">
+              Product details
+            </a>
+          )}
         </div>
-      )}
-
-      {product.link && (
-        <a href={product.link} className="btn btn-outline-primary btn-sm mt-2">
-          Detalii produs
-        </a>
-      )}
-    </div>
-  </div>
-</article>
-);
-
+      </div>
+    </article>
+  );
 };
 
 export default ProductCard;

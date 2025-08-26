@@ -20,19 +20,19 @@ export default function Checkout() {
     console.log('🔐 Token:', token); // DEBUG
 
     if (!token || token === 'undefined') {
-      setMessage('❗ Token-ul lipsește sau este invalid. Te rugăm să te autentifici.');
+      setMessage('❗ Token is missing or invalid. Please log in.');
       return;
     }
 
     if (cartItems.length === 0) {
-      setMessage('❌ Coșul este gol. Adaugă produse înainte de a comanda.');
+      setMessage('❌ Your cart is empty. Add items before placing an order.');
       return;
     }
 
     const itemsPayload = cartItems.map(item => ({
-      product_id: item.id, // corespunde backend-ului
+      product_id: item.id, // matches backend
       quantity: Number(item.quantity),
-      price: Number(item.price) // forțez numeric
+      price: Number(item.price) // force numeric
     }));
 
     try {
@@ -51,22 +51,22 @@ export default function Checkout() {
 
       if (response.ok) {
         const result = await response.json();
-        console.log('✅ Comandă trimisă:', result);
+        console.log('✅ Order submitted:', result);
 
-        // stochez totalul din răspuns
+        // store total from response
         setLastOrderTotal(result.order?.total_price || null);
 
-        setMessage(`✅ Comanda ta a fost plasată cu succes!`);
+        setMessage(`✅ Your order has been placed successfully!`);
         setName('');
         setAddress('');
         dispatch({ type: 'CLEAR_CART' });
       } else {
         const errorData = await response.json();
-        setMessage(errorData.error || '❌ Eroare la trimiterea comenzii.');
+        setMessage(errorData.error || '❌ Error submitting order.');
       }
     } catch (error) {
-      console.error('❌ Eroare conexiune:', error);
-      setMessage('❌ Serverul nu răspunde. Încearcă mai târziu.');
+      console.error('❌ Connection error:', error);
+      setMessage('❌ Server is not responding. Please try again later.');
     }
   };
 
@@ -74,20 +74,20 @@ export default function Checkout() {
     <>
       <Header />
       <div className="container mt-5">
-        <h2 className="text-primary mb-4">Finalizare comandă</h2>
+        <h2 className="text-primary mb-4">Checkout</h2>
 
         {message && (
           <div className="alert alert-info">
             {message}
             {lastOrderTotal !== null && (
-              <div><strong>Total comandă: </strong>€{Number(lastOrderTotal).toFixed(2)}</div>
+              <div><strong>Order Total: </strong>€{Number(lastOrderTotal).toFixed(2)}</div>
             )}
           </div>
         )}
 
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
-            <label className="form-label">Nume</label>
+            <label className="form-label">Name</label>
             <input
               type="text"
               className="form-control"
@@ -98,7 +98,7 @@ export default function Checkout() {
           </div>
 
           <div className="mb-3">
-            <label className="form-label">Adresă de livrare</label>
+            <label className="form-label">Delivery Address</label>
             <textarea
               className="form-control"
               value={address}
@@ -107,7 +107,7 @@ export default function Checkout() {
             ></textarea>
           </div>
 
-          <h4 className="mt-4">🧾 Sumar comandă</h4>
+          <h4 className="mt-4">🧾 Order Summary</h4>
           <ul className="list-group mb-3">
             {cartItems.map((item) => (
               <li
@@ -129,7 +129,7 @@ export default function Checkout() {
                   <span>{item.name} x {item.quantity}</span>
                 </div>
                 <span>
-                  {(item.price * item.quantity).toLocaleString('ro-RO', {
+                  {(item.price * item.quantity).toLocaleString('en-GB', {
                     style: 'currency',
                     currency: 'EUR',
                   })}
@@ -141,7 +141,7 @@ export default function Checkout() {
           <div className="mb-3 text-end">
             <strong>
               Total:{' '}
-              {total.toLocaleString('ro-RO', {
+              {total.toLocaleString('en-GB', {
                 style: 'currency',
                 currency: 'EUR',
               })}
@@ -149,7 +149,7 @@ export default function Checkout() {
           </div>
 
           <button type="submit" className="btn btn-success w-100">
-            ✅ Confirmă comanda
+            ✅ Confirm Order
           </button>
         </form>
       </div>

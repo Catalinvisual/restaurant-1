@@ -22,7 +22,7 @@ export default function Cart() {
   );
 
   const handleRemove = (index) => {
-    if (window.confirm("Ești sigur că vrei să ștergi acest produs?")) {
+    if (window.confirm("Are you sure you want to remove this item?")) {
       dispatch({ type: "REMOVE_BY_INDEX", payload: index });
     }
   };
@@ -43,17 +43,17 @@ export default function Cart() {
     const token = localStorage.getItem("accessToken");
 
     if (!token || token === "undefined") {
-      setMessage(<p className="cart-message warning">❗ Te rugăm să te autentifici.</p>);
+      setMessage(<p className="cart-message warning">❗ Please log in to continue.</p>);
       return;
     }
 
     if (cartItems.length === 0) {
-      setMessage(<p className="cart-message warning">❗ Coșul este gol.</p>);
+      setMessage(<p className="cart-message warning">❗ Your cart is empty.</p>);
       return;
     }
 
     if (!firstName || !lastName || !street || !number || !postalCode || !city) {
-      setMessage(<p className="cart-message warning">❗ Completează toate câmpurile.</p>);
+      setMessage(<p className="cart-message warning">❗ Please fill in all fields.</p>);
       return;
     }
 
@@ -81,12 +81,12 @@ export default function Cart() {
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || "❌ Eroare la trimiterea comenzii.");
+        throw new Error(err.error || "❌ Error submitting order.");
       }
 
       const data = await res.json();
-      console.log("✅ Comandă trimisă:", data);
-      setMessage(<p className="cart-message success">✅ Comanda a fost înregistrată!</p>);
+      console.log("✅ Order submitted:", data);
+      setMessage(<p className="cart-message success">✅ Your order has been placed!</p>);
       dispatch({ type: "CLEAR_CART" });
       setShowForm(false);
       setFirstName('');
@@ -104,19 +104,19 @@ export default function Cart() {
     <>
       <Header />
       <div className="cart-container container">
-        <h2 className="cart-title">Coșul meu de cumpărături</h2>
+        <h2 className="cart-title">My Shopping Cart</h2>
 
         {message && <div>{message}</div>}
 
         {cartItems.length === 0 ? (
-          <p className="cart-message warning">Coșul este gol.</p>
+          <p className="cart-message warning">Your cart is empty.</p>
         ) : (
           <>
             <ul className="cart-list">
               {cartItems.map((item, index) => (
                 <li className="cart-item" key={index}>
                   <img
-                    src={item.image || "https://via.placeholder.com/80?text=Imagine"}
+                    src={item.image || "https://via.placeholder.com/80?text=Image"}
                     alt={item.name}
                   />
                   <div className="cart-item-details">
@@ -137,9 +137,9 @@ export default function Cart() {
                       </button>
                     </div>
                     <p className="mb-0">
-                      Preț:{" "}
+                      Price:{" "}
                       <strong>
-                        {(item.price * item.quantity).toLocaleString("ro-RO", {
+                        {(item.price * item.quantity).toLocaleString("en-GB", {
                           style: "currency",
                           currency: "EUR",
                         })}
@@ -147,7 +147,7 @@ export default function Cart() {
                     </p>
                   </div>
                   <button className="remove-button" onClick={() => handleRemove(index)}>
-                    Șterge
+                    Remove
                   </button>
                 </li>
               ))}
@@ -155,23 +155,23 @@ export default function Cart() {
 
             <div className="cart-summary mt-4 text-end">
               <div className="total-label">
-                <span>Total de plată: </span>
+                <span>Total: </span>
                 <strong>
-                  {total.toLocaleString("ro-RO", {
+                  {total.toLocaleString("en-GB", {
                     style: "currency",
                     currency: "EUR",
                   })}
                 </strong>
               </div>
               <button className="btn btn-success mt-3" onClick={handleCheckout}>
-                ✅ Confirmă comanda
+                ✅ Confirm Order
               </button>
             </div>
 
             {showForm && (
               <div className="card mt-5 shadow-sm">
                 <div className="card-header bg-light">
-                  <h5 className="mb-0 text-primary fw-bold">📦 Date de livrare</h5>
+                  <h5 className="mb-0 text-primary fw-bold">📦 Delivery Details</h5>
                 </div>
                 <div className="card-body">
                   <div className="row g-3">
@@ -179,7 +179,7 @@ export default function Cart() {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Prenume"
+                        placeholder="First Name"
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
                         required
@@ -189,7 +189,7 @@ export default function Cart() {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Nume"
+                        placeholder="Last Name"
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
                         required
@@ -199,7 +199,7 @@ export default function Cart() {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Strada"
+                        placeholder="Street"
                         value={street}
                         onChange={(e) => setStreet(e.target.value)}
                         required
@@ -209,7 +209,7 @@ export default function Cart() {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Nr."
+                        placeholder="No."
                         value={number}
                         onChange={(e) => setNumber(e.target.value)}
                         required
@@ -219,7 +219,7 @@ export default function Cart() {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Cod poștal"
+                        placeholder="Postal Code"
                         value={postalCode}
                         onChange={(e) => setPostalCode(e.target.value)}
                         required
@@ -229,7 +229,7 @@ export default function Cart() {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Oraș"
+                        placeholder="City"
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
                         required
@@ -238,7 +238,7 @@ export default function Cart() {
                   </div>
 
                   <button className="btn btn-primary w-100 mt-4" onClick={handleSubmitOrder}>
-                    📤 Trimite comanda
+                    📤 Submit Order
                   </button>
                 </div>
               </div>

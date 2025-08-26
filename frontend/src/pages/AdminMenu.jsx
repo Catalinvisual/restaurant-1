@@ -26,7 +26,7 @@ export default function AdminMenu() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
-  // ✅ Verificare token și rol admin la accesare
+  // ✅ Check token and admin role on access
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
     if (!token || token === "undefined") {
@@ -45,19 +45,19 @@ export default function AdminMenu() {
     }
 
     if (payload.role !== "admin") {
-      toast.error("⛔ Acces restricționat: doar adminii pot accesa această pagină.");
+      toast.error("⛔ Access restricted: only admins can access this page.");
       navigate("/login?unauthorized=true");
       return;
     }
   }, [navigate]);
 
-  // ✅ Preluare meniu doar când secțiunea "menu" e activă
+  // ✅ Fetch menu only when "menu" section is active
   useEffect(() => {
     if (activeSection !== "menu") return;
 
     const token = localStorage.getItem("accessToken");
     if (!token) {
-      toast.error("❌ Token lipsă. Autentifică-te.");
+      toast.error("❌ Missing token. Please log in.");
       navigate("/login?expired=true");
       return;
     }
@@ -66,14 +66,14 @@ export default function AdminMenu() {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then((res) => {
-        if (!res.ok) throw new Error(`Eroare ${res.status}`);
+        if (!res.ok) throw new Error(`Error ${res.status}`);
         return res.json();
       })
       .then((data) => setMenu(data))
-      .catch((err) => console.error("❌ Eroare la preluare meniu:", err));
-  }, [activeSection, refreshKey]); // adăugat refreshKey
+      .catch((err) => console.error("❌ Error fetching menu:", err));
+  }, [activeSection, refreshKey]);
 
-  // ✅ Tema salvată
+  // ✅ Load saved theme
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme === "dark") {
@@ -100,7 +100,7 @@ export default function AdminMenu() {
       if (file?.type?.startsWith("image/")) {
         setNewItem((prev) => ({ ...prev, image: file }));
       } else {
-        toast.error("❌ Fișierul selectat nu este valid.");
+        toast.error("❌ Selected file is not valid.");
         setNewItem((prev) => ({ ...prev, image: null }));
       }
     } else {
@@ -124,12 +124,12 @@ export default function AdminMenu() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (newItem.image?.size > 5 * 1024 * 1024) {
-      toast.error("❌ Imaginea este prea mare. Maxim 5MB.");
+      toast.error("❌ Image is too large. Max 5MB.");
       return;
     }
     const token = localStorage.getItem("accessToken");
     if (!token) {
-      toast.error("❌ Token lipsă. Autentifică-te.");
+      toast.error("❌ Missing token. Please log in.");
       return;
     }
     const formData = new FormData();
@@ -154,14 +154,14 @@ export default function AdminMenu() {
           ? menu.map((item) => (item.id === editingId ? result : item))
           : [...menu, result];
         setMenu(updatedMenu);
-        toast.success(editingId ? "✏️ Produs actualizat!" : "✅ Produs adăugat!");
+        toast.success(editingId ? "✏️ Product updated!" : "✅ Product added!");
         resetForm();
         setRefreshKey((k) => k + 1);
       } else {
-        toast.error(`❌ Eroare: ${result.error}`);
+        toast.error(`❌ Error: ${result.error}`);
       }
     } catch {
-      toast.error("❌ Serverul nu răspunde.");
+      toast.error("❌ Server is not responding.");
     }
   };
 
@@ -188,229 +188,228 @@ export default function AdminMenu() {
       });
       if (res.ok) {
         setMenu((prev) => prev.filter((item) => item.id !== id));
-        toast.info("🗑️ Produs șters cu succes");
+        toast.info("🗑️ Product successfully deleted");
         setRefreshKey((k) => k + 1);
       } else {
-        toast.error("❌ Nu s-a putut șterge produsul.");
+        toast.error("❌ Could not delete product.");
       }
     } catch {
-      toast.error("❌ Eroare de rețea.");
+      toast.error("❌ Network error.");
     }
   };
 
   const sections = [
-    { id: "menu", label: "Meniu 🍽️" },
-    { id: "inventory", label: "Inventar 📦" },
-    { id: "orders", label: "Comenzi 🛒" },
-    { id: "stats", label: "Statistici 📊" },
-    { id: "clients", label: "Clienți 👥" },
+    { id: "menu", label: "Menu 🍽️" },
+    { id: "inventory", label: "Inventory 📦" },
+    { id: "orders", label: "Orders 🛒" },
+    { id: "stats", label: "Statistics 📊" },
+    { id: "clients", label: "Clients 👥" },
     { id: "staff", label: "Staff 🧑‍🍳" },
-    { id: "schedule", label: "Programări 🗓️" },
+    { id: "schedule", label: "Schedule 🗓️" },
   ];
 
 
+return (
+  <>
+    {/* Hamburger Button */}
+    <button
+      className="hamburger"
+      onClick={() => setSidebarOpen(!sidebarOpen)}
+      aria-label="Toggle menu"
+    >
+      ☰
+    </button>
 
-  return (
-    <>
-      {/* Buton Hamburger */}
-      <button
-        className="hamburger"
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-        aria-label="Deschide/închide meniul"
+    <div className="admin-dashboard">
+      {/* Theme Switch */}
+      <div
+        className="theme-switch"
+        onClick={toggleTheme}
+        role="button"
+        tabIndex={0}
+        aria-label="Toggle theme"
+        onKeyDown={(e) => e.key === "Enter" && toggleTheme()}
       >
-        ☰
-      </button>
+        🌗 Toggle Theme
+      </div>
 
-      <div className="admin-dashboard">
-        {/* Schimbare temă */}
-        <div
-          className="theme-switch"
-          onClick={toggleTheme}
-          role="button"
-          tabIndex={0}
-          aria-label="Schimbă tema"
-          onKeyDown={(e) => e.key === "Enter" && toggleTheme()}
-        >
-          🌗 Schimbă tema
-        </div>
+      {/* Sidebar Navigation */}
+      <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
+        <h2>🍕 Restaurant Admin</h2>
+        <ul>
+          {sections.map((section) => (
+            <li
+              key={section.id}
+              className={activeSection === section.id ? "active" : ""}
+              onClick={() => {
+                setActiveSection(section.id);
+                setSidebarOpen(false);
+              }}
+            >
+              {section.label}
+            </li>
+          ))}
+        </ul>
+      </aside>
 
-        {/* Sidebar unic */}
-        <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
-          <h2>🍕 Admin Restaurant</h2>
-          <ul>
-            {sections.map((section) => (
-              <li
-                key={section.id}
-                className={activeSection === section.id ? "active" : ""}
-                onClick={() => {
-                  setActiveSection(section.id);
-                  setSidebarOpen(false);
-                }}
-              >
-                {section.label}
-              </li>
-            ))}
-          </ul>
-        </aside>
+      {/* Main Content Area */}
+      <main className="main-area">
+        <h1>{sections.find((s) => s.id === activeSection)?.label}</h1>
 
-        {/* Zona principală */}
-        <main className="main-area">
-          <h1>{sections.find((s) => s.id === activeSection)?.label}</h1>
+        {activeSection === "menu" && (
+          <>
+            <div className="card-add-product">
+              <h2>Add New Products</h2>
+              <form className="product-form" onSubmit={handleSubmit}>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Product Name"
+                  value={newItem.name}
+                  onChange={handleChange}
+                  required
+                />
+                <textarea
+                  name="description"
+                  placeholder="Description"
+                  value={newItem.description}
+                  onChange={handleChange}
+                  required
+                />
+                <input
+                  type="number"
+                  name="price"
+                  placeholder="Price (€)"
+                  value={newItem.price}
+                  onChange={handleChange}
+                  required
+                />
+                <select
+                  name="category"
+                  value={newItem.category}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Select Category</option>
+                  <option value="mancare">Food</option>
+                  <option value="bautura">Drink</option>
+                </select>
 
-          {activeSection === "menu" && (
-            <>
-              <div className="card-add-product">
-                <h2>Adaugă produse noi</h2>
-                <form className="product-form" onSubmit={handleSubmit}>
-                  <input
-                    type="text"
-                    name="name"
-                    placeholder="Nume produs"
-                    value={newItem.name}
-                    onChange={handleChange}
-                    required
-                  />
-                  <textarea
-                    name="description"
-                    placeholder="Descriere"
-                    value={newItem.description}
-                    onChange={handleChange}
-                    required
-                  />
-                  <input
-                    type="number"
-                    name="price"
-                    placeholder="Preț (€)"
-                    value={newItem.price}
-                    onChange={handleChange}
-                    required
-                  />
-                  <select
-                    name="category"
-                    value={newItem.category}
-                    onChange={handleChange}
-                    required
-                  >
-                    <option value="">Selectează categoria</option>
-                    <option value="mancare">Mâncare</option>
-                    <option value="bautura">Băutură</option>
-                  </select>
-
-                  <div className="checkbox-row">
-                    <label className="tag-new">
-                      <input
-                        type="checkbox"
-                        name="isNew"
-                        checked={newItem.isNew}
-                        onChange={handleChange}
-                      />
-                      Nou
-                    </label>
-                    <label className="tag-promo">
-                      <input
-                        type="checkbox"
-                        name="isPromo"
-                        checked={newItem.isPromo}
-                        onChange={handleChange}
-                      />
-                      Promo
-                    </label>
-                  </div>
-
-                  <label className="file-upload">
-                    Alege imaginea produsului
+                <div className="checkbox-row">
+                  <label className="tag-new">
                     <input
-                      type="file"
-                      name="image"
-                      accept="image/*"
+                      type="checkbox"
+                      name="isNew"
+                      checked={newItem.isNew}
                       onChange={handleChange}
                     />
+                    New
                   </label>
-
-                  <div className="form-actions">
-                    <button type="submit">
-                      {editingId ? "Salvează" : "Adaugă"}
-                    </button>
-                    {editingId && (
-                      <button type="button" onClick={resetForm}>
-                        Anulează
-                      </button>
-                    )}
-                  </div>
-                </form>
-              </div>
-
-              {/* Previzualizare produs */}
-              {newItem.name && newItem.description && newItem.price && (
-                <div className="preview">
-                  <p>Previzualizare:</p>
-                  <ProductCard
-                    product={{
-                      ...newItem,
-                      id: "preview",
-                      image:
-                        newItem.image instanceof File
-                          ? URL.createObjectURL(newItem.image)
-                          : newItem.image || "/default-product.jpg",
-                    }}
-                  />
+                  <label className="tag-promo">
+                    <input
+                      type="checkbox"
+                      name="isPromo"
+                      checked={newItem.isPromo}
+                      onChange={handleChange}
+                    />
+                    Promo
+                  </label>
                 </div>
-              )}
 
-              {/* Lista de produse */}
-              <div className="product-grid">
-                {menu.map((item) => (
-                  <div key={item.id} className="product-wrapper">
-                    <div className="product-card-wrapper">
-                      <div className="product-actions">
-                        <button
-                          className="btn-edit"
-                          onClick={() => handleEdit(item)}
-                          aria-label={`Editează ${item.name}`}
-                        >
-                          ✏️
-                        </button>
-                        <button
-                          className="btn-delete"
-                          onClick={() => handleDelete(item.id)}
-                          aria-label={`Șterge ${item.name}`}
-                        >
-                          🗑️
-                        </button>
-                      </div>
-                      <ProductCard product={item} />
-                    </div>
-                  </div>
-                ))}
+                <label className="file-upload">
+                  Choose Product Image
+                  <input
+                    type="file"
+                    name="image"
+                    accept="image/*"
+                    onChange={handleChange}
+                  />
+                </label>
+
+                <div className="form-actions">
+                  <button type="submit">
+                    {editingId ? "Save" : "Add"}
+                  </button>
+                  {editingId && (
+                    <button type="button" onClick={resetForm}>
+                      Cancel
+                    </button>
+                  )}
+                </div>
+              </form>
+            </div>
+
+            {/* Product Preview */}
+            {newItem.name && newItem.description && newItem.price && (
+              <div className="preview">
+                <p>Preview:</p>
+                <ProductCard
+                  product={{
+                    ...newItem,
+                    id: "preview",
+                    image:
+                      newItem.image instanceof File
+                        ? URL.createObjectURL(newItem.image)
+                        : newItem.image || "/default-product.jpg",
+                  }}
+                />
               </div>
-            </>
-          )}
+            )}
 
-          {activeSection === "orders" && (
-            <div className="admin-panel">
-              <Orders onOrderUpdated={handleOrdersChange} />
+            {/* Product List */}
+            <div className="product-grid">
+              {menu.map((item) => (
+                <div key={item.id} className="product-wrapper">
+                  <div className="product-card-wrapper">
+                    <div className="product-actions">
+                      <button
+                        className="btn-edit"
+                        onClick={() => handleEdit(item)}
+                        aria-label={`Edit ${item.name}`}
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        className="btn-delete"
+                        onClick={() => handleDelete(item.id)}
+                        aria-label={`Delete ${item.name}`}
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                    <ProductCard product={item} />
+                  </div>
+                </div>
+              ))}
             </div>
-          )}
+          </>
+        )}
 
-          {activeSection === "stats" && (
-            <div className="admin-panel">
-              <Statistics refreshKey={refreshKey} />
-            </div>
-          )}
+        {activeSection === "orders" && (
+          <div className="admin-panel">
+            <Orders onOrderUpdated={handleOrdersChange} />
+          </div>
+        )}
 
-          {activeSection === "clients" && (
-            <div className="admin-panel">
-              <Clients />
-            </div>
-          )}
+        {activeSection === "stats" && (
+          <div className="admin-panel">
+            <Statistics refreshKey={refreshKey} />
+          </div>
+        )}
 
-          {["inventory", "staff", "schedule"].includes(activeSection) && (
-            <section className="placeholder">
-              <p>Funcționalitate în curs de dezvoltare.</p>
-            </section>
-          )}
-        </main>
-      </div>
-    </>
-  );
+        {activeSection === "clients" && (
+          <div className="admin-panel">
+            <Clients />
+          </div>
+        )}
+
+        {["inventory", "staff", "schedule"].includes(activeSection) && (
+          <section className="placeholder">
+            <p>Feature under development.</p>
+          </section>
+        )}
+      </main>
+    </div>
+  </>
+);
 }

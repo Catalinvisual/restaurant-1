@@ -2,10 +2,10 @@ import React, { createContext, useReducer, useContext, useEffect } from 'react';
 import { API_URL } from '../apiConfig';
 import { getToken } from '../utils/auth';
 
-// 🔧 Creăm contextul
+// 🔧 Create context
 const CartContext = createContext();
 
-// 🔄 Reducer pentru coș
+// 🔄 Cart reducer
 const cartReducer = (state, action) => {
   switch (action.type) {
     case 'ADD_TO_CART':
@@ -41,7 +41,7 @@ const cartReducer = (state, action) => {
   }
 };
 
-// 🔄 Funcție pentru actualizarea statusului comenzii
+// 🔄 Function to update order status
 const updateOrderStatus = async (orderId, newStatus) => {
   const token = getToken();
 
@@ -50,25 +50,25 @@ const updateOrderStatus = async (orderId, newStatus) => {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}` // ✅ token adăugat
+        'Authorization': `Bearer ${token}` // ✅ token added
       },
       body: JSON.stringify({ status: newStatus }),
     });
 
     if (!response.ok) {
-      throw new Error('Eroare la actualizarea statusului comenzii');
+      throw new Error('Error updating order status');
     }
 
     const data = await response.json();
-    console.log('✅ Status actualizat:', data);
+    console.log('✅ Status updated:', data);
     return data;
   } catch (error) {
-    console.error('❌ Eroare la actualizare:', error);
+    console.error('❌ Update error:', error);
     throw error;
   }
 };
 
-// 🛒 Provider cu salvare automată în localStorage
+// 🛒 Provider with automatic localStorage sync
 export const CartProvider = ({ children }) => {
   const initialCart = JSON.parse(localStorage.getItem('cart')) || [];
   const [cartItems, dispatch] = useReducer(cartReducer, initialCart);
@@ -76,7 +76,7 @@ export const CartProvider = ({ children }) => {
   useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(cartItems));
     const total = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-    console.log(`🧾 Total în coș: €${total.toFixed(2)}`);
+    console.log(`🧾 Cart total: €${total.toFixed(2)}`);
   }, [cartItems]);
 
   return (
@@ -86,5 +86,5 @@ export const CartProvider = ({ children }) => {
   );
 };
 
-// 🧩 Hook personalizat
+// 🧩 Custom hook
 export const useCart = () => useContext(CartContext);

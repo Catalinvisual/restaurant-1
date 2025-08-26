@@ -11,12 +11,12 @@ export default function MyOrders() {
 
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
-    console.log('🔐 Token în MyOrders:', token);
+    console.log('🔐 Token in MyOrders:', token);
 
     if (!token || token === 'undefined') {
       setMessage(
         <p className="cart-message warning">
-          ❗ Trebuie să fii autentificat pentru a vedea comenzile.
+          ❗ You must be logged in to view your orders.
         </p>
       );
       setLoading(false);
@@ -37,29 +37,29 @@ export default function MyOrders() {
         setOrders(normalized);
       })
       .catch((err) => {
-        console.error('❌ Eroare la încărcarea comenzilor mele:', err);
+        console.error('❌ Error loading your orders:', err);
         setMessage(
           <p className="cart-message error">
-            ❌ Nu s-au putut prelua comenzile.
+            ❌ Failed to retrieve orders.
           </p>
         );
       })
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <p>Se încarcă comenzile...</p>;
+  if (loading) return <p>Loading your orders...</p>;
 
   return (
     <>
       <Header />
 
       <div className="container">
-        <h2 className="my-orders-title">Comenzile Mele</h2>
+        <h2 className="my-orders-title">My Orders</h2>
 
         {message && <div>{message}</div>}
 
         {!message && orders.length === 0 && (
-          <p className="cart-message warning">Nu ai comenzi înregistrate.</p>
+          <p className="cart-message warning">You have no recorded orders.</p>
         )}
 
         {orders.map((order) => {
@@ -69,23 +69,23 @@ export default function MyOrders() {
           );
 
           const formattedDate = order.created_at
-            ? new Date(order.created_at).toLocaleDateString('ro-RO', {
+            ? new Date(order.created_at).toLocaleDateString('en-GB', {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric',
               })
-            : 'Data indisponibilă';
+            : 'Date unavailable';
 
           return (
             <div key={order.id} className="card mb-4">
               <div className="card-header">
-                <strong>Comandă #{order.id}</strong> – {formattedDate}
+                <strong>Order #{order.id}</strong> – {formattedDate}
                 <span className="badge bg-secondary float-end">{order.status}</span>
               </div>
 
               <div className="card-body">
-                <p><strong>👤 Nume:</strong> {order.customer_name || 'N/A'}</p>
-                <p><strong>📍 Adresă:</strong> {order.address || 'N/A'}</p>
+                <p><strong>👤 Name:</strong> {order.customer_name || 'N/A'}</p>
+                <p><strong>📍 Address:</strong> {order.address || 'N/A'}</p>
               </div>
 
               <ul className="list-group list-group-flush">
@@ -95,7 +95,7 @@ export default function MyOrders() {
                     typeof product.image === 'string' &&
                     product.image.trim().startsWith('https://')
                       ? product.image
-                      : 'https://via.placeholder.com/80?text=Imagine';
+                      : 'https://via.placeholder.com/80?text=Image';
 
                   return (
                     <li
@@ -105,7 +105,7 @@ export default function MyOrders() {
                       <div className="d-flex align-items-center">
                         <img
                           src={imageSrc}
-                          alt={product.name || 'Fără imagine'}
+                          alt={product.name || 'No image'}
                           style={{
                             width: '60px',
                             height: '60px',

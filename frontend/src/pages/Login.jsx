@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Header from "../components/Header";
-import { apiFetch } from "../apiConfig"; // schimbat: import apiFetch, nu API_URL
+import { apiFetch } from "../apiConfig"; // changed: using apiFetch instead of API_URL
 import "../assets/styles/Login.css";
 import { parseJwt } from "../utils/auth";
 
@@ -57,13 +57,13 @@ export default function Login({ redirectTo = "/" }) {
 
         if (response.ok) {
           setIsRegistering(false);
-          setError("✅ Înregistrare reușită. Te poți autentifica.");
+          setError("✅ Registration successful. You can now log in.");
         } else {
-          setError(result.error || "Înregistrare eșuată");
+          setError(result.error || "Registration failed");
         }
       } catch (err) {
-        console.error("❌ Eroare la înregistrare:", err);
-        setError("Serverul nu răspunde");
+        console.error("❌ Registration error:", err);
+        setError("Server is not responding");
       }
       return;
     }
@@ -98,17 +98,17 @@ export default function Login({ redirectTo = "/" }) {
         );
 
         if (from === "/admin" && role !== "admin") {
-          setError("Acest cont nu are rol de admin.");
+          setError("This account does not have admin privileges.");
           return;
         }
 
         navigate(from, { replace: true });
       } else {
-        setError(result.error || "Autentificare eșuată");
+        setError(result.error || "Login failed");
       }
     } catch (err) {
-      console.error("❌ Eroare la login:", err);
-      setError("Serverul nu răspunde");
+      console.error("❌ Login error:", err);
+      setError("Server is not responding");
     }
   };
 
@@ -117,11 +117,11 @@ export default function Login({ redirectTo = "/" }) {
       <Header />
       <div className="login-wrapper">
         <div className="login-card">
-          <h2>{isRegistering ? "Înregistrare" : "Autentificare"}</h2>
+          <h2>{isRegistering ? "Register" : "Login"}</h2>
 
           {expired && (
             <div className="alert alert-warning">
-              🔒 Tokenul a expirat. Te rog să te loghezi din nou.
+              🔒 Your token has expired. Please log in again.
             </div>
           )}
 
@@ -130,7 +130,7 @@ export default function Login({ redirectTo = "/" }) {
           {isAuthenticated ? (
             <>
               <div className="alert alert-success text-center">
-                ✅ Ești autentificat
+                ✅ You are logged in
               </div>
               <div className="text-center mt-3">
                 <button
@@ -146,14 +146,14 @@ export default function Login({ redirectTo = "/" }) {
               <form onSubmit={handleSubmit}>
                 {isRegistering && (
                   <div className="mb-3">
-                    <label className="form-label">Nume</label>
+                    <label className="form-label">Name</label>
                     <input
                       type="text"
                       className="form-control"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       required
-                      placeholder="Numele complet"
+                      placeholder="Full name"
                     />
                   </div>
                 )}
@@ -166,19 +166,19 @@ export default function Login({ redirectTo = "/" }) {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    placeholder="ex: admin@restaurant.com"
+                    placeholder="e.g. admin@restaurant.com"
                   />
                 </div>
 
                 <div className="mb-3">
-                  <label className="form-label">Parolă</label>
+                  <label className="form-label">Password</label>
                   <input
                     type="password"
                     className="form-control"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    placeholder={isRegistering ? "Creează o parolă" : "Parola"}
+                    placeholder={isRegistering ? "Create a password" : "Password"}
                   />
                 </div>
 
@@ -197,7 +197,7 @@ export default function Login({ redirectTo = "/" }) {
                       <path d="M8 1a4 4 0 0 0-4 4v2H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-1V5a4 4 0 0 0-4-4zM5 5a3 3 0 1 1 6 0v2H5V5zm3 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
                     </svg>
                   )}
-                  {isRegistering ? "Înregistrează-te" : "Login"}
+                  {isRegistering ? "Register" : "Login"}
                 </button>
               </form>
 
@@ -210,8 +210,8 @@ export default function Login({ redirectTo = "/" }) {
                   }}
                 >
                   {isRegistering
-                    ? "Ai deja cont ? Autentifică-te"
-                    : "Nu ai cont ? Înregistrează-te"}
+                    ? "Already have an account? Log in"
+                    : "Don't have an account? Register"}
                 </button>
               </p>
             </>
@@ -221,3 +221,4 @@ export default function Login({ redirectTo = "/" }) {
     </>
   );
 }
+

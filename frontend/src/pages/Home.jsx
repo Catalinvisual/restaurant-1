@@ -11,7 +11,7 @@ export default function Home() {
   const [message, setMessage] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Imagini statice servite de frontend — nu au nevoie de /api
+  // Static images served by frontend — no /api needed
   const carouselImages = [
     "dish1.jpg",
     "dish2.jpg",
@@ -26,7 +26,7 @@ export default function Home() {
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
 
-    // Backend endpoint — are nevoie de /api
+    // Backend endpoint — requires /api
     fetch(`${API_URL}/api/menu`, {
       headers: {
         Authorization: token ? `Bearer ${token}` : "",
@@ -35,7 +35,7 @@ export default function Home() {
       .then(async (res) => {
         if (!res.ok) {
           const text = await res.text();
-          throw new Error(`Eroare ${res.status}: ${text || res.statusText}`);
+          throw new Error(`Error ${res.status}: ${text || res.statusText}`);
         }
         return res.json();
       })
@@ -44,8 +44,8 @@ export default function Home() {
         setSpecialItems(filtered);
       })
       .catch((err) => {
-        console.error("❌ Eroare la încărcarea meniului:", err);
-        setMessage("❌ Nu s-au putut încărca produsele evidențiate.");
+        console.error("❌ Error loading menu:", err);
+        setMessage("❌ Could not load featured products.");
       });
   }, []);
 
@@ -92,16 +92,16 @@ export default function Home() {
                   Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit.
                   Aliqu diam amet diam et eos.
                 </p>
-                {/* Ruta frontend — nu are nevoie de /api */}
+                {/* Frontend route — no /api needed */}
                 <a href="/menu" className="btn btn-book mt-3">
                   Book a Table
                 </a>
               </div>
               <div className="grill-container">
-                {/* Imagine statică — nu are nevoie de /api */}
+                {/* Static image — no /api needed */}
                 <img
                   src="assets/images/grill-round.png"
-                  alt="Grătar rotund"
+                  alt="Round Grill"
                   className="rotating-grill-small"
                 />
               </div>
@@ -110,19 +110,19 @@ export default function Home() {
         </section>
 
         <div className="container mt-5">
-          {/* Oferte Speciale */}
+          {/* Special Offers */}
           <section className="special-offers my-5 text-center">
-            <h3 className="text-success">🎉 Oferte Speciale</h3>
+            <h3 className="text-success">🎉 Special Offers</h3>
             <ul className="list-unstyled offer-list">
-              <li>🍕 2x Pizza + 1 Cola gratis</li>
-              <li>🍔 Burger + Cartofi la doar €9.99</li>
-              <li>🍝 Happy Hour: -20% la paste între 14:00 - 16:00</li>
+              <li>🍕 2x Pizza + 1 Free Cola</li>
+              <li>🍔 Burger + Fries for only €9.99</li>
+              <li>🍝 Happy Hour: -20% on pasta between 14:00 - 16:00</li>
             </ul>
           </section>
 
-          {/* Carusel Imagini */}
+          {/* Image Carousel */}
           <section className="image-carousel my-5 text-center">
-            <h3 className="text-primary mb-4">📸 Din Bucătăria Noastră</h3>
+            <h3 className="text-primary mb-4">📸 From Our Kitchen</h3>
 
             <div {...handlers} className="carousel-wrapper">
               <button className="btn btn-outline-secondary" onClick={prevSlide}>
@@ -132,8 +132,8 @@ export default function Home() {
               {visibleImages.map((img, index) => (
                 <img
                   key={index}
-                  src={`/assets/images/${img}`} // static — fără /api
-                  alt={`Imagine ${index + 1}`}
+                  src={`/assets/images/${img}`} // static — no /api
+                  alt={`Image ${index + 1}`}
                   className="carousel-img"
                 />
               ))}
@@ -144,14 +144,14 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Produse Evidențiate */}
+          {/* Featured Products */}
           {message && (
             <div className="alert alert-warning text-center">{message}</div>
           )}
 
           {specialItems.length > 0 && (
             <section className="featured-products my-5">
-              <h3 className="text-warning text-center">🌟 Produse Evidențiate</h3>
+              <h3 className="text-warning text-center">🌟 Featured Products</h3>
 
               <div className="card-container">
                 {specialItems.map((item) => (
@@ -161,9 +161,9 @@ export default function Home() {
             </section>
           )}
 
-          {/* Echipa Noastră */}
+          {/* Our Team */}
           <section className="team-section my-5 text-center">
-            <h3 className="text-danger">👨‍🍳 Echipa Noastră</h3>
+            <h3 className="text-danger">👨‍🍳 Our Team</h3>
             <div className="row justify-content-center mt-4">
               <div className="col-md-4">
                 <img
@@ -174,8 +174,7 @@ export default function Home() {
                 />
                 <h5 className="mt-3">Chef Tom</h5>
                 <p>
-                  Maestru al bucătăriei franțuzești, pasionat de sosuri fine și
-                  plating artistic.
+                  Master of French cuisine, passionate about fine sauces and artistic plating.
                 </p>
               </div>
               <div className="col-md-4">
@@ -187,8 +186,7 @@ export default function Home() {
                 />
                 <h5 className="mt-3">Chef Alexandra</h5>
                 <p>
-                  Expertă în deserturi rafinate, cu o pasiune pentru ciocolată
-                  belgiană și decoruri spectaculoase.
+                  Expert in refined desserts, with a passion for Belgian chocolate and spectacular decorations.
                 </p>
               </div>
               <div className="col-md-4">
@@ -200,35 +198,32 @@ export default function Home() {
                 />
                 <h5 className="mt-3">Chef Ana</h5>
                 <p>
-                  Creatoare de rețete vegane inovatoare, iubitoare de
-                  ingrediente locale și sustenabile.
+                  Creator of innovative vegan recipes, passionate about local and sustainable ingredients.
                 </p>
               </div>
             </div>
           </section>
 
-          {/* Despre Noi */}
+          {/* About Us */}
           <section className="about-section my-5">
-            <h3 className="text-info text-center">📍 Despre Noi</h3>
+            <h3 className="text-info text-center">📍 About Us</h3>
             <p className="lead text-center">
-              Cu tradiție din 2005, oferim preparate autentice și servicii de
-              calitate. Ne găsești în <strong>Emmeloord</strong>, Strada
-              Gustului nr. 10 — locul unde fiecare masă spune o poveste.
+              With tradition since 2005, we offer authentic dishes and quality service. You can find us in <strong>Emmeloord</strong>, Gustului Street no. 10 — the place where every meal tells a story.
             </p>
 
             <div className="row align-items-center mt-4">
               <div className="col-md-6">
                 <ul className="list-unstyled about-values">
-                  <li>🍷 Atmosferă caldă și primitoare</li>
-                  <li>👨‍🍳 Bucătari pasionați de gastronomie</li>
-                  <li>🌿 Ingrediente locale și proaspete</li>
-                  <li>🎶 Muzică ambientală și decor rustic</li>
+                  <li>🍷 Warm and welcoming atmosphere</li>
+                  <li>👨‍🍳 Chefs passionate about gastronomy</li>
+                  <li>🌿 Fresh and local ingredients</li>
+                  <li>🎶 Ambient music and rustic decor</li>
                 </ul>
               </div>
               <div className="col-md-6 text-center">
                 <img
                   src="assets/images/our-restaurant.jpg"
-                  alt="Interiorul restaurantului"
+                  alt="Restaurant Interior"
                   className="img-fluid rounded shadow-lg"
                 />
               </div>
