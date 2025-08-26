@@ -25,21 +25,18 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
-/* ✅ Mesaj de succes */
 .cart-message.success {
   background-color: #e6f4ea;
   color: #2e7d32;
   border-left: 4px solid #2e7d32;
 }
 
-/* ❗ Mesaj de avertizare */
 .cart-message.warning {
   background-color: #fff4f0;
   color: #E2725B;
   border-left: 4px solid #E2725B;
 }
 
-/* ❌ Mesaj de eroare */
 .cart-message.error {
   background-color: #fdecea;
   color: #c62828;
@@ -57,7 +54,7 @@
 .cart-item {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
   gap: 1rem;
   padding: 1rem;
   margin-bottom: 1rem;
@@ -68,6 +65,7 @@
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
+  flex-wrap: wrap;
 }
 
 .cart-item:hover {
@@ -90,8 +88,21 @@
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
-  font-size: 0.9rem;
+  font-size: 1rem;
   min-width: 0;
+}
+
+.cart-item-details h5 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0;
+  text-align: left;
+}
+
+.cart-item-details p {
+  font-size: 1.05rem;
+  margin: 0;
+  text-align: left;
 }
 
 /* 🔹 Cantitate și preț */
@@ -103,6 +114,7 @@
   color: #212529;
   flex-wrap: wrap;
   justify-content: flex-start;
+  width: 100%;
 }
 
 /* 🔹 Butoane + și − */
@@ -170,7 +182,7 @@
 /* 🔹 Buton checkout */
 .btn-success {
   font-size: 0.9rem;
-  padding: 0.15rem 0.5rem;
+  padding: 0 !important;
   border-radius: 0.5rem;
 }
 
@@ -195,7 +207,7 @@
 
   .cart-item {
     flex-direction: row;
-    align-items: center;
+    align-items: flex-start;
     gap: 0.6rem;
     padding: 0.6rem;
     margin-bottom: 0.8rem;
@@ -207,32 +219,50 @@
 
   .cart-item img {
     width: 56px;
-    height: 56px;
+    height: 70px;
     border-radius: 6px;
   }
 
   .cart-item-details {
     flex: 1;
-    font-size: 0.85rem;
-    gap: 0.3rem;
+    font-size: 1rem;
+    gap: 0.4rem;
+  }
+
+  .cart-item-details h5 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
+    text-align: left;
+  }
+
+  .cart-item-details p {
+    font-size: 1rem;
+    margin: 0;
+    text-align: left;
   }
 
   .qty-price {
-    gap: 0.4rem;
-    font-size: 0.8rem;
-    flex-wrap: wrap;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.85rem;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    width: 100%;
   }
 
-  .qty-price button {
-    padding: 0.2rem 0.4rem;
+  .qty-price .qty-button {
+    padding: 0;
     font-size: 0.85rem;
     width: 24px;
     height: 24px;
-    border-radius: 4px;
-    text-align: center;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+  }
+
+  .btn-success {
+    font-size: 0.9rem;
+    padding: 0.1rem 0.3rem!important;
+    margin-left: auto;
   }
 
   .remove-button {
@@ -251,11 +281,5 @@
     font-size: 0.95rem;
     padding: 0.4rem 0.8rem;
     border-radius: 0.4rem;
-  }
-
-  .btn-success {
-    width: 100%;
-    font-size: 0.9rem;
-    padding: 0.5rem 1rem;
   }
 }

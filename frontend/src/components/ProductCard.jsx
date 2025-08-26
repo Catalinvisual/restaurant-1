@@ -37,78 +37,83 @@ const ProductCard = ({ product = {} }) => {
       : null;
 
   return (
-    <article className="card product-card narrow-card h-100">
-      <div className="product-media">
-        <img
-          src={imageSrc}
-          className="card-img-top"
-          alt={product.name || "Fără nume"}
-          loading="lazy"
-        />
+  <article className="card product-card narrow-card h-100">
+  <div className="product-media">
+    <img
+      src={imageSrc}
+      className="card-img-top"
+      alt={product.name || "Fără nume"}
+      loading="lazy"
+    />
 
-        {product.isNew && <span className="product-badge badge-new">Nou</span>}
-        {product.isPromo && <span className="product-badge badge-promo">Promo</span>}
-        {categoryLabel && <span className="category-label bottom-right">{categoryLabel}</span>}
-      </div>
+    {product.isNew && <span className="product-badge badge-new">Nou</span>}
+    {product.isPromo && <span className="product-badge badge-promo">Promo</span>}
+    {categoryLabel && <span className="category-label bottom-right">{categoryLabel}</span>}
+  </div>
 
-      <div className="card-body">
-        <div className="card-content">
-          <h5 className="card-title">{product.name || "Produs fără nume"}</h5>
+  <div className="card-body">
+    <div className="card-content">
+      <h5 className="card-title">{product.name || "Produs fără nume"}</h5>
 
-          <p className="card-text product-description">
-            {product.description || "Fără descriere disponibilă."}
-          </p>
+      <p className="card-text product-description">
+        {product.description || "Fără descriere disponibilă."}
+      </p>
 
-          <p className="card-text fw-bold">€{priceValue.toFixed(2)}</p>
-
-          {typeof product.rating === "number" && (
-            <div className="rating">
-              {"★".repeat(Math.round(product.rating))}
-              <span>({product.rating.toFixed(1)})</span>
-            </div>
-          )}
-
-          {product.link && (
-            <a href={product.link} className="btn btn-outline-primary btn-sm mt-2">
-              Detalii produs
-            </a>
-          )}
-        </div>
+      {/* Grupare preț + cantitate + buton */}
+      <div className="action-row">
+        <p className="card-text fw-bold">€{priceValue.toFixed(2)}</p>
 
         {product.id !== "preview" && (
-          <div className="actions-row mt-auto">
-            <div className="quantity-controls">
-              <button
-                type="button"
-                className="btn btn-outline-secondary btn-sm"
-                onClick={handleDecrement}
-                aria-label="Scade cantitatea"
-              >
-                −
-              </button>
-              <span className="qty" aria-live="polite">{quantity}</span>
-              <button
-                type="button"
-                className="btn btn-outline-secondary btn-sm"
-                onClick={handleIncrement}
-                aria-label="Crește cantitatea"
-              >
-                +
-              </button>
-            </div>
-
+          <div className="quantity-controls">
             <button
-              className={`btn btn-success btn-sm ${buying ? "btn-added" : ""}`}
-              onClick={handleBuyClick}
-              disabled={buying || quantity < 1}
+              type="button"
+              className="btn btn-outline-secondary btn-sm"
+              onClick={handleDecrement}
+              aria-label="Scade cantitatea"
             >
-              {buying ? "✔ Adăugat!" : "Adaugă în coș"}
+              −
+            </button>
+            <span className="qty" aria-live="polite">{quantity}</span>
+            <button
+              type="button"
+              className="btn btn-outline-secondary btn-sm"
+              onClick={handleIncrement}
+              aria-label="Crește cantitatea"
+            >
+              +
             </button>
           </div>
         )}
+
+        {product.id !== "preview" && (
+          <button
+            className={`btn btn-success btn-xs ${buying ? "btn-added" : ""}`}
+            onClick={handleBuyClick}
+            disabled={buying || quantity < 1}
+          >
+            {buying ? "✔ Adăugat!" : "Add to cart"}
+          </button>
+        )}
       </div>
-    </article>
-  );
+
+      {/* Rating + link */}
+      {typeof product.rating === "number" && (
+        <div className="rating mt-2">
+          {"★".repeat(Math.round(product.rating))}
+          <span>({product.rating.toFixed(1)})</span>
+        </div>
+      )}
+
+      {product.link && (
+        <a href={product.link} className="btn btn-outline-primary btn-sm mt-2">
+          Detalii produs
+        </a>
+      )}
+    </div>
+  </div>
+</article>
+);
+
 };
 
 export default ProductCard;
