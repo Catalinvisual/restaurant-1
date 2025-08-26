@@ -35,7 +35,15 @@
   color: #ffc107;
   text-decoration: underline;
 }
+.footer .offer-list {
+  justify-content: center;
+}
 
+.footer ul {
+  display: flex;
+  justify-content: center;
+  padding-left: 0;
+}
 @media (max-width: 768px) {
   .footer .row > div {
     text-align: center;
