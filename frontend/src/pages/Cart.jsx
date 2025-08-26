@@ -61,7 +61,7 @@ export default function Cart() {
     const address = `${street.trim()} ${number.trim()}, ${postalCode.trim()} ${city.trim()}`;
 
     try {
-      const res = await fetch(`${API_URL}/orders`, {
+      const res = await fetch(`${API_URL}/api/orders`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

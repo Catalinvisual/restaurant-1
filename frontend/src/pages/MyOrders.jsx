@@ -24,7 +24,7 @@ export default function MyOrders() {
     }
 
     axios
-      .get(`${API_URL}/orders/user`, {
+      .get(`${API_URL}/api/orders/user`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
