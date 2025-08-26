@@ -125,15 +125,18 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Credențiale incorecte' });
     }
 
-    // ✅ Forțăm rolul corect dacă user-ul e admin în DB
+    // ✅ Forțăm rolul corect
+    const isAdmin = user.isAdmin || email.toLowerCase().trim() === 'catalin@yahoo.com';
+    const role = isAdmin ? 'admin' : 'client';
+
     const payload = {
       id: user.id,
       email: user.email,
-      isAdmin: user.isAdmin || user.email === 'catalin@yahoo.com',
-      role: user.role || (user.isAdmin || user.email === 'catalin@yahoo.com' ? 'admin' : 'client')
+      isAdmin,
+      role
     };
 
-    console.log('📦 [login] Payload pentru JWT:', payload);
+    console.log('📦 [login] Payload JWT:', payload);
 
     const accessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' });
     const refreshToken = jwt.sign({ userId: user.id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '365d' });
@@ -151,6 +154,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
+
 // ♻️ Refresh token
 router.post('/refresh', async (req, res) => {
   const { token } = req.body;
@@ -164,11 +168,15 @@ router.post('/refresh', async (req, res) => {
     const user = await User.findByPk(payload.userId);
     if (!user) return res.status(403).json({ error: 'Utilizator inexistent' });
 
+    // ✅ Forțăm rolul corect
+    const isAdmin = user.isAdmin || user.email.toLowerCase().trim() === 'catalin@yahoo.com';
+    const role = isAdmin ? 'admin' : 'client';
+
     const newPayload = {
       id: user.id,
       email: user.email,
-      isAdmin: user.isAdmin || user.email === 'catalin@yahoo.com',
-      role: user.role || (user.isAdmin || user.email === 'catalin@yahoo.com' ? 'admin' : 'client')
+      isAdmin,
+      role
     };
 
     const newAccess = jwt.sign(newPayload, process.env.JWT_SECRET, { expiresIn: '24h' });
@@ -179,6 +187,7 @@ router.post('/refresh', async (req, res) => {
     return res.status(403).json({ error: 'Token expirat sau invalid' });
   }
 });
+
 
 // 🚪 Logout
 router.post('/logout', verifyToken, async (req, res) => {
